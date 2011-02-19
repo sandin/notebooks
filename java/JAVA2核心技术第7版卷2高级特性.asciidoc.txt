@@ -1,0 +1,631 @@
+﻿= JAVA2核心技术第7版卷2高级特性 =
+lds <lds2012@gmail.com>
+{localdate}
+
+:language: java
+
+.LOG
+***************************************
+    * 2010-11-26 [START]
+    * 2010-11-26 p15
+    * 2010-11-27 p25 [PAUSE]
+    * 2010-12-02 p36 
+    * 2010-12-02 p51
+    * 2010-12-03 p85
+    * 2010-12-04 p153
+    * 2010-12-07 p598 [PAUSE]
+    * 2011-01-23 p815 [EOF]
+***************************************
+
+.TODO
+***************************************
+    * 1.5.4 LOCK p25 [DONE]
+    * invokeAll & ExecutorCompletionService p55
+    * 倒计时门栓, 交换器, 同步队列, 信号量 p57 ~ p62
+    * 线程与Swing p63 ~ p73
+    * 红-黑树数据结构 
+    * LinkedHashSet 高速缓存 p100 
+    * 集合剩余部分 p100 ~ p124
+    * 可滚动的结果集&可更新的结果集&元数据&行集  p188 ~ p209
+    * 高级连接管理 JNDI & 连接池  p211
+    * LDAP 轻量级目录访问协议(lightweight directory access protocol) p212 ~ p224
+    * C5 分布式对象 p225 ~ p278
+    * C6 高级Swing p279
+    * C7 高级AWT p396
+    * C8 JavaBean p534
+    * XML DTD p772 ~ p790
+    * 元注释 p815
+***************************************
+
+== 多线程/并发 ==
+
+.进程和线程
+每个进程有自己的变量的完备集,线程则共享相同的数据.
+线程比进程更"轻量级",创建和销毁的开销更小.
+
+.Runnable
+[source]
+------------------------------
+// 定义一个类实现Runnable接口
+class MyRunnable implements Runnable {
+    public void run() {
+        // your code 
+    }
+}
+
+// 实例化该类
+Runnable r = new MyRunnable();
+
+// 创建一个Thread对象, 传入Runnable对象
+Thread t = new Thread(r);
+
+// 启动进程
+t.start();
+------------------------------
+
+.中断线程
+
+查看当前进程是否被中断
+`Thread.currentThread().isInterrupted()`
+
+[source]
+------------------------------
+public void run() {
+    try {
+        while ( /* more work to do */ )
+        {
+            // do more work
+            Thread.sleep(delay);
+        }
+    }
+    catch(InterruptedException e)
+    {
+        // thread was interrupted during sleep or wait
+    }
+    finally
+    {
+        // cleanup, if required
+    }
+}
+------------------------------
+
+NOTE: sleep会抛出一个InterruptedException异常( *实际测试未发现此现象* ),并且抛出会也会清除中断状态.
+
+`interrupt()` 发送一个中断请求给一个线程,将线程的中断状态设为 `True` ,并抛出一个InterruptedException异常.
+`interrupted()` 方法是一个静态方法,它检查当前线程是否已被中断,将线程的中断状态设为 `false` .
+`isInterrupted()` 是一个实例方法,它只检查线程是否被中断,而不改变中断状态.
+
+.线程状态
+    * New, 新生状态, 调用 `new Thread(r)` 和 `Thread.start` 之间的状态.
+    * Runnable, 可运行状态, 调用 `start()` 后, 可能是 *正在运行* ,也可能是 *可运行的* .
+    * Blocked, 阻塞状态, 调用 `sleep()` , I/O上被阻塞, 被锁定 等情况
+    * Dead, 死亡状态, `run()` 方法正常退出而自然死亡; 一个未捕获的异常提前终止了 `run` 方法而猝死.
+
+.阻塞状态
+从阻塞状态回到可运行状态的途径:
+    * 线程被置于睡眠状态,且指定睡眠时间已过.
+    * 线程在等待I/O操作,且该操作已完成.
+    * 线程在等待另一个线程所持有的锁,且另一个线程已经释放该锁的所有权(或等待超时.
+    * 线程在等待某个触发条件,且另一个线程发出信号表明条件成立.(或等待超时)
+    * 线程已被挂起( `suspend()` ), 且有人调用了 `resume()` 方法.
+
+NOTE: 一个被阻塞线程只能通过和先前阻塞它的相同过程重新进入可运行状态. 不能通过调用 `resume` 方法来解除非挂起原因导致阻塞线程的阻塞状态.
+
+.死线程
+`isAlive` , 线程在可运行时或被阻塞时返回 `true` , new状态或死亡状态返回 `false` .
+
+.进程优先级
+每个进程继承父进程的进程优先级. 
+调用 `setPriority(i)` 设置进程优先级. `i` 为 1 ~ 10 之间任意值.
+    * `Thread.MIN_PRIORITY = 1`
+    * `Thread.NORM_PRIORITY = 5`
+    * `Thread.MAX_PRIORITY = 10`
+
+NOTE: 如果高优先级的进程很不阻塞,那么低优先级的进程可能永远都不会被运行.完全被饿死.
+
+.守护进程
+`t.setDaemon(true)`
+
+守护进程唯一作用是为其他进程提供服务,如果只剩下守护进程那么虚拟机就自动退出.
+
+.进程组
+`ThreadGroup g = new ThreadGroup("myGroupName");`
+`Thread t = new Thread(g, "mythreadName");
+
+嵌套
+`ThreadGroup(ThreadGroup parent, String name);`
+
+.未捕获异常处理器
+`run` 方法不能抛出任何被检查的异常, 但是不检查的异常可以导致线程终止(死亡).
+
+可为任何一个线程单独设置一个异常处理器
+`setDefaultUncaughtExceptionHandler`
+
+`Thread.UncaughtExceptionHandler` 接口只有一个方法 `void uncaughtExcetpion(THread t, Throwable e)`
+
+=== 同步 ===
+
+各个线程对相同对象进行共享访问.
+
+    "如果你向一个变量写值,而这个变量接下来可能会被另一个线程所读取,或者你从一个变量读值,而它的值可能是前面由另一个线程写入的,此时你就必须使用同步."
+
+.LOCK
+[source]
+------------------------------
+Lock myLock = new ReentrantLock();
+
+myLock.lock();
+try {
+    // some code
+    // 这里的结构保证在任何时候只有一个线程
+    // 能够进入临界区
+    // 被lock的对象, 不能被两个进程同时访问
+} finally {
+    myLock.unlock();
+}
+------------------------------
+
+.条件对象
+[source]
+-----------------------------------------
+Lock myLock = new ReentrantLock();
+Condition condition = myLock.newCondition();
+
+myLock.lock();
+try {
+    while (accounts[from] < amount) {
+        // 调用await，该线程将进入阻塞状态，并放弃锁，其他进程可进入。
+        // 该线程也将进入 *等待该条件集* 中，只有当 *另一个线程* 调用该条件
+        // 的signalAll()方法，并且如果条件满足，才会解除阻塞
+        //（并非马上可以对该对象进去访问，而是解除等待线程的阻塞状态，而是通过竞争去获得对对象的访问）。
+        condition.await();
+    }
+    // 解除所有等待此条件的线程的阻塞状态
+    condition.signalAll();
+
+    // 在该条件的等待集中随机选择一个线程，解除其阻塞状态
+    // condition.signal();
+} finally {
+    myLock.unlock();
+}
+
+
+//在JDK5之前，使用synchronized来实现锁和条件
+public synchronized void transfer()
+{
+    while (accounts[from] < amount) 
+        wait();
+    // somecode
+    notifyAll(); // 解除阻塞状态
+}
+-----------------------------------------
+
+.Lock&Condition
+    * 锁用来保护代码片段，任何时刻只允许一个线程执行被保护的代码。
+    * 锁可以管理试图进入被保护代码段的线程
+    * 锁可以拥有一个或多个相关的条件对象（condition)
+    * 每个条件对象管理那些已进入被保护代码段但还不能运行（条件不成熟)的线程
+
+.synchronized的缺点
+    * 不能中断一个正在试图获得锁的线程。Lock则有 `lockInterruptibly()`
+    * 试图获得锁时不能设置超时。
+    * 每个锁只能有一个条件。
+    * 虚拟机的加锁原句不能很好的映射到硬件可用的最有效的加锁机制上。
+
+.lock和synchronized的选择
+    * 最好两者都不用，而是用 `java.util.concurrent` 中的另一种机制
+    * 如果 `synchronized` 可以满足需求，则用它，因为可以减少代码量。
+    * 只有在需要使用 `Lock/Condition` 结构的独有特性时才使用他们。
+
+.volatile关键词
+线程能够自动发现 `volatile` 变量的最新值
+
+.死锁
+每个线程都被阻塞. JAVA没有解决此问题的东西,只能靠自己设计时确保不会死锁.
+
+.公平锁
+`Lock fairLock = new ReentrantLock(true);`
+它会优待那些等待了最长时间的线程. 但性能上牺牲较大.
+
+.tryLock
+`boolean tryLock(long time, TimeUnit unit)`
+`void lockInterruptibly()`
+`awaitUninterryptibly()`
+
+.ReentrantReadWriteLock
+分离read和write两种锁, 因为允许读取器线程共享访问是合适的.而写操作则必须互斥访问.
+
+.阻塞队列
+
+`BlockingQueue` 和 `Queue` 类似,只是提供了两个变种的 `put` , `take` 方法,用于操作时阻塞,直到条件成熟在执行.
+
+`put` 在尾部添加一个元素, 如果列表为满,则阻塞,直到有空位.
+`take` 移除并返回头部元素,如果列表为空,则阻塞,直到有元素可移除.
+
+阻塞队列是Java5线程新特征中的内容，Java定义了阻塞队列的接口java.util.concurrent.BlockingQueue，阻塞队列的概念是，一个指定长度的队列，如果队列满了，添加新元素的操作会被阻塞等待，直到有空位为止。同样，当队列为空时候，请求队列元素的操作同样会阻塞等待，直到有可用元素为止。
+有了这样的功能，就为多线程的排队等候的模型实现开辟了便捷通道，非常有用。
+
+.`Java.util.concurrent` 提供四种阻塞队列的变种:
+    * LinkedBlockingQueue 没有上限, 由链表实现
+    * ArrayBlockQueue 需要给定容量,并可选择是否需要公平性, 由循环数组实现
+    * PriorityBlockQueue 带优先级的列表,不是先进先出原则,而是按优先顺序被移除.
+    * DelayQueue 实现了delayed接口, 只有延迟已经过去的元素才能够从列表中移除
+
+.线程安全的集合
+BlockQueue就是一个线程安全的集合.
+
+`ConcurrentHashMap` 和 `ConcurrentLinkedQueue`
+
+`CopyOnWriteArrayList` 适合使用在读操作远远大于写操作的场景里，比如缓存。
+
+.同步包装器
+`List synchArrayList = Collections.synchronizedList(new ArrayList());`
+
+.Callable & Future
+`Runnable` 封装一个异步运行的任务;一个没有任何参数和返回值的异步方法.
+`Callable` 与 `Runnable` 类似, 但有返回值.
+
+`Future` 保存异步计算的结果. `Future` 对象的所有者在结果计算好之后就可以得到它.
+
+[source]
+-----------------------------------------
+class MyComputation implements Callable<Integer>
+{
+    private int count;
+    public MyComputation(String keyword) {
+    }
+    public Integer call() {
+        return count;  // must return Integer
+    }
+}
+
+Callable<Integer> myComputation = new MyComputation("args");
+// 将Callable转换成Future和Runable
+FuturnTast<integer> task = new FuturnTast<Integer>(myComputation);
+
+Thread t = new Thread(task); // it's a Runnable
+t.start();
+// ...
+
+// 调用get()时会发生阻塞,直到可获得结果为止
+Integer result = task.get(); // it's a Future
+-----------------------------------------
+
+.执行器
+如果你的程序创建了大量生存期很短的线程,那就应该使用线程池.
+
+.线程池
+    * newCachedThreadPool(), 带缓存的线程池,线程空闲60秒后关闭.
+    * newFixedThreadPool(int threads), 指定数量的线程池.
+    * newSingleThreadExecutor(), 但个线程的线程池,一个一个的执行.
+
+`Future<T> submit(Callable<T> task)`
+`Future<T> submit(Runnable task, T result)`
+`Future<T> submit(Runnable task)`
+
+.预订执行线程池
+    * newScheduledThreadPool(int threads)
+    * newSingleThreadScheduledExecutor()
+
+`ScheduledFuture<V> schedule(Callable<V> task, long time, TimeUnit unit)`
+`ScheduledFuture<?> schedule(Runnbale task, long time, TimeUnit unit)`
+
+.同步器
+
+`CyclicBarrier` 类实现了一个成为 障栅 barrier 的集合点, 当所有线程都达到某个集合点,才可以继续运行.
+
+[source]
+------------------------------
+CyclicBarrier barrier = new CyclicBarrier(nthreas);
+// 也可执行所以线程到达集合点后的一个行为动作
+// CyclicBarrier(int threas, Runnable action);
+
+public void run() {
+    // do something
+
+    // 等待其他线程达到集合点
+    barrier.await();
+}
+------------------------------
+
+
+
+.线程与Swing
+
+NOTE: Swing 不是线程安全的!
+
+
+== 集合 ==
+
+.迭代器
+[source]
+------------------------------
+public interface Iterator<E>
+{
+    E next();
+    boolean hasNext();
+    void remove();
+}
+------------------------------
+
+NOTE: Iterator的remove方法将会移除上次调用next方法时返回的元素. (也就是说 *每次* `remove` 之前都必须调用一次 `next` 方法)
+
+NOTE: Java迭代器指向的是两个元素之间的位置.
+
+.基本集合类型
+    * ArrayList, get(), set().
+    * LinkedList, 中间插入.
+    * HashSet, 散列集, 无序集合
+    * TreeSet, 树集, 有序集合
+    * EnumSet
+    * LinkedHashSet
+    * PriorityQueue, 优先级队列, 使用堆实现(可自我调整的二叉树),并不对所有元素进行排序.
+    * HashMap
+    * TreeMap
+    * EnumMap
+    * LinkedHashMap
+    * WeakHashMap, 弱散列映射表
+    * IdentityHashMap
+
+.链表
+在JAVA中,所有链表都是双链表.
+
+.listIterator
+接口提供add方法和previous方法. 
+add方法将新元素添加到迭代器位置的前面.
+set方法将替代上一次next或previous返回的值
+
+.散列表
+散列表是个链表的数组,每个列表成为一个散列表元.若要查找表中的某个对象的位置,只要计算出它的散列码(hashCode),再将它除以散列表元的总数得到的 *余数* ,就是包含该元素的散列表元的索引.
+例如一个对象的散列码为 `76268` , 散列表元共有 `128` 个, 那么它的位置是 `76268 % 128 = 108`
+
+.映射表
+键/值对, HashMap, TreeMap
+HashMap, 对键进行散列. 无序.
+TreeMap, 使用键的全局顺序进行排序,并将其组织成搜索树. 有序.
+
+NOTE: 散列函数或比较函数只能作用于键.值不能进行散列或比较.
+NOTE: 键必须是唯一的.
+
+== 网络 ==
+
+.Socket
+`Socket(String host, int post)`
+`InputStream getInputStream()`
+`OutputStream getOutputStream()`
+
+.ServerSocket
+`ServerSocket(int post)`
+`Sockted accpet()`
+`close()`
+
+.多客户端
+[source]
+------------------------------
+ServerSocket s = new ServerSocket(8189);
+
+while (true)
+{
+    Socket incoming = s.accept();
+    System.out.println("Spawning " + i);
+    Runnable r = new ThreadedEchoHandler(incoming, i);
+    Thread t = new Thread(r);
+    t.start();
+    i++;
+}
+------------------------------
+
+.发EMAIL
+`SMTP port = 25`
+
+NOTE: 大部分SMTP服务器都不检查信息的真实性,你可以随便填写任何你喜欢使用的 *发件人* 名字.
+
+.URL
+可以打开一个流.
+
+.URI
+只负责解析URI, 也可进行URL的相对化和绝对化转换
+    * getScheme
+    * getSchemeSpecificPart
+    * getHost
+    * getPost
+    * getPath
+    * getQuery
+    * ...
+
+.URLConnection
+`setRequestProperty()`
+`connect()`
+`getHeaderFields()`
+
+.POST数据
+
+[source]
+------------------------------
+try {
+    // init URL
+    URL url = new URL("http://localhost/client.php");
+    URLConnection urlc = url.openConnection();
+    urlc.setDoOutput(true);
+
+    // POST data { name:lds, password:123 }
+    PrintWriter out = new PrintWriter(urlc.getOutputStream());
+    out.print("name=" + URLEncoder.encode("lds", "UTF-8") + "&" );
+    out.print("password=" + URLEncoder.encode("123", "UTF-8"));
+    out.close();
+
+    // connect to the server
+    urlc.connect();
+
+    // print HeaderFields
+    Map<String, List<String>> map = urlc.getHeaderFields();
+    for (Map.Entry<String, List<String>> entry : map.entrySet() ) {
+        System.out.println(entry.getKey() + " : " + entry.getValue().toString());
+    }
+
+    // print response(inputStream)
+    Scanner scanner = new Scanner(urlc.getInputStream());
+    while (scanner.hasNext()) {
+        System.out.println(scanner.nextLine());
+    }
+} catch (Exception e) {
+    e.printStackTrace();
+}
+------------------------------
+
+`HttpUrlConnection` 的方法 `getErrorStream()` 可以得到 `404` 之类的HTTP错误代号和信息.
+
+.高级套接字编程
+[source]
+------------------------------
+// 建立无连接的套接字
+Socket s = new Socket();
+// 设置超时
+s.connect(new InetSocketAddress(host, post), timeout);
+
+
+// 可interrupt的channel;
+SocketChannel channel = SocketChannel.open(new InetSocketAddress("localhost", 8189));
+------------------------------
+
+.半关闭
+通过关闭一个套接字的输出流来表示发送给服务器的数据已经结束,但必须保留输入流用以读取服务器返回的响应信息.
+
+[source]
+------------------------------
+Socket socket = new Socket(host, post);
+Scanner in = new Scanner(socket.getInputStream());
+PrintWriter writer = new PrintWriter(socket.getOutputStream());
+// send request data
+writer.println("data");
+writer.flush();
+socket.shutdownOutput();
+// now socket is half closed
+// read response data
+while ( (in.hasNextLine()) != null ) {
+    //...
+}
+socket.close();
+------------------------------
+
+== 数据库编程 ==
+
+.加载数据库驱动
+
+[source]
+------------------------------
+System.setProperty("jdbc.drivers", "org.postgresql.Driver");
+// 或者
+Class.forName("org.postgresql.Driver");
+------------------------------
+
+
+[source]
+------------------------------
+// 读取属性文件
+// jdbc.url=jdbc:postgresql:COREJAVA
+
+Properties props = new Properties();
+FileInputStream in = new FileInputStream("database.properties");
+props.load(in);
+in.close();
+String url = props.getProperty("jdbc.url");
+------------------------------
+
+.Statement
+    * `executeUpdate` 可以执行 `INSERT` `UPDATE` `DELETE` `CREATE TABLE` `DROP TABLE`
+    * `executeQuery` 可以执行 `SELECT`
+    * `execute` 可以执行所有SQL语句
+
+[source]
+------------------------------
+ResultSet rs = stat.executeQuery("SELECT * FROM Book");
+while (rs.next()) {
+    String name = rs.getString("name");
+}
+------------------------------
+
+.DriverManager
+`static Connection getConnect(String url, String user, String password)`
+
+.Connection
+`Statement createStatement()`
+`void close()`
+
+.Statement
+`ResultSet executeQuery(String sqlQuery)`
+`int executeUpdate(STring sqlStatement)`
+`boolean execute(String sqlStatement)`
+`int getUpdateCount()`
+`ResultSet getResultSet()`
+`void close()`
+
+.SQLException
+`String getSQLState()`
+`int getErrorCode()`
+`SQLException getNextException()`
+
+NOTE: 当时用完ResultSet, Statement, Connection对象后, 应立即调用close方法. (直接关闭Connection可关闭该连接上的所有Statement和ResultSet.)
+
+
+[source]
+------------------------------
+PreparedStatement prep = conn
+        .prepareStatement("insert into people values (?, ?);");
+
+prep.setString(1, "Gandhi");
+prep.setString(2, "politics");
+prep.executeQuery();
+
+// 或者批处理
+prep.setString(1, "Gandhi");
+prep.setString(2, "politics");
+prep.addBatch();
+prep.setString(1, "Turing");
+prep.setString(2, "computers");
+prep.addBatch();
+prep.setString(1, "Wittgenstein");
+prep.setString(2, "smartypants");
+prep.addBatch();
+
+prep.executeBatch();
+------------------------------
+
+.事务
+`conn.getAutoCommit(false)`
+`conn.commit()`
+`conn.rollback()`
+
+[source]
+------------------------------
+// 开启事务
+conn.getAutoCommit(false);
+
+Statement stat = conn.createStatement();
+stat.excuteUpdate(command1);
+
+// 设置保存点
+Savepoint svpt = conn.setSavepoint();
+
+if (/*...*/) {
+    // 回滚到指定的保存点
+    conn.rollback(svpt);
+}
+
+// 释放保存点
+conn.releaseSavepoint(svpt);
+------------------------------
+
+.批量操作
+`addBatch()`
+`executeBatch()`
+
+NOTE: 不能在批量操作中加入 `SELECT` 语句.
+
+== XML ==
+
+.解析器
+    * DOM, w3c标准
+    * SAX, 
+
+

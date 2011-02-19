@@ -1,0 +1,12 @@
+
+== IMG底部出现空白 ==
+
+img底部出现空白色空隙，在 <img> 上加 display:block; 即可
+
+== IE filter 失效 ==
+
+在
+`<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">`
+下,ie7对
+`filter:alpha(opacity=50);` 
+失效

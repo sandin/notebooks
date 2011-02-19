@@ -1,0 +1,48 @@
+
+== 设置虚拟主机 ==
+
+环境: Ubuntu 11.04
+主机: Apache/2.2.16
+
+1 在 `/etc/apache2/sites-available` 目录下新建一个文件 `yourdomain` (文件名随意), 内容类似:
+
+[source, bash]
+---------------------------------------------
+# 新建虚拟主机
+<VirtualHost *:80>  # 设置IP
+    # 域名
+    ServerName yourdomain.com
+    ServerAdmin ubuntu.firehare@firehare.com
+
+    # 根目录 
+    DocumentRoot "/var/www/test/drupal-happy/src"
+    <Directory />
+		Options Indexes FollowSymLinks MultiViews
+		AllowOverride All
+		Order allow,deny
+		allow from all
+	</Directory>
+</VirtualHost>
+---------------------------------------------
+
+2 `sudo vim /etc/hosts` and add your new domain to the 127.0.0.1 localhost line so it looks like this:
+
+[source, bash]
+---------------------------------------------
+127.0.0.1 localhost yourdomain.com
+---------------------------------------------
+
+3 Enable your new virtualhost:
+
+[source, bash]
+---------------------------------------------
+sudo a2ensite yourdomain.com.conf
+---------------------------------------------
+
+4 Reload the Apache configuration:
+
+[source, bash]
+---------------------------------------------
+sudo /etc/init.d/apache2 reload
+sudo /etc/init.d/apache2 restart
+---------------------------------------------

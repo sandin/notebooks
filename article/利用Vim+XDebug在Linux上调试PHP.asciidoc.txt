@@ -1,0 +1,68 @@
+= 利用Vim+XDebug在Linux上调试PHP =
+lds <lds2012@gmail.com>
+{localdate}
+
+== 系统环境 ==
+- os     : ubuntu 10.04
+- vim    : vim 7.2
+- xdebug : php5-xdebug 2.0.5-1ubuntu1
+- php    : php 5.3.2
+
+== 安装Xdebug ==
+
+`sudo apt-get install php5-xdebug`
+
+.配置XDebug 
+编辑 `/etc/php5/apache2/conf.d/xdebug.ini` 文件，在其中加入以下内容：
+
+-------------------------
+xdebug.remote_enable = 1
+xdebug.remote_port = 9000
+xdebug.remote_host = localhost
+-------------------------
+
+== 安装vim插件DBGp client ==
+
+下载页面： http://www.vim.org/scripts/script.php?script_id=1929
+
+下载后放入plugins目录中即可。
+
+== 调试方法 ==
+
+1. 用浏览器打开你要调试的页面文件，并在url尾部加上如下形式：
+http://localhost/blog/index.php?XDEBUG_SESSION_START=1
+
+2. 用vim打开此文件，用可 `:Bp` 设置断点，然后安 `F5` 键， 你将会看见 `waiting for a new connection on port 9000 for 5 seconds…` ，此时在5秒内刷新刚才那个页面，即可在vim中看到调试界面。
+
+NOTE: 如果出现 `<type 'exceptions.AttributeError'>, AttributeError("DbgProtocol instance has no attribute 'stop'",` 则说明没有配置成功，要么是 `xdebug.remote_*` 没有配置好，要么是url尾部上没有加入 `?XDEBUG_SESSION_START=1` ，要么是你没有在5秒内刷新页面 .
+
+== 调试技巧 ==
+
+|========================================================
+|  *[ Function Keys ]*                ||
+|  <F1> |  resize                   | 调整窗口大小
+|  <F2> |  step into                |           
+|  <F3> |  step over                |                       
+|  <F4> |  step out                 |                       
+|  <F5> |  run                      | 
+|  <F6> |  quit debugging           |
+|  <F11>|  get all context          | 获取所有变量内容   
+|  <F12>|  get property at cursor   | 获取当前光标变量                     
+|  *[ Normal Mode ]*                  ||    
+|  ,e   |  eval                     |
+|  *[ Command Mode ]*                 ||
+|  :Bp  |  toggle breakpoint        |
+|  :Up  |  stack up                 |
+|  :DN  |  stack down               |
+|========================================================
+
+
+== 配置debugger ==
+
+首先需要配置的是在获取变量内容时，如果变量为 `array` ，那么默认只会显出 `(array)` ，而不会显示数组内的各元素，如果无法显示数组元素内容，那么调试会遇到很多问题，因此可以根据 `debugger.vim` 中的注释，自行在 `.vimrc` 中加上如下一行：
+
+---------------------------
+let g:debuggerMaxDepth = 5
+---------------------------
+
+更多的配置，可以依次类推，都在debugger.vim中有所说明。

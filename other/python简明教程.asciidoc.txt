@@ -1,0 +1,395 @@
+= Python简明教程 读书笔记 =
+lds <lds2012@gmail.com>
+{localdate}
+
+:language: python
+:encoding: utf-8
+
+.遗留问题
+======================================================
+* lambda形式
+
+======================================================
+
+    语言只是工具,重要的还是解决问题的思路与算法,切勿本末倒置.
+
+
+== 基本概念 ==
+
+=== 字面意义上的常量 ===
+
+.数的类型
+    * 整数, `2`
+    * 长整数,大一些的整数
+    * 浮点数, `3.12` , `52.4E-4`
+    * 复数, `(-5+4j)` , `(2.3-4.6j)`
+
+.字符串
+    * 单引号 `'` ,所有空白原样保留.
+    * 双引号 `"` ,和单引号一样.
+    * 三引号 `'''` , `"""` , 多行字符串,其中可自由使用单引号和双引号.
+    * 转义符 `\`
+    * 自然字符串 `r"New /n"` ,其中不会转义.
+    * Unicode字符串 `u"This is a Unicode string"`
+
+NOTE: 字符串是不可变的.
+
+.给Perl/PHP程序员的注释
+NOTE: 单引号和双引号字符串是完全相同的.
+    
+.给正则表达式用户的注释
+NOTE: 一定要用自然字符串处理正则表达式,否则会需要很多转义符.
+
+
+=== 缩进 ===
+
+同一层次的语句必须有相同的缩进.每组这样的语句组成一个 *块* .
+
+=== 逻辑行和物理行 ===
+
+.行连接符
+[source]
+-----------------------------------
+s = 'This is a string. \
+This continues the string.'
+
+print s
+# output: This is a string. This continues the string.
+-----------------------------------
+
+== 控制流 ==
+
+=== if语句 ===
+
+[source]
+---------------------------------------------------------------------
+#!/usr/bin/python
+# Filename: if.py
+
+number = 23
+guess = int(raw_input('Enter an integer : '))
+
+if guess == number:
+    print 'Congratulations, you guessed it.' # New block starts here
+    print "(but you do not win any prizes!)" # New block ends here
+elif guess < number:
+    print 'No, it is a little higher than that' # Another block
+    # You can do whatever you want in a block ...
+else:
+    print 'No, it is a little lower than that'
+    # you must have guess > number to reach here
+
+print 'Done'
+# This last statement is always executed
+# after the if statement is executed
+---------------------------------------------------------------------
+
+NOTE: elif = else if
+
+NOTE: Python中没有switch语句
+
+=== while语句 ===
+
+[source]
+---------------------------------------------------------------------
+#!/usr/bin/python
+# Filename: while.py
+
+number = 23
+running = True
+
+while running:
+    guess = int(raw_input('Enter an integer : '))
+
+    if guess == number:
+        print 'Congratulations, you guessed it.'
+        running = False # this causes the while loop to stop
+    elif guess < number:
+        print 'No, it is a little higher than that'
+    else:
+        print 'No, it is a little lower than that'
+else:
+    print 'The while loop is over.'
+    # Do anything else you want to do here
+
+print 'Done'
+---------------------------------------------------------------------
+
+NOTE: while语句也可以最后跟else,当while循环的条件为False时执行else语句.
+
+
+=== for语句 ===
+
+[source]
+---------------------------------------------------------------------
+#!/usr/bin/python
+# Filename: for.py
+
+for i in range(1, 5):
+    print i
+else:
+    print 'The for loop is over'
+---------------------------------------------------------------------
+
+NOTE: for语句也可以最后跟else语句,当循环结束时执行else语句.
+
+
+== 函数 ==
+
+[source]
+---------------------------------------------------------
+#!/usr/bin/python
+# Filename: func_key.py
+
+y = 123;
+
+# 关键参数/默认参数值
+def func(a, b=5, c=10):
+    '''DocString首字大写,第二行空行.
+    
+    第三行为详细描述'''
+    
+    global y #全局变量
+    x = 234; # 局部变量,作用域为该函数内部
+    print 'a is', a, 'and b is', b, 'and c is', c
+    return x # 返回语句,无则自动返回None
+
+func(3, 7)
+func(25, c=24)
+
+# 可以不按照形参顺序,直接根据关键参数来设实参
+func(c=50, a=100)
+
+# 读取函数的docString
+print func.__doc__
+--------------------------------------------------------
+
+== 模块 ==
+
+[source]
+---------------------------------------------------------
+
+if __name__ == '__main__':
+    print 'This program is being run by itself'
+else:
+    print 'I am being imported from another module'
+
+---------------------------------------------------------
+
+.导入模块
+    * import
+    * from..import _(应尽量避免使用)_
+    * import..as
+
+.dir函数
+`dir(sys)` 列出模块的所有名称列表.
+
+== 数据结构 ==
+
+.序列
+    * 列表, `[1,2,3]` , 类似于索引数组.
+    * 元祖, `(1,2,3)` , 和列表一样,但不能被修改.
+    * 字典, `{"name" : "lds" , "age" : 23 }` , 和列表一样,但不能被修改.
+    
+
+
+== 面向对象的编程 ==
+
+.关于面向对象的一系列测试
+
+[source]
+---------------------------------------------------------
+# filename: lds_test_class.py
+
+print u'Module A,测试类的变量'
+
+class P:
+    # 类的变量
+    short_name = 'lds'
+    po = 0   # 实例对象的个数
+
+    def __init__(self,name,age):
+        # 对象(实例)的变量
+        self.name = name
+        self.age  = age
+
+        # 利用类的变量为所有实例共享,计算实例化对象的个数
+        P.po += 1
+
+    def changeShortName(self,newName):
+        # 修改类的变量,将影响所有实例
+        P.short_name = newName
+    
+   
+# 实例化
+a = P('liudingsan',100)
+b = P('LDS',25)
+c = P('newGuy',0)
+
+# 类的变量是所有实例所共有的
+assert a.short_name == 'lds'
+assert b.short_name == 'lds'
+assert c.short_name == 'lds'
+
+# 如果直接给实例对象添加一个与类的变量同名的属性
+# 则该属性会覆盖掉类的同名变量
+# 那么今后即使对类的该同名变量作出改变,该实例也不会随之改变
+b.short_name = 'LLLL'
+assert b.short_name == 'LLLL'
+assert a.short_name == 'lds' #不变
+
+# 修改类的变量,将会影响这个类的所有实例对象
+a.changeShortName('changeShortName by b')
+assert a.short_name == 'changeShortName by b'
+assert c.short_name == 'changeShortName by b'
+
+# 直接修改类的公共变量,也将会影响这个类的所有实例对象
+P.short_name = 'newName'
+assert P.short_name == 'newName'
+
+# 会随着类变量的改变而改变,即时反应
+assert a.short_name == 'newName' 
+# 不会随着类变量的改变而改变,因为已被实例的同名变量覆盖
+assert b.short_name == 'LLLL' 
+# 会随着类变量的改变而改变,即时反应
+assert c.short_name == 'newName'
+
+# 删除了同名变量后,则该实例会自动去读取类的变量
+del b.short_name
+assert b.short_name == 'newName' 
+
+# 修改对象的变量,则只影响这个实例对象
+b.age = 1000
+assert b.age == 1000
+assert a.age == 100 # 不变
+assert c.age == 0   # 不变
+
+# 利用类的变量为所有实例共享,计算实例化对象的个数
+assert P.po == 3
+
+print 'End of module A ,All Pass!\n'
+
+print u'Module B,测试类的继承'
+
+
+# 将父类传递进子类中
+class B(P):
+    '''继承与P'''
+
+    def __init__(self,name,age,sex):
+        #必须手动调用父类的init
+        P.__init__(self,name,age)
+        self.sex = sex
+
+name = 'b_guy'
+sex  = 'M'
+d = B(name,30,sex)
+
+# 继承属性
+assert d.name == name
+assert d.short_name == 'newName'
+
+assert d.sex  == sex
+
+# 继承方法
+d.changeShortName('newName by d')
+assert d.short_name == a.short_name == 'newName by d'
+
+print 'End of module B,ALL PASS\n'
+----------------------------------------------------------------
+
+NOTE: 类中以单下划线开头的变量约定为只在类或对象中使用的变量,但这只是 _约定_ ,该变量还是可以被外部访问.只有以双下划线开头的变量才会被视为私有变量.
+
+
+== 输入/输出 ==
+
+=== 永久化对象 ===
+
+[source]
+---------------------------------------------------------------
+import cPickle as p
+#import pickle as p
+
+shoplistfile = 'shoplist.data'
+# the name of the file where we will store the object
+
+shoplist = ['apple', 'mango', 'carrot']
+# Write to the file
+
+f = file(shoplistfile, 'w')
+p.dump(shoplist, f) # dump the object to a file 将对象储存到一个文本中去
+f.close()
+
+del shoplist # remove the shoplist
+
+# Read back from the storage
+f = file(shoplistfile)
+# 从文件储存器中读取对象
+storedlist = p.load(f)
+print storedlist
+---------------------------------------------------------------
+
+== 异常 ==
+
+.语法结构
+`try..except..finally`
+
+.抛出异常
+`raise`
+
+
+== 更多Python的内容 ==
+
+=== 特殊方法 ===
+
+名称               | 说明
+__init__(self,...) | 这个方法在新建对象恰好要被返回使用之前被调用。
+__del__(self)      | 恰好在对象要被删除之前调用。
+__str__(self)      | 在我们对对象使用print语句或是使用str()的时候调用。
+__lt__(self,other) | 当使用 小于 运算符（<）的时候调用。类似地，对于所有的运算符（+，>等等）都有特殊的方法。
+__getitem__(self,key) |使用x[key]索引操作符的时候调用。
+__len__(self)      |对序列对象使用内建的len()函数的时候调用。
+
+=== 列表综合 ===
+
+[source]
+-------------------------------------------
+listone = [2, 3, 4]
+# listone中大于大的数(乘以2),组成一个新list
+listtwo = [2*i for i in listone if i > 2]
+print listtwo
+-------------------------------------------
+
+=== 在函数中接收元组和列表 ===
+
+.一个星号
+`def powersum(power, *args):`::
+    从第二个参数开始,都以 *元祖* 的形式存入args变量中.
+
+.两个星号
+`def powersum(power, **args):`::
+    从第二个参数开始,都以 *字典* 的形式存入args变量中.
+
+=== exec和eval语句 ===
+
+.exec
+    可从执行储存在 _字符串_ 或 _文件_ 中的Python语句.
+
+.eval
+    可从执行储存在 _字符串_ 中的Python语句.
+
+=== 断言 ===
+
+`assert 1 == 1`
+
+=== repr函数 ===
+
+`repr` 函数和反引号 ``` 用来获取对象的可打印的表示形式。你可以通过定义类的 `__repr__` 方法来控制你的对象在被 `repr` 函数调用的时候返回的内容。
+
+
+[source]
+-----------------------------------------
+i = ['a','b']
+`i` # output: "['a','b']"
+repr(i) #同上
+----------------------------------------

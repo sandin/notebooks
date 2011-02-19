@@ -1,0 +1,1070 @@
+﻿= PHP经典实例 笔记 =
+lds <lds2012@gmail.com>
+{localdate}
+
+:language: php
+
+.LOG
+****************************************************
+    * 2010-06-19
+    * 2010-06-20 p96
+    * 2010-07-xx p204
+    * 2010-07-27
+    * 2010-07-28 p276
+    * 2010-07-30 p335
+    * 2010-08-14 p370
+    * 2010-08-21 p379
+    * 2010-08-31 p665~p703
+****************************************************
+
+.TODO
+****************************************************
+    * 7-19 反射类 new ReflectionClass();
+    * set_exception_handler()?
+    * SimpleTest:WebTestCase
+    * Selenium
+    * XAMPP
+****************************************************
+
+
+== 字符串 ==
+
+=== heredoc ===
+
+`heredoc` 定义的字符串可以识别所有的插入变量以及双引号能够识别的转义序列,却不要求对双引号进行转义.
+
+[source]
+----------------------------------------------------
+$className = 'nav';
+$content   = 'It\'s content';
+
+$html = <<< END
+<div class="$className">
+    $content;
+    /$3.23
+</div>
+END;
+
+echo $html;
+-----------------------------------------------------
+
+NOTE: `heredoc` 可以识别其中的变量,因此需要对 `$` 符号转义.
+
+=== strpos ===
+
+`strpos` 返回子字符串的起始位置,若未找到则返回false,在利用它去检查一个字符串是否包含一个子字符串时,需要用 `=== false`,用来区分0和false. 
+
+=== substr_replace ===
+
+对于长字符串,只显示前25个字符,其后用 `...` 代替
+`substr_replace($longText, '...', 25);`
+
+=== 字符串中插入表达式 ===
+
+双引号下的字符串中可用大括号插入复杂的表达式:
+
+[source]
+-------------------------------------------------------------------
+print "MY circle's diameter is {$circle->getDiameter()} inches"
+-------------------------------------------------------------------
+
+=== or ===
+
+[source]
+-------------------------------------------------------------------
+$fh = fopen('sales.csv,'w') or dir("can't open sales.csv");
+-------------------------------------------------------------------
+
+=== impload ===
+
+[source]
+-------------------------------------------------------------------
+echo '<tr><td>' . implode('</td><td>',$total_line) . </td></tr>';
+-------------------------------------------------------------------
+
+=== 不用相信用户输入 ===
+
+[source]
+-------------------------------------------------------------------
+//不要直接使用 $format = $_GET['format']
+//你不能知道(控制)用户给format传递什么值
+$format = $_GET['format'] == 'csv' ? 'csv' : 'html';
+-------------------------------------------------------------------
+
+== 数字 ==
+
+=== is_numeric ===
+
+检查是否为数字(或可以被转换成数字的字符串)
+
+=== 比较浮点型数字 ===
+
+不要直接 `$a == $b` 来检查两个浮点型数字是否相等.而应该:
+
+[source]
+-------------------------------------------------------------------
+//一个非常小的浮动范围
+$delta = 0.00001;
+
+$a = 1.000000001;
+$b = 1.000000000;
+
+if (abs($a - $b) < $delta ) {/* 则认为$a,$b相等 */}
+-------------------------------------------------------------------
+
+=== 对浮点数取整 ===
+
+* 四舍五入, `round(2.4)` //2
+* 向上取整, `ceil(2.4)` //3
+* 向下取整, `floor(2.4)` //2
+
+=== 随机数 ===
+
+`mt_rand` 比 `rand` 更好更快.
+
+=== 计算指数 ===
+
+`pow(2,10)` 表示2的10次方.
+
+
+== 时间和日期 ==
+
+=== 检验日期 ===
+
+`checkdate($mounth,$day,$year)`
+
+=== 当前日期 ===
+
+`list($this_year,$this_mounth,$this_day) = explode(',',date('Y,m,d'));`
+
+=== 从字符串中解析日期和时间 ===
+
+[source]
+-------------------------------------------------------------------
+$a = strtotime('march 10');
+$b = strtotime('last thursday');
+$c = strtotime('now + 3 months');
+$f = strtotime('now + 3 days');
+
+
+$d = strtotime('now');
+print strftime('%c',$d);
+
+$e = strtotime('today');
+
+//解析mysql时间格式
+$date = '2010-06-22 05:23:23';
+$ar   = preg_split('/[- :]/',$date);
+--------------------------------------------------------------------
+
+=== 对日期进行加减运算 ===
+
+[source]
+-------------------------------------------------------------------
+//直接利用strtotime
+$birthday = 'March 10, 1975';
+$whoopee_made = strtotime("$birthday - 9 months age");
+
+//或使用时间戳
+$birthday = 163727100;
+$gestation = 36 * 7 * 86400; //36周
+$whoopee_made = $birthday - $gestation;
+-------------------------------------------------------------------
+
+=== 根据时区计算时间 ===
+
+[source]
+-------------------------------------------------------------------
+$now = time();
+date_default_timezone_set('America/New York');
+print date('c',$now);
+date_default_timezone_set('Europe/Paris');
+print date('c',$now);
+--------------------------------------------------------------------
+
+
+== 数组 ==
+
+=== list ===
+
+[source]
+-------------------------------------------------------------------
+$fruits = array('apples','bananas','Cantaloupes');
+list($red, $yellow, $beige) = $fruits;
+//$red = 'apples'; $yellow = 'bananas';...
+-------------------------------------------------------------------
+
+=== 从1开始索引 ===
+
+`array(1 = > 'apples', 'bananas', 'Cantaloupes')`
+
+NOTE: 可以从任意数值开始索引.甚至是负数,因为PHP中关联数组和数字数组的界限很模糊.
+
+=== 删除数组元素 ===
+
+.删除单个元素或不连续的多个元素
+    * `unset($arr[0])`
+    * `unset($arr[1], $arr[5])`
+
+.删除连续的多个元素
+    * `array_splice($array, $offset, $length)`
+
+NOTE: array_splice函数直接对数组本身进行操作(值传递).
+
+NOTE: unset只是将该元素删除,并不重新索引数组.array_splice会重新索引数组.
+
+=== 合并数组 ===
+
+两种方法:
+    *  `array_merge($arr1, $arr2)` ,避免冲突,会重新索引. 适用于数字数组.
+    *  `$arr1 + $arr2`  ,不会避免冲突,直接用右边去覆盖左边的同名键值, 适用于关键数组.
+
+=== 在数组中寻找元素 ===
+
+. `in_array` & `array_search`
+用 `in_array` 可以查找是否数组包含某一值,用 `array_search`  可以找到该值所在的位置.但是,由于 `array_search` 能够适当的处理找不到相应值的情况,所以使用 `array_search` 更好,且速度相差不大.
+
+. `foreach` & `array_filter`
+使用 `foreach` 寻找某种符合条件的值时,若只需要找一个,可使用break提前退出循环,节约资源.而 `array_filter` 则不行,必须所有元素都循环一遍, 在这种情况下就没有 `foreach` 灵活.
+
+
+== 变量 ==
+
+=== 检查变量是否为空 ===
+
+`empty($var)` ,对未定义的变量也不会报错(也就是说不需先使用 `isset` 去判断该变量是否被定义,而避免报错). 
+
+NOTE: 对未定义的变量, `0` ,空字符串等空值情况它都会返回 `true` .
+
+
+NOTE: 如果仅仅只是去判断变量是否被定义,而不管它是不是空值,则应该使用 `isset` .
+
+=== 消除 `=` 和 `==` 的困挠 ===
+
+[source]
+---------------------------------------------------
+// 使用:
+if (12 == $num) { /* ... */ }
+
+// 而不使用:
+if ($num == 12) { /* ... */ }
+
+// 因为前者如果错把'=='写成了'=',会引发一个错误
+// 而后者只会默默错误的执行
+
+
+// 假如你本来以为$num是一个整型数字,但实际上它确是一个字符串
+// 那么你用它去和一个整型做比较时,该字符串会自动转化为整型
+// 而很有可能被直接转换为0,当你再与0去做比较时
+// 则永远都会得到一个true,为避免应该使用全等符号
+$num = 'string';
+
+var_dump( 0 == $num ); //总是true
+var_dump( 0 === $num); //正确的方法
+
+---------------------------------------------------
+
+=== 为变量设置一个默认值 ===
+
+[source]
+---------------------------------------------------
+
+$default_cars = 'car'; //默认值
+
+$cars = isset($_REQUEST['cars']) ? $_REQUEST['cars'] : $default_cars;
+
+// 判断数组元素则应该这样, 可以避免元素恰好为逻辑值:
+$cars = array_key_exists('cars', $_REQUEST) ? $_REQUEST['cars'] :$default_cars;
+
+// 在数组中,isset和array_key_exists的区别是对待null值时
+$va = array('cars' => null);
+var_dump(array_key_exists('cars', $va); // true
+var_dump(isset($va['cars']))            // false
+
+
+---------------------------------------------------
+
+=== 为一个数组设置默认值 ===
+
+[source]
+---------------------------------------------------
+
+$request = array('a' => 'A', 'b' => 'B', 'c' => 'C');
+
+$default = array('a' => 'aa', 'd' => '默认值');
+
+foreach($default as $k => $v) {
+    if (! isset($request[$k]) ) $request[$k] = $v;
+}
+
+var_dump($request);
+
+---------------------------------------------------
+
+
+=== 静态变量 ===
+
+`static` ::
+    把一个变量声明为 *静态变量* 会使得函数记住这个变量的值.
+
+
+NOTE: 静态变量也只存活于一个请求中.
+
+=== 在进程中共享变量 ===
+
+`shmop` 或 `System V` 共享内存.
+
+NOTE: 该节略过,未读.
+
+
+=== serialize ===
+
+`magic_quotes_gpc` 和 `magic_quotes_runtime` 会影响 `unserialize`
+
+`magic_quotes_gpc` 开启后,使用serialize会自动调用addslashes,所以在使用unserialize时需要先使用stripslashes.
+
+如果 `magix_quotes_runtime` 开启,则应该在使用serialize前手工去调用addslashes.
+
+[source]
+------------------------------------------------------------------------
+$new_cart = unserialize(stripslashes($cart)); //gpc开启
+$new_cart = unserialize($cart);               //gpc未开启
+
+//runtime开启时,写入文件和数据库必须先addslashes
+$fp = fopen('/tem/cart', 'w');
+fputs($fp, addslashes(serialize($a)));       //runtime开启
+fclose($fp);
+
+
+//runtime开启时,读也必须先stripslashes
+$new_cart = unserialize(stripslashes(file_get_contents('/tmp/cart')));
+-----------------------------------------------------------------------
+
+
+== 函数 ==
+
+NOTE: 函数定义位置不分先后,但不允许定义同名函数,会抛出致命错误,中止脚本运行.
+
+=== 函数的参数 ===
+
+PHP中函数的参数默认是值传递(及复制值,而不会改变参数变量的本身).引用传递加 `&` 符号即可.
+
+定义函数时,也可以不指定参数的个数,而使用 `func_num_args` 来获得此信息, 并使用 `func_get_arg($i)` 来获取指定参数.
+
+=== 返回变量的引用 ===
+
+[source]
+----------------------------------------------------------
+function &pc_array_find_value($needle, &$haystack) {
+    foreach ($haystack as $key => $value) {
+        if ($needle == $value) {
+            return $haystack[$key];
+        }
+    }
+}//end of function
+
+// 调用时必须使用 =& 符号来传递
+// 如果用 = 号则依然是返回值,而不是返回变量的引用.
+$html =& pc_array_find_value('The Doors', $artists);
+
+-------------------------------------------------------------------
+
+NOTE: 建议,如果在一个函数中要修改一个变量的值,最好是返回这个值,然后将其赋给一个变量.
+
+=== 返回失败信息 ===
+
+`return false` 
+
+=== 调用可变函数 ===
+
+[source]
+----------------------------------------------------------------------
+function get_file($filename) {
+    return file_get_content($filename);
+}
+
+$functionname = 'get_file';
+$filename     = 'graphic.png';
+
+// 相当于调用 get_file('graphic.png');
+call_user_func($functionname, $filename);
+call_user_func_array($functionname, array($filename));
+
+// 实例
+// 允许的命令列表
+$dispatch = array(
+        'add'      => 'do_add',
+        'commit'   => 'do_commit',
+        'checkout' => 'do_checkout',
+        'update'   => 'do_update'
+        );
+
+$cmd = (isset($_REQUEST['command']) ? $_REQUEST['command'] : '';
+
+// 必须要检查请求的命令是否在允许的命令列表中
+// 否则会引起严重的安全隐患.如用户直接请求phpinfo,或系统命令
+if (array_key_exists($cmd, $dispatch)) {
+    $function = $dispatch[$cmd];
+    call_user_func($function); //调用函数
+} else {
+    error_log("Unknown command $cmd");
+}
+
+---------------------------------------------------------------------
+
+=== 在函数内部访问全局变量 ===
+
+[source]
+---------------------------------------------------------
+function eat_fruit($fruit) {
+    global $chew_count;
+
+    for ($i = $chew_count; $i > 0; $i--) {
+        //...
+    }
+
+    //或者
+    for ($i = $GLOBALS['chew_count']; $i > 0; $i-- ) {
+       //...
+    }
+
+}//end of function
+---------------------------------------------------------------
+
+用global 标记的全局变量上使用unset,只会删除函数中的该变量,全局变量依然存在.
+而在$GLOBALS使用的全局变量上使用unset,会直接删除该全局变量.
+
+NOTE: 在函数中修改全局变量,会使得该全局变量在全局范围内真的发生变化.即函数中的全局变量并非复制值,而是可以看作为引用值(只有在使用unset时有所矛盾).
+
+=== 动态创建函数 ===
+
+[source]
+-------------------------------------------------------------
+
+$add = create_function('$i, $j', 'return $i + $j');
+
+// 以上相当于
+function add($i, $j) {
+    return $i + $j;
+}
+
+
+// 常用于 usort, array_walk 之类
+usort($file, create_function('$a, $b', 'return strnatcmp($b, $a);'));
+
+-----------------------------------------------------------------------
+
+
+== 类和对象 ==
+
+=== 调用父类方法 ===
+
+`parent::dosomething()` 
+
+=== 访问权限 ===
+
+`public` ::
+    任何地方都可以访问.
+
+`protected` ::
+    只有该类内部或该子类内部才能访问.(可被继承)
+
+`private` ::
+    只有该类内部才能访问.(不会被子类继承,子类也不能访问,访问则报错Fatal error).
+
+
+.`protected` 和 `private` 选择问题
+原则是你是否认为有人有必要在子类中调用改方法.
+
+推荐使用 `protected` ,除非你有100%的把握认为使用 `private` 是正确的选择,也就是说确定没有任何情况下某人会使用到该方法.
+
+=== 防止修改 ===
+
+`final` 标记函数,则可以防止在继承过程中,改方法或类被修改.
+
+`final class` 不能被继承和修改.
+
+=== 接口 ===
+
+`interface` 定义一个接口.
+
+.检查一个类是否实现了特定的接口
+
+[source]
+-------------------------------------------------------------
+/******************************************************/
+// 用class_implements 查看一个类是否为另一个类的子类
+class Book implements Nameable {
+    //..
+}
+
+// 返回Book类实现的所有接口,返回数组
+$interfaces = class_implements('Book');
+
+if (isset($interfaces['Nameable'])) {
+    // Book 实现了 Nameable 接口
+}
+
+/******************************************************/
+// 用class_parents 查看一个类是否为另一个类的子类
+class foo { }
+class bar extends foo {}
+
+print_r(class_parents(new bar));
+
+// since PHP 5.1.0 you may also specify the parameter as a string
+print_r(class_parents('bar'));
+
+
+/******************************************************/
+// 或用 instanceof 去判断继承而是否实现接口
+
+// 接口
+interface MyInterface { }
+class MyClass implements MyInterface { }
+$a = new MyClass;
+var_dump($a instanceof MyClass);
+var_dump($a instanceof MyInterface);
+
+// 继承
+class ParentClass {}
+class MyClass2 extends ParentClass { }
+$b = new MyClass2;
+var_dump($b instanceof MyClass);
+var_dump($b instanceof ParentClass);
+
+-------------------------------------------------------------
+//review Oct,29 2010
+
+=== 抽象类 ===
+
+`abstract` ['æbstrækt'] 定义一个抽象类,抽象类不能直接实例化,只能被继承.
+
+`abstract class` 至少要包含一个 `abstract function` ,`abstract function` 必须被子类实现,否则报错.
+
+一个抽象类B可以继承另一个抽象类A,B不用实现A的所有抽象方法,而可以只实现部分.
+
+NOTE: 是否使用抽象类,考虑 *是一个* 原则, 比如'MYSQL 是一个 DATABASE'.
+
+=== 引用传递 ===
+
+`$dave = $adam` 两个变量实际指向同一个对象.
+
+PHP5中的 `clone` 是浅克隆,可以手工使用 `__clone` 是修改为深克隆(对所有属性都进行值赋值,而非引用赋值).
+
+=== __get() __set() ===
+
+不建议使用魔术访问器的原因:
+    * 子类不会去自动执行父类的 `__get` , `__set`
+    * 必须重写 `__isset` , `__unset`
+    * 速度相对较慢
+    * 不能使用反射类,以及 `phpdocumentor` 来自动文档化.
+    * 不能将其用于静态属性.
+
+=== 检查是否存在某个方法 ===
+
+method_exists($objectname, $methodName);
+
+
+[source]
+-------------------------------------------------------------
+class myclass {
+    // constructor
+    function myclass() {
+        return(TRUE);
+    }
+    
+    // method 1
+    function myfunc1() {
+        return(TRUE);
+    }
+
+    // method 2
+    function myfunc2() {
+        return(TRUE);
+    }
+}
+
+$my_object = new myclass();
+
+$class_methods = get_class_methods(get_class($my_object));
+
+// 原书源代码错误
+is_callable(array('my_object', 'myfunc1'));
+// 应该为:
+is_callable(array('myclass', 'myfunc1'));
+------------------------------------------------------------
+
+
+=== 链式结构 ===
+
+`$orange = $fruit->get('citrus')->peel();`
+
+
+=== 聚合对象 ===
+
+
+[source]
+-------------------------------------------------------------
+
+class Address {
+    protected $city;
+
+    public functino setCity($city) {
+        $this->city = $city;
+    }
+
+    public function getCity() {
+        return $this->city;
+    }
+}
+
+class Person {
+    protected $name;
+    protected $address;
+
+    public function __construct() {
+        $this->address = new Address();
+    }
+
+    public functino setName($name) {
+        $this->name = $name;
+    }
+
+    // 聚合Address类
+    // 如果调用的方法不存在,则在Address类中去寻找
+    public functino __call($method, $args) {
+        if (method_exists($this->address, $method)) {
+                return call_user_func_array(
+                    array($this->address,$method),$args);
+        }
+    }
+
+
+ 
+    // 个人觉得可以这样写,而避免使用__call
+    // 如此一来,可更方便去聚合其他类 
+    public function callAddressMethod($method, $args) {
+
+        //如果参数不是以数组形式提供的则将其变为数组
+        if (!is_array($args) {
+            //剔除第一个参数,因为第一个参数为method名
+            $args = array_slice(func_get_args(), 1);
+        }
+
+        if (method_exists($this->address, $method)) {
+                return call_user_func_array(
+                    array($this->address,$method),$args);
+        }
+    }
+
+}
+
+$resums = new Person();
+// 如果resums是Person的一个实例
+// 但因为Person聚合了Address,所以它同样可以使用Address的方法
+$resums->getCity();
+-------------------------------------------------------------
+
+
+NOTE: 聚合对象,考虑 *有一个* 原则,例如本例中 `Person` *有一个* `Address`
+
+
+=== __sleep ===
+
+只应该在 `__sleep` 中用于排除那些由于会占有过多磁盘空间而不应该被序列化的动作,而不要做任何会妨碍序列化或反序列化的事.
+
+=== 反射类 ===
+
+
+[source]
+-------------------------------------------------------------
+
+// 打印Person类的所有信息
+Reflection::export(new ReflectionClass('Person'));
+
+-------------------------------------------------------------
+
+
+=== __autoload ===
+
+
+[source]
+-------------------------------------------------------------
+
+// 使用PEAR命名约定自动加载类,和ZF的一致
+function __autoload($package_name) {
+    // 按下划线分割
+    $floders = split('_', $package_name);
+    // 基于目录结构重组
+    // 使用 DIRECTORY_SEPARATOR 常量以适应所有平台
+    $path = join(DIRECTORY_SEPARATOR, $floders);
+    // 添加扩张名
+    $path .= '.php';
+
+    include $path;
+}
+
+-------------------------------------------------------------
+
+=== 动态实例化对象 ===
+
+
+[source]
+-------------------------------------------------------------
+$prefix = 'LDS_';
+$className = 'Proson';
+
+
+// $b = new LDS_Preson
+$class_name = $prefix . $className;
+$b = new $class_name;
+
+// 注意，如下方式为不合法的：
+// $b = new 'LDS_Proson';
+
+-------------------------------------------------------------
+
+
+== Web基础 ==
+
+=== 设置cookie ===
+
+`bool setcookie ( string name [, string value [, int expire [, string path [, string domain [, bool secure]]]]] )`
+
+32位系统的最大纪元时间戳: 2147483647
+
+NOTE:　`cookie` 是随着 `HTTP-HEADER` 一起发送的,也就是说必须在未输出任何内容之前设置cookie.
+
+
+=== 读取cookie ===
+
+`$_COOKIE[$cookieName]`
+
+NOTE: setcookie后不会立即更新$_COOKIE变量,而是在下一次请求才会更新.
+
+=== 删除cookie ===
+
+`setcookie($cookieName, '', 1);`
+
+NOTE: 删除cookie时必须提供与设置该cookie时相同的参数,如路径,域名,安全标记等(值和过期时间除外).
+
+=== 重定向 ===
+
+`header('Location: http://www.google.com?keyword=lds')`
+
+=== 生成GET字符串 ===
+
+
+[source]
+-------------------------------------------------------------
+$var = array('name' => 'LDS','age' => 23);
+
+$string = http_build_query($var);
+
+$url = 'http://www.google.com?' . $string;
+// $url = http://www.google.com?name=LDS&age=23;
+-------------------------------------------------------------
+
+=== 读取POST请求的主体 ===
+
+`$post_body = file_get_contents('php://input');`
+
+=== cookie认证 ===
+
+[source]
+-------------------------------------------------------------
+// 用户安全码
+$secret_word = 'if i ate spinach';
+
+// 登录成功后将 username, secret_word 联合加密，存入cookie
+if ( pc_validate($_POST['username'], $_POST['password']) ) {
+    setcookie('login',
+            $_POST['username'] . ',' . 
+            md5($_POST['username'] . $secret_word));
+}
+
+// 验证登录cookie
+unset($username);
+
+if ($_COOKIE['login']) {
+    list($c_username, $cookie_hash) = split(',', $_COOKIE['login']);
+    if (md5($c_username . $secret_word) == $cookie_hash) {
+        $username = $c_username;
+    } else {
+        print "You Have sent a bad cookie";
+    }
+}
+
+if ($username) {
+    print "Welcome, $username";
+} else {
+    print "Welcome, anonymous user.";\
+}
+-------------------------------------------------------------
+
+=== 压缩Web输出 ===
+
+`php.ini` 中 `zlib.output_compression=1`
+
+
+
+== 表单 ==
+
+=== 判断是GET还是POST === 
+
+` 'GET' == $_SERVER['REQUESTS_METHOD'] ` 
+
+如果是GET则是请求页面,如果是POST则是提交表单.
+
+=== 必填字段 ===
+
+` if( ! (isset($_POST['flavor']) && strlen($_POST['flavor'])) ) {} `
+
+NOTE: 如果使用 `empty` 代替 `strlen` 则会出现问题,因为 `empty` 会将 `0` 也看作空值,而在表单字段中很显然 `0` 是有意义的值,而非空值.
+
+=== 检查数字 ===
+
+检查表单的一个值是否为integer, 不能直接使用 `is_int` ,因为POST过来的数据始终都是字符串类型.
+
+可以通过正反两次转换后和原值进行比较来测试是否为整数:
+
+`if ($_POST['rating'] != strval(intval($_POST['rating']))) {}` 
+
+判断是否为浮点数
+`if ($_POST['rating'] != strval(floatval($_POST['rating']))) {}` 
+
+=== 验证多选和单选表单 ===
+
+必须要去验证所选的内容是否在可选项目的数组中(in_array&array_key_exists),避免恶意用户.
+
+[source]
+-------------------------------------------------------------
+// 验证一组复选框
+$choices = array('eggs'   => 'eggssomething',
+                 'toast'  => 'fnihsfd',
+                 'coffee' => 'erwrew');
+foreach ($choice as $key => $choice) {
+    echo "<input type='checkbox' name='food[]' value='$key' /> $choice \n";
+}
+
+// 验证,所选的都是在所提供的数组中
+// $_POST['food']和array_keys($choices)的交集即为$_POST['food']自己
+// 即集合$_POST['food']是集合array_keys($choices)的真子集
+if (array_intersect($_POST['food'], array_keys($choices)) != $_POST['food'])
+{
+    echo "You must select only valid choice.";
+}
+-------------------------------------------------------------
+
+
+=== 验证时间和日期 ===
+
+.验证日期是否有效
+`checkdate($mouth, $day, $year)`
+
+.制作unix时间戳
+`int mktime ( [int hour [, int minute [, int second [, int month [, int day [, int year [, int is_dst]]]]]]] )`
+
+
+NOTE: 比较两个时间的前后或检验时间是否在某个范围内,都应该使用时间戳进行比较.
+
+=== 预防跨站点脚本 ===
+
+`htmlentities($sting, ENT_QUOTES, 'UTF-8')`
+
+=== 防止重复提交表单 ===
+
+::LDS:: 具体如何操作?
+
+[source,html]
+-------------------------------------------------------------
+<form method="post" action="<?php echo $_SERVER['SCRIPT_NAME'] ?>" 
+    onsubmit="document.getElementById('submit-button').disabled = true;">
+<input type='hidden' name='token' value='<?php echo md5(uniqid()); ?>' />
+<input type='submit' value='Save Data' id='submit-button' />
+</form>
+
+-------------------------------------------------------------
+
+=== 处理上传文件 ===
+
+=== input image ===
+
+`<input type="image" name="locations" src="locations.gif">`
+
+提交时,还会自动传递 `locations_x` , `locations_y`
+给服务器,表示用户点击了图片的哪里(坐标).
+
+
+=== input 传递多值 ===
+
+`<input id="" name="pop[NY][NYC]" type="checkbox" />`
+
+可通过 `$_POST['pop']['NY']['NYC']` 访问到.
+
+=== 日期 ===
+
+`list($hour, $minute, $second, $month, $day, $year) =
+    split(':', date('h:i:s:m:d:Y'))`
+这样的好处是,一快捷,二,格式可直接用于mktime()函数.
+
+//MARK review on Nov. 4 2010
+
+== 数据库 ==
+
+=== prepare ===
+
+[source]
+-----------------------------------------------------------
+$st = $db->prepare('DELETE FROM family WHERE name LIKE ?');
+
+// prepare会,则方便多次执行
+// prepare会自动转义,防止代码注入
+// 建立在prepare的基础上,许多数据库后台都会对查询进行解析和优化
+// 每次调用会比自建字符串查询语句要快速
+$st->execute(array('Fredo'));
+$st->execute(array('Sonny'));
+$st->execute(array('lau'));
+
+// prepare也支持命名占位符
+$st = $db->prepare('DELETE FROM family WHERE name LIKE :name');
+
+$st->execute(array('name' => 'lau'));
+
+//---------------------------------------------------------
+
+// 利用binkParam()绑定参数
+$pairs = array('Mars' => 'water',
+               'Moon' => 'water',
+               'Sun'  => 'fire');
+
+$st = $db->prepare(
+        'SELECT sign FROM zodiac WHERE element LIKE :element AND planet LIKE
+        :planet");
+$st->bindParam(':planet', $planet);
+// 强制转换为字符串
+$st->bindParam(':element',$element, PDO::PARAM_STR);
+foreach ($pairs as $planet => $element) {
+    // 自动读取$element,$planet的值
+    // 不需要提供参数
+    $st->execute();
+    var_dump($st->fetch());
+}
+
+//---------------------------------------------------------
+
+// 手工转义引号
+$safe = $db->quote($_GET['searchTrem]);
+
+//---------------------------------------------------------
+
+// 让所有数据库错误抛出异常
+$db->setAttribute(PDO::ATTR_ERRMOD, PDO::ERRMOD_EXCEPTION);
+
+//---------------------------------------------------------
+
+// 使用implode来构建查询语句
+$fields = array('symbol', 'planet', 'element');
+
+$update_fields = array();
+$update_values = array();
+
+foreach ($fields as $field) {
+    $update_fields[] = "$field = ?";
+    // 注意实际中要考虑转义问题,避免代码注入
+    $update_values[] = $_POST[$field];
+}
+
+$st = $db->prepare("UPDATE zodiac SET " . 
+                    implode(',', $update_fields) .
+                    'WHERE sign = ?');
+
+// WHERE
+$update_values[] = $_GET['sign'];
+
+$st->execute($update_values);
+
+-----------------------------------------------------------
+
+在magic_quotes_gpc开启的情况下,再使用quote之类的函数会使得数据重复转义,应该避免这种情况,最好将magic_quotes_gpc关闭(不能在运行时关闭),如果没有权限关闭,那么在使用转义函数时应该注意此问题.
+
+magic_quotes_sybase 只转义单引号
+
+
+== 错误处理,故障排除和测试 ==
+
+=== 输出栈轨迹 ===
+
+`debug_print_backtrace()` & `debug_backtrace()`
+
+=== E_ALL ===
+`E_STRICT` 是PHP 5新引入的错误级别,其不包含在E_ALL中,在开发过程中十分有用.为PHP有关改进代码质量的修改建议.
+
+=== 空白符 ===
+
+如果包含文件中带有位于<?php ?>标签之外的空白符, 那么这个空白符也会被发送到客户端,从而可能导致 `headers already sent` 错误.
+
+一种合法的解决方法是,如果脚本时纯PHP文件, 可以通过不书写尾部的 `?>` PHP关闭标签来保证不再对该文件中的空白符进行处理.
+
+=== 调试函数 ===
+[source]
+--------------------------------------
+// 筛选信息: 为不同的调试注释类型指定不同的优先级
+// 之后调试函数只输出那些高于当前优先级的调试信息
+define('DEBUG', 2);
+
+function pc_debug($message, $level = 0) {
+    if (defined('DEBUG') && $level > DEBUG) {
+        error_log($message);
+    }
+}
+
+pc_debug('debug it', 1); //不输出, 因为当前debug级别小于1
+pc_debug('debug it', 3); //输出
+
+=== Xdebug ===
+代码剖析与kcachegrind兼容
+
+`debugclient` 工具
+[source,bash]
+---------------------------------
+export XDEBUG_CONFiG="idekey=session_name remote_enable=1"
+php myscript.php
+--------------------------------
+
+远程服务器调试需在URL后加 `?XDEBUG_SESSION_START=name`
+
+== 性能调谐和负载测试 ==
+
+`microtime()` 计算速度
+
+`PEAR Benchmark` 详细分析速度
+
+[source]
+-----------------------------------
+function profile($display = false) {
+    static $times;
+
+    switch ($display) {
+        case false:
+            $times[] = microtime();
+            break;
+        case true:
+            $start = array_shift($times);
+
+            $start_mt = explode(' ', $start);
+            $start_total = doubleval($start_mt[0] + $start_mt[1]);
+
+            foreach ($times as $stop) {
+                $stop_mt = explode(' ', $stop);
+                $stop_total = doubleval($stop_mt[0] + $stop_mt[1]);
+                $elapsed[] = $stop_total - $start_total;
+            }
+
+            unset($times);
+            return $elapsed;
+            break;
+    }
+}
+-----------------------------------

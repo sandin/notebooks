@@ -1,0 +1,116 @@
+= Mar-android Notebook =
+lds <lds2012@gmail.com>
+2010-12-12
+
+== Note ==
+.htaccess
+`AddType application/vnd.android.package-archive apk`
+
+.adb
+`adb shell` .
+`cd data/app` .
+`ls` .
+`rm some.apk` .
+
+== Activity ==
+.生命周期
+    1. onCreate or on Restart
+    2. onStart
+    3. onResume
+    4. onPause
+    5. onStop [invisible]
+    6. onDestory [finish()]
+
+== Task ==
+A Task is a stack of Activities.
+
+finish() -> destory() Activity at Task.
+
+== Layout ==
+    * linearLayout
+    * TableLayout
+    * ...
+
+== Handle ==
+用于独立线程，处理需要长时间的操作.
+提供异步消息处理机制.
+
+.Handle的两个队列
+    * 消息队列, `handle.sendMessage(Message m)` .
+    * 线程队列, `handle.post(Runnable r)` , `handle.postDelayed(Runnable r)` , `handle.removeCallbacks(Runnable r)` .
+
+
+NOTE: `post(Runnable)`  并非真正独立线程.
+
+.真正独立线程的使用方法：
+    1. HandleThread 实现使用Loop循环处理消息队列
+    2. HandleThread.start() 
+
+== Bundel ==
+数据储存类型，类似于hash map的键值对.
+
+
+== SQLite ==
+`SQLiteOpenHelper` -> `MyDatabaseHelper` -> `getReadeleDatabase()` -> `SQLiteDatabase db`
+    
+
+== ContentProvider ==
+
+.ContentProvider
+    * 为存储和获取数据提供了统一接口.
+    * Android内置多种 `ContentProvider` (音频，视频，通讯录，图片).
+    * 在应用程序之间共享数据
+    * 以表的形式组织数据 (类似于常用的关系型数据库中的表结构)
+
+.ContentURI
+每一个 `ContentProvider` 都拥有一个 `URI` ( `ContentURI` ).
+
+.Methods
+    * query
+    * insert
+    * update
+    * delete
+    * getType
+    * onCreate
+
+
+== XML解析 ==
+
+.XML解析方法
+    * SAX, 逐行解析，为遇到各种解析事件（遇到某节点）时绑定回调函数
+    * DOM, 树模型（需读取全部文件，装载到内存）
+
+SAX::
+    Simple API for XML.
+
+.interface ContentHandler
+    * startDocument() .
+    * endDocument() .
+    * startElement(uri, localName, qName, atts) .
+    * endElement(uri, localName, qName, atts) .
+    * characters(...) .
+    * ...
+
+== 广播机制 ==
+
+.BroadcastReceiver
+    1. 某种事件被触发.
+    2. Android系统将该事件广播给所有的 `BroadcastReceiver` .
+
+.Intent
+    * Action
+    * Data
+
+.注册BroadcastReceiver
+    1. 在 manifest 中注册，注册后该Receiver将会在应用程序关闭后也继续监听事件.
+    2. 在代码中注册. Activity.registerReciver(receiver, filter)
+
+== Service ==
+
+.Service
+    * 和Activity类似，但没有UI界面，后台运行.
+    * 用来处理一些耗时比较长的操作（避免阻塞用户界面）.
+    * 可用来更新 ContentProvide, 发送Intent, 启动通知等.
+
+NOTE: Service即不是一个单独的进程，甚至都不是一个单独的线程。
+

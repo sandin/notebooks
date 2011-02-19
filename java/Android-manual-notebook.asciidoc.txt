@@ -1,0 +1,203 @@
+= Android API notebook =
+lds <lds2012@gmail.com>
+2010-12-11
+
+.TODO
+******************************************
+    * Intents and Intent Filters [skip]
+    * Data Backup <requires API 8> [skip]
+    * Content Providers [skip]
+    * Tween Animation & Frame Animation [skip]
+    * App Widgets, Audio and video, Blutooth, Search skip [skip]
+******************************************
+
+== Application Fundamentals =
+
+=== components ===
+Android applications don't have *a single entry point* for everything in the application (no `main()` function, for example). Rather, they have essential components that the system can instantiate and run as needed. There are four types of components:
+
+==== Activities ====
+user interface ,they work together, but each activity is independent of the others. 
+
+Moving from one activity to another is accomplished by having the current activity start the next one.
+
+==== Services ====
+A service doesn't have a visual user interface, but rather runs in the background for an indefinite period of time.
+
+services run in the main thread of the application process.
+
+==== Broadcast receivers ====
+A broadcast receiver is a component that does nothing but *receive and react to broadcast announcements*. 
+
+==== Content providers ====
+A content provider makes a specific set of the application's data available to other applications. 
+
+A `ContentResolver` can talk to any content provider; 
+
+==== Activating components: intents ====
+Content providers are activated when they're targeted by a request from a ContentResolver.
+The other three components — activities, services, and broadcast receivers — are activated by asynchronous messages called intents.
+
+An *intent* is an Intent object that holds the content of the message.
+
+=== The manifest file === 
+.Intent filters
+An Intent object can explicitly name a *target component*.
+
+=== Activities and Tasks ===
+TODO: .
+
+== User InterFace ==
+
+=== View & ViewGroup ===
+The *View* class serves as the base for subclasses called "widgets," which offer fully implemented UI objects, like text fields and buttons.
+
+The *ViewGroup* class serves as the base for subclasses called "layouts," which offer different kinds of layout architecture, like linear, tabular and relative.
+
+your Activity must call the `setContentView()` method and pass a reference to the root node object.
+
+=== Declaring Layout ===
+
+.Size
+`getMeasuredWidth`, These dimensions define how big a view wants to be within its parent.
+
+`getWidth`, These dimensions define the actual size of the view on screen, at drawing time and after layout. 
+
+.Margins
+Even though a *view* can define a padding, it does *not* provide any support for margins. However, *view groups* provide such a support. 
+
+=== Creating Menus ===
+
+.Menu 
+    1. 选项菜单 OptionsMenu 
+    2. 上下文菜单 ContextMenu , 长按住某个View弹出的浮动菜单，类似于鼠标右键      
+    3. 子菜单 SubMenu, 可拥有子菜单的菜单, 子菜单为弹出浮动框。
+
+.Submenus
+A sub menu can be added within any menu, except another sub menu.
+
+.Menu groups
+When adding new items to a menu, you can optionally include each item in a group. A menu group is a collection of menu items that can share certain traits, like whether they are visible, enabled, or checkable.
+
+Shortcut keys
+`menu.add(0, MENU_QUIT, 0, "Quit").setAlphabeticShortcut('q');`
+
+=== Creating Dialogs ===
+
+.Dialogs
+    * AlertDialog
+    * ProgressDialog
+    * DatePickerDialog
+    * TimePickerDialog
+
+.AlertDialog
+A dialog is always created and displayed as a part of an Activity. You should normally create dialogs from within your Activity's onCreateDialog(int) callback method.
+
+[source]
+---------------------------
+protected Dialog onCreateDialog(int id) {
+    // switch(id) 
+    Dialog dialog;
+    
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setMessage("Are you sure you want to exit?")
+           .setCancelable(false) // 是否可以按[返回键]退出dialog
+           .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+               public void onClick(DialogInterface dialog, int id) {
+                    MyActivity.this.finish();
+               }
+           })
+           .setNegativeButton("No", new DialogInterface.OnClickListener() {
+               public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+               }
+           });
+    dialog = builder.create();
+    
+    return dialog;
+}
+---------------------------
+
+.To showing/dismissing a AlertDialog:
+`showDialog(int)` .
+`dismissDialog(int)` .
+
+== Application Resources ==
+
+=== Localization ===
+.Why Default Resources Are Important
+To prevent this situation(missing some resources in default), make sure that a res/values/strings.xml file exists and that it defines every needed string. The situation applies to all types of resources, not just strings: You need to create a set of default resource files containing all the resources that your application calls upon — layouts, drawables, animations, etc. 
+
+.Which Resources Take Precedence?
+locale almost always takes precedence
+
+.Use the Android Context object for manual locale lookup
+`String locale = context.getResources().getConfiguration().locale.getDisplayName();`
+
+.How to Testing for Default Resources
+Set the emulator or device to a language that your application does not support. 
+
+=== Resource Types ===
+.Drawable
+Bitmap files(in the `res/drawable` ) may be automatically optimized with lossless image compression by the aapt tool.
+Images which in the `res/raw/` folder will not be optimized
+
+.Nine-Patch File
+`res/drawable/filename.9.png`
+NOTE: tool -> *`draw9patch.jar`*
+
+== Data Storage ==
+
+=== Using Shared Preferences ===
+Store private primitive data in key-value pairs. 
+This data will persist across user sessions (even if your application is killed).
+
+=== Using the Internal Storage ===
+`FileOutputStream openFileOutput()`
+
+NOTE: Tip:If you want to save a static file in your application at compile time, save the file in your project res/raw/ directory. You can open it with openRawResource(), passing the R.raw.<filename> resource ID. This method returns an InputStream that you can use to read the file (but you cannot write to the original file). 
+
+.Saving cache files
+`getCacheDir()`
+
+=== Using the External Storage ===
+`getExternalStorageDirectory() `
+
+=== Using Databases === 
+[source]
+------------------------------
+public class MyDbOpenHelper extends SQLiteOpenHelper { 
+ 
+    private static final int DATABASE_VERSION = 2; 
+    private static final String DICTIONARY_TABLE_NAME = "dictionary"; 
+    private static final String DICTIONARY_TABLE_CREATE = 
+                "CREATE TABLE " + DICTIONARY_TABLE_NAME + " (" + 
+                KEY_WORD + " TEXT, " + 
+                KEY_DEFINITION + " TEXT);"; 
+ 
+    // TODO: ???
+    DictionaryOpenHelper(Context context) { 
+        super(context, DATABASE_NAME, null, DATABASE_VERSION); 
+    } 
+ 
+    @Override 
+    public void onCreate(SQLiteDatabase db) { 
+        db.execSQL(DICTIONARY_TABLE_CREATE); 
+    } 
+}
+
+------------------------------
+
+== Graphics ==
+
+=== 2D ===
+.NinePatchDrawable
+A NinePatchDrawable graphic is a *stretchable* bitmap image, which Android will automatically resize to accommodate the contents of the View in which you have placed it as the background.
+
+The border is used to define the stretchable and static areas of the image. You indicate a stretchable section by drawing one (or more) *1-pixel-wide black line(s)* in the left and top part of the border. (You can have as *many* stretchable sections as you want.) The relative size of the stretchable sections *stays the same*, so the largest sections always remain the largest. 
+
+
+== Testing and Instrumentation ==
+In Android, test applications are themselves Android applications.
+
+

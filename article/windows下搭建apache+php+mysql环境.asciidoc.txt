@@ -1,0 +1,179 @@
+= Windows下搭建Apache+PHP+MYSQL+PHPUnit环境 =
+lds <lds2012@gmail.com>
+{localdate}
+
+
+== 说明 ==
+
+本文将以Windows XP为安装环境,简要记录在windows下快速搭建一个apache+php+mysql开发环境的基本过程.
+
+
+.本例中的安装文件各版本为:
+    1. `apache-2.2.15-win32-x86-no_ssl.msi`
+    2. `php-5.3.2-Win32-VC6-x86.zip`
+    3. `mysql-essential-5.1.48-win32.msi`
+    4. `PHPUnit-3.4.9.tgz`
+    5. `php_xdebug-2.1.0-5.3-vc6.dll`
+
+.安装路径各为:
+- *apache* : `C:\Program Files\Apache Software Foundation\Apache2.2\`
+- *php*    : `D:\web\php\`
+- *mysql*  : `D:\web\mysql\`
+- *phpunit*: `D:\web\php\includes\PHPUnit-3.4.9\`
+- *xdebug* : `D:\web\php\ext\`
+
+== 安装apache ==
+
+从apache官方镜像中下载MSI打包好的安装文件.本例中下载的为httpd-2.2.15-win32-x86-no_ssl.msi
+
+执行安装文件即可(本例中使用默认安装目录).
+
+访问 http://localhost ,确保 "it's work!".
+
+
+== 安装PHP ==
+
+.安装过程
+    - 从php官方网站下载PHP5的解压包,apache需下载vc6版本,本例中下载的为php-5.3.2-Win32-VC6-x86.zip
+
+    - 将其解压到某个目录(目录路径中最好不带空格),本例中解压到D:\web\php目录中.
+
+    - 将文件夹中的 `php.ini-development` 重命名为 `php.ini`.
+
+    - 将php目录加入到系统的环境变量中去.本例中在环境变量中加入了 `;D:\web\php;D:\web\php\ext;`
+
+    - 在CMD下输入 `php -v` ,确保php可正常运行.
+
+    - 配置apache的 `httpd.conf` 文件(路径为apache安装目录下的 `\conf\httpd.conf`)
+
+本例中在 `httpd.conf` 中加入以下内容:
+
+----------------------------------------------------------
+# 以模块形式载入php5
+LoadModule php5_module "D:/web/php/php5apache2_2.dll"
+
+# php后缀文件关联
+AddType application/x-httpd-php .php 
+
+# 配置首页文件
+DirectoryIndex index.php index.html index.htm default.html default.htm
+
+# 指定php.ini文件路径
+PHPIniDir "D:/web/php"
+----------------------------------------------------------
+
+(可根据路径不同,自行修改以上内容)
+这里需要注意的是DLL一定要根据apache版本选对,再者就是PHPIniDir路径的最后不能加上一个"/", 例如本例中如果使用 PHPIniDir "D:/web/php/" 则无法找到php.ini文件.
+
+    - 重启apache,并在htdocs目录下新建一个文件,输入以下内容.
+----------------
+<?php
+
+phpinfo();
+
+?>
+----------------
+将其命名为 `index.php` 文件,访问 `http://localhost/index.php` ,访问可正常显示phpinfo内容即表明安装成功.
+
+
+== 安装MYSQL ==
+
+- 从官网下载MSI打包的安装文件,执行安装即可.本例下载的为mysql-essential-5.1.48-win32.msi,安装目录为 `D:\web\mysql` .
+
+- 在CMD下登录MYSQL,确保安装成功.
+
+- 配置 `php.ini` 文件.
+分别找到如下几行,并去掉前面的分号
+----------------------------
+; extension_dir = "ext"
+
+;extension=php_mysql.dll
+
+;extension=php_pdo_mysql.dll
+----------------------------
+
+确保php目录下的ext目录中存在 `php_mysql.dll` 和 `php_pdo_mysql.dll` 两个文件.(默认是肯定存在的)
+
+- 访问 `http://localhost/index.php` (其中调用了 `phpinfo()` 函数),查看phpinfo信息中是否存在 `MYSQL` 段内容,以确保php能正确载入mysql模块(将有 `MySQL Support enabled` 字样).
+
+
+== 安装PHPUnit ==
+
+必要要首先说明的,PHPUnit的推荐安装方法是通过php PEAR Installer安装的,这是一个非常简单而方便的安装方法,而只有在无法通过PEAR安装时(例如没有网络支持或网络不稳定等情况),才建议使用手工安装.
+
+手动安装的过程为:
+
+- 在php.ini文件中定义include_path
+------------------------------------
+;include_path = ".;c:\php\includes"
+------------------------------------
+将首分号去掉,然后修改路径到你想要的includes路径,本例中使用的是 `D:\web\php\includes\` 目录.
+
+- 从http://pear.phpunit.de/get/下载解压包,将其解压到php.ini中定义的include_path里面, 本例中解压后的路径为 `D:\web\php\includes\PHPUnit-3.4.9\`.(确保该目录下存在phpunit.php,phpunit.bat文件.
+
+- 修改phpunit.php文件
+
+将 `@php_bin@` 字符全部替换成你PHP执行文件的绝对路径,例如本例中的D:/web/php/php
+你可以先在CMD下尝试执行 `D:/web/php/php -v` ,以检查php执行文件的路径是否正确.
+
+- 将你的phpunit目录加入到系统的环境变量中.本例中在系统的环境变量中加入了
+`;D:\web\php\includes\PHPUnit-3.4.9` ,这样可确保你在CMD下可以直接执行phpunit命令.
+
+- 修改phpunit.bat文件,本例中将其修改为如下:
+------------------------------------------------------------
+set PHPBIN="D:/web/php/php"
+%PHPBIN% "D:\web\php\includes\PHPUnit-3.4.9\phpunit.php" %*
+------------------------------------------------------------
+将 `@php_bin@` 替换成你PHP执行文件的绝对路径
+将 `@bin_dir@` 替换成你PHPUnit解压目录的绝对路径
+
+- 修改 PHPUnit目录下的 /Util/PHP.php 文件:
+
+将 @php_bin@ 字符全部替换为你的PHP执行文件的绝对目录,本例中的是D:/web/php/php
+注意,该文件一共有两处@php_bin@.
+
+- 在CMD下执行 `phpunit -version` ,将会看到phpunit的版本信息,则说明安装成功.
+
+- 检测phpunit是否能正常运行,需要写一个test文件来测试,这里提供一份简单的文件
+
+-------------------------------------------------------------
+<?php
+
+class SetupTest extends PHPUnit_Framework_TestCase
+{
+    protected $_setUp;
+    protected $_hasError;
+
+    public function setUp()
+    {
+        $this->_setUp    = True;
+        $this->_hasError = False;
+    }
+
+    public function testSetup()
+    {
+        $this->assertTrue($this->_setUp);
+        $this->assertFalse($this->_hasError);
+    }
+}
+    
+?>
+------------------------------------------------------------
+将其命名为SetupTest.php,然后在CMD下cd到SetupTest.php文件的目录,执行命令 `phpunit SetupTest` 得到测试通过的结果: `OK (1 test, 2 assertions)` ,即表明phpunit可正常运行.
+
+== 安装Xdebug ==
+
+- 首先从官网上下载php_xdebug-2.1.0-5.3-vc6.dll文件,并将其放置于php目录下的ext文件夹中.
+- 在php.ini中增加如下几行
+
+---------------------------
+[Xdebug]
+zend_extension="d:\web\php\ext\php_xdebug-2.1.0-5.3-vc6.dll"
+xdebug.auto_trace=on
+xdebug.collect_params=on
+xdebug.collect_return=on
+---------------------------
+
+NOTE: 这里需要注意的是 `zend_extension` ,在过去的windows下的php版本中是要求写成 `zend_extension_ts` ,而php 5.3以后则全部统一写成 `zend_extension` 了.官方说明中有明确说明,原文为: `From PHP 5.3 onwards, you always need to use zend_extension and not zend_extension_ts.`
+
+- 重启apache,在phpinfo中查看是否存在了xdebug段内容,有则说明安装成功.

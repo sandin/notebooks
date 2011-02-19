@@ -1,0 +1,1058 @@
+﻿= JAVA2核心技术第7版卷1基础知识 =
+lds <lds2012@gmail.com>
+{localdate}
+
+:language: java
+
+.LOG
+***************************************
+    * MISSING
+    * 2010-11-18 p115
+    * 2010-11-19 p131
+    * 2010-11-19 p148
+    * 2010-11-20 p243
+    * 2010-11-22 p290
+    * 2010-11-23 p562
+    * 2010-11-23 p602
+    * 2010-11-25 END
+***************************************
+
+.TODO
+***************************************
+    * ?codePointAt & charAt 区别
+    * 反射部分跳过 p183
+    * 代理部分跳过 p229(C6.5)
+    * C7 图像部分仅浏览 p243 ~ p267
+    * C8 Swing事件 跳过 p267 ~ p316
+    * C9 Swing组件 跳过 p316 ~ p455
+    * C10 applet 跳过 p455 ~ p513
+    * C12.7 新I/O(内存映射等) 跳过 p640 ~ ?
+    * C13.6 泛型 跳过 p670 ~ p683
+***************************************
+
+== 基本类型 ==
+
+=== boolean ===
+
+`true` 不等于 1.
+`false` 不等于 0.
+
+=== 整型和浮点 ===
+
+整型常使用 `int` .
+浮点常使用 `double` .
+
+0除以整数，异常 .
+0除以浮点，无穷大或 `NaN` .
+
+.大数值
+`BigInteger` `BigDecimal` .
+
+.将普通数值转换为大数值
+`BigInteger a = BigInteger.valueOf(1000);`
+
+=== char ===
+
+尽量不直接使用char .
+
+=== 常量 ===
+
+常量使用 `final` ,习惯上大写 .
+类常量使用 `static final` .
+
+=== Math ===
+
+JDK 5.0后,可不加 `Math` ,只需在顶部加入:
+`import static java.lang.Math.*;  //静态导入`
+
+要求严格计算结果可使用 `StrictMath`
+
+=== String ===
+
+`String` 只能用双引号.
+`String` 又称不可变字符串.
+`StringBuilder` 构建字符串,适合多操作.
+
+检查字符串是否相等，一定不能使用 `==` 之类， `==` 只表示判断两个字符串是否放置在同一个位置。
+
+必须使用 `equals['i:kwәl]` 或 `equalsIgnoreCase [ig'nɒ:]` :
+[source]
+-------------
+"Hello".equals("HI");
+-------------
+
+=== 枚举类型 ===
+
+[source]
+------------
+enum Size {SMALL, MEDIUM, LERGE};
+Size s = Size.MEDIUM;
+------------
+
+== 结构语句 ==
+
+=== 块 ===
+
+*块* (即符合语句）是指一对花括号括起来的若干条件的那的Java语句。块确定了变量的作用域。块可以嵌套。
+
+[source]
+------------
+{
+        String name = "23";
+        int ab = Integer.parseInt(name);
+}
+
+// 这里是会报错的
+// 因为变量ab在单独的一个块中，作用域也只在那个块里面
+// 在外层空间是无法访问的.
+System.out.println(ab);
+
+
+String str = "name";
+
+{
+    // 可以读取上一层块中定义的变量
+    System.out.println(str);
+
+    // 这里会报错，不能在子块中重定义父层中定义的变量
+    String str = "name-rewrite";
+
+    {
+        System.out.println(str);
+    }
+}
+------------
+
+=== foreach ===
+
+没有 `foreach` 这个词, 但有这种结构的语法.
+
+[source]
+------------
+int[] arr = new int[100];
+for (int item : arr) {
+    System.out.println(item);
+}
+------------
+
+=== if ===
+
+`else` 总是与最近的一个 `if` 组成一组。
+
+=== switch ===
+
+NOTE: case标签必须是整数或枚举常量，不能检测字符串。
+
+
+
+== 数组 ==
+
+`int[] arr = new int[100];`
+创建了一个int类型数组，可储存100位(0 ~ 99)
+
+NOTE: 数组一旦创立，就不能改变其大小了。
+
+
+[source]
+------------
+int[] arr = {1,2,3,4,5};
+
+// 定义匿名数组，并重新初始化已经定义过的 arr变量
+arr = new int[] {1,2,3,5};
+
+// 多维数组
+int [][] magicSquare =
+    {
+        {16, 3, 2, 2},
+        {1, 2, 3, 4},
+        {2, 2, 5, 4}
+    };
+------------
+
+== 面向对象 ==
+
+.类之间的关系
+    * 依赖 `uses-a`
+    * 聚合 `has-a`
+    * 继承 `is-a`
+
+在一个源文件中只能有一个 `public` 类（并与文件名对应），可以有任意个非 `public` 类。
+
+=== 日期和时间 ===
+
+分开处理时间和日期。
+
+.日历
+`new GregorianCalendar(1985, 1, 1)` 
+
+NOTE: 月份从 *0* 开始
+
+=== 定义类 ===
+
+NOTE: 不要在任何方法内定义与实例域同名的变量。
+
+.构造器
+    * 构造器与类同名
+    * 可以有多个构造器（重载）
+    * 构造器没有返回值( `public ClassName` )
+
+NOTE: 不要返回一个可变的引用对象，如果非要返回引用对象，clone一个返回。
+
+NOTE: 一个类的方法可以访问所属类的 *所有实例对象* 的私有数据。
+
+.修饰符
+`final` 修饰符表示不可变的域，
+
+`static` 修饰符表示静态域或静态方法，只属于类的域或方法，该类的所有实例对象所共有。
+
+`static final` 修饰符表示静态常量。
+
+`main` 方法不对任何对象进行操作，任何一个类都可以有一个 `main` 方法（可用于单元测试，单独调试一个类)
+
+
+=== 值调用和引用调用 ===
+
+Java中方法的参数是 *值调用* ,方法得到是所有参数的一个拷贝。
+
+.方法参数的 *值传递* 特点：
+    * 一个方法不能修改一个基本数据类型的参数（数值和布尔）
+    * 一个方法可以修改一个对象参数的状态。
+    * 一个方法不能让对象参数引用一个新的对象。
+
+但是对于属于引用类型的变量，虽然同为值调用模式，但依然可以改变该变量的值，原因是：
+
+[source, java]
+-----------------------------------
+
+class Employee {
+    //...
+
+
+    public void raiseSalary(int i) {
+        // ...
+    }
+
+    //...
+}
+
+class Some {
+    public static void main(String[] args) {
+        harry = new Employee(...);
+        tripleSalary(harry);
+    }
+
+    public static void tripleSalary(Employee x) {
+        // 假如执行
+        // tripleSalary(harry);
+        //
+        // 那么这里的x参数则为 harry 值的一个拷贝，属值传递
+        // 但是因为harry的值只是一个对象的引用(它引用的是一个Employee对象),
+        // 此时x参数虽然和harry并不是一个变量(它只是harry的一个拷贝)
+        // 但这个拷贝的值也是对同一个Employee对象的引用
+        // 即harry和x此时引用了同一对象，
+        // 因此对于x的操作则实际上是在对那个Employee对象进行操作，
+        // 其操作则也会影响到同样引用了这个Employee对象的harry变量
+        //
+        // 该函数结束后，x对象自动销毁
+        x.raiseSalary(200);
+    }
+}
+----------------------------------
+
+在这一点上，javascript的值传递基本和java是完全一致的,
+而PHP虽默认也为值传递，但略有不同,主要是在对于数组元素的处理上, 在PHP中Array类型的变量并不是引用类型，以下为相同逻辑的代码分别在java,javascript,php中的测试可证明：
+
+[source, java]
+------------------------------
+int[] arr = {1,2,3,4,5};
+
+int[] abc = arr;  // 引用对象
+abc[0] = 100; //修改对象
+
+System.out.println(arr[0]); //修改成功 输入：100
+------------------------------
+
+[source, javascript]
+------------------------------
+arr = [1,2,3,4,5];
+abc = arr;
+abc[0] = 100;
+alert(arr[0]); //修改成功 输入： 100
+
+------------------------------
+
+[source, php]
+------------------------------
+$arr = array(1,2,3,4,5);
+$abc = $arr; 
+$abc[0] = 100;
+
+var_dump($arr[0]); //未修改，输入: 1
+------------------------------
+
+
+.Javascript中的值传递
+[source, javascript]
+-----------------------------
+// javascript, firebug-console
+
+// Array
+>>> var arr = [1,2,3];
+>>> arr
+[1, 2, 3]
+>>> function change(arr) {arr[0] = 100;}
+>>> change(arr);
+>>> arr
+[100, 2, 3] //随之改变
+
+// String
+>>> var a= 'l';
+>>> function change2(str) { str='lds';}
+>>> change2(a);
+>>> a
+"l" //不变
+
+// Int
+>>> var b = 123;
+>>> change2(b);
+>>> b
+123 //不变
+
+// Object
+>>> var obj = {};
+Object {}
+>>> function change3(obj) { obj.name='liudingsan';}
+>>> change3(obj);
+>>> obj
+Object { name="liudingsan"} //随之改变
+-----------------------------
+
+.PHP中的值传递
+[source, php]
+------------------------------
+// 值传递 - 对象object
+class Person {
+    public $name = '';
+
+    public function __construct($name) {
+        $this->name = $name;
+    }
+
+    public function getName() {
+        var_dump($this->name);
+    }
+    
+    public function setName($newname) {
+        $this->name = $newname;
+    }
+}
+
+$jack = new Person('jack');
+
+function test($someone) {
+    $someone->setName('jack-new');  //$jack也随之改变
+    $someone->name = 'jack-new2';  //$jack也随之改变
+    $someone = null;  //$jack不变，依然存在
+    unset($someone);  //$jack不变，依然存在
+}
+
+test($jack);
+
+var_dump($jack);
+
+
+// 值传递 - 数组array
+$arr = array(1,2,3,4);
+
+function change($arr) {
+    $arr[0] = 100;
+}
+
+change($arr);
+
+var_dump($arr); // 依然为 array(1,2,3,4) ， 不变
+----------------------------------------------
+
+
+== 对象构造 ==
+
+=== 重载 ===
+
+*重载* ( `overloading` ), 如多个方法有相同的名字,不同的参数.
+
+方法名以及参数类型,叫做方法的签名( `signat` ).
+
+NOTE: 返回类型不是方法签名的一部分,也就是说不能用两个相同名字,相同类型的却返回不同类型值的方法.
+
+=== 显式域初始化 ===
+
+[source]
+------------------------------
+class Employee {
+    private String name = "";
+
+    // 初始值不一定是常量,也可以调用方法来初始
+    private int id = assignId();
+
+    static int assignId() {
+        int r = nextId;
+        retrun r;
+    }
+}
+------------------------------
+
+=== 调用另一个构造器 ===
+
+`this();`
+
+=== 初始化块 ===
+
+`static { /* 代码将会在每次初始化时自动执行 */ }`
+
+== Package ==
+
+.引用冲突
+例如 `java.util` 和 `java.sql` 都有 `Date` 类,那么就必须指明将使用哪个包中的类.
+
+[source]
+------------------------------
+import java.util.*;
+import java.sql.*;
+import java.sql.Date;
+------------------------------
+
+.引入静态方法或静态域
+`import static java.lang.System.*;`
+常用于:算法函数和笨重的常量.
+
+
+.编译
+`javac com/mycompany/PayrollApp.java`
+`java  com.mycompany.PayrollApp`
+
+
+== 文档注释 ==
+
+.域注释
+只需要对公有域(通常指的是静态常量)建立文档.
+
+.链接
+    * @see com.horstaman.corejava.Employee#raiseSalary(double)
+    * @see <a href="www.google.com">Google Home Page</a>
+    * @see "some text"
+
+在其他地方加入链接
+[source]
+--------------------
+{@link package.class#feature lable}
+--------------------
+
+.包注释
+在包目录中添加 `package.html` 文件即可, `<body></body>` 之间的代码将被提取到文档中.
+
+.文档化命令
+`javadoc -d toDocDirectory nameOfPackage`
+
+== 类设计技巧 ==
+
+.OOP技巧
+    * 一定将数据设计为私有.
+    * 一定要对数据初始化.
+    * 不要在类中使用过多的相关联的基本数据类型作为域.
+    * 不是所有域都需要独立的域访问器和域设置器.
+    * 保持一致的格式进行类定义.
+    * 将职责过多的类进行分解.
+    * 类名和方法名要能体现它们的职责.
+
+== 继承 ==
+
+NOTE: 如果子类的构造器中没有显式的调用超类的构造器,那么JAVA会自动调用超类默认(没有参数)的构造器.如果超类没有默认构造器,则报错.
+
+.多态(polymorphism)
+对象变量是多态的.
+
+.动态绑定(dynamic binding)
+寻找方法
+
+.防止继承
+`final`
+
+NOTE: 如果一个类申明为 `final` 类,那么只有其中的方法自动为 `final`, 而不包括域.
+
+.强制类型转换
+将一个值存入变量时,编译器允许将一个子类的引用赋给以个超类变量,但将一个超类的引用赋予一个子类变量时,就必须进行类型转换.
+
+在一般情况下,应该少用类型转换和 `instanceof` 
+
+.抽象类
+`abstract`
+
+.访问权限
+    * `private` : 仅对比本类可见
+    * `public` : 对所有类可见
+    * `protected` : 对本包和所有子类都可见
+    * `默认` : 对本包可见
+
+.Object类
+
+所有类的最终祖先 `Object` .
+
+在JAVA中只有 *基本类型* ( `primitive type` ,如数值,字符,布尔)的值不是对象, 数组(不管是对象数组还是基本类型数组)都是Object类型.
+
+`equals` 方法用于判断两个对象是佛具有相同的引用.在自己编写的类中应该覆盖这个方法.
+
+覆盖父类方法可以标记 `@Override` ,如果没有覆盖成功,编译器会给出错误报告.
+
+`toString` 当在对象上进行 `+` 操作时, 就会自动调用 `toString` 方法.
+
+自定义的 `toString` 格式一般为 `className[name=lds,age=23]`
+
+NOTE: 强烈建议为自己编写的每个类添加 `toString` 方法.
+
+.泛型数组列表 `ArrayList`
+
+无需指定数组大小
+
+[source]
+------------------------------
+ArrayList<Employee> staff = new ArrayList<Employee>();
+// 或者指定数组大小
+// ArrayList<Employee> staff = new ArrayList<Employee>(100);
+
+// 类似于Array.push()
+staff.add(new Employee("Jack", 23));
+
+// 在n的位置之后插入一个新值
+int n = 2;
+staff.add(n, Employee("newGuy", 23));
+
+// 删除一个元素
+staff.remove(3);
+
+// 设置数组大小
+staff.ensureCapacity(100);
+
+// 返回数组大小
+staff.size();
+
+// staff[i] = harray , 只能set已经存在的值
+staff.set(i, harry);
+
+staff.get(i);
+
+for (Employee e : staff) {
+    //e.dosomething();
+}
+
+// 将数组列表转化为普通数组
+Employee[] staff_arr = new Employee[staff.size()];
+staff.toArray(staff_arr);
+------------------------------
+
+.对象包装器与自动打包
+包装器(wrapper) : `Integer` , `Long` , `Float` , `Double` , `Short` ...
+
+[source]
+------------------------------
+// 不能这样写: ArrayList<int>
+ArrayList<Integer> list = new ArrayList<Integer>();
+
+// 自动打包(autoboxing)
+
+list.add(3);
+// 自动变换为
+// list.add(new Integer(3));
+------------------------------
+
+.可变数量参数
+`public static double max(double... values)`
+可接受随意个参数, 编译器将以数组形式将参数传递给方法 `new double[] {1, 2, 3}`
+
+.反射
+`getClass()` 将返回一个 `Class` 类型的实例:
+`Class cl = e.getClass();`
+`Class cl = MyClass.getClass();`
+
+.继承设计技巧
+    * 将公共操作和域放置在超类中.
+    * 不要使用受保护的域.
+    * 使用继承实现 `is-a` 关系.
+    * 除非所有继承的方法都有意义,否则不要使用继承.
+    * 在覆盖方法的时候,不要改变预期的行为.
+    * 使用多态,而非类型信息.
+    * 不要过多的使用反射.
+
+== 接口 ==
+
+接口::
+    接口 ( `interface` ) 不是类,而是一组对类的需求描述.这些类要遵从接口描述的统一格式进行定义.
+
+[source]
+------------------------------
+public interface Comparable 
+{
+    int compareTo(Object otherObj);
+}
+------------------------------
+
+.接口特点:
+    * 不需要在方法前指定 `public`
+    * 接口可以用常量, 也不用指定 `public static final`
+    * 接口可以继承接口
+
+.接口和抽象类
+抽象类不能实现多继承
+
+.克隆
+要使用 `clone()` 必须实现 `Cloneable` 接口,并覆盖 `clone()` 方法(并且标记为 `public` ).
+
+也应该抛出异常,例如:
+`public Employee clone() throws CloneNotSuppertedException`
+
+
+浅拷贝::
+    只拷贝基本类型的数据,对于可变的引用类型的数据拷贝的值和原值都引用同一对象.
+
+深拷贝::
+    拷贝所有可变和不可变数据.
+
+.接口和回调
+向定时器传递一个对象(实现了某个Listener接口的对象),而非函数名.
+
+[source]
+------------------------------
+Timer t = new Timer(1000, new ActionListener() {
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            // TODO Auto-generated method stub
+            Random r = new Random(5);
+            int x = r.nextInt();
+            int y = r.nextInt();
+            System.out.println(x + " " + y);
+            addLine(x, y);
+        }
+});
+t.start();
+
+------------------------------
+
+== 内部类 ==
+
+.特点
+    * 只有内部类可以是私有类.
+    * 内部类可以访问外部类的域和方法.(哪怕是申明为 `private` 的)
+
+在内部类中引用外部类 `OuterClass.this`
+在外部类中明确引用内部类 `this.new InnerClass`
+在外部引用类中的内部类 `OuterClass.InnerClass`
+
+.局部内部类
+在方法中定义一个局部类,不能使用访问说明符.
+
+优势:
+    * 完全隐蔽.
+    * 可以访问标记为 `final` 的局部变量.
+
+.匿名内部类
+
+[source]
+------------------------------
+// 内部类
+class A {
+    public void start() {}
+
+    private class B {}
+}
+
+// 局部内部类
+class A {
+    public void start() {
+        class B {}
+    }
+}
+
+// 静态内部类, 不需要访问外部类的域或方法
+class A {
+    public static class B {
+        public func() {}
+    }
+
+    puvlic static B getClassB() {
+        retrun new B();
+    }
+
+}
+// 外部访问:
+A.B myVar = A.getClassB();
+myVar.func();
+
+// 匿名内部类
+class A {
+    public void start() {
+
+        // 创建一个实现ActionListener接口的类的新对象
+        ActionListener listener = new 
+            ActionListener()
+            {
+                public void t() {}
+            };
+
+        Timer t = new Timer(1000, listenner);
+    }
+}
+------------------------------
+
+== GUI ==
+
+@see: project->test
+
+== 异常和调试 ==
+
+    * Error
+    * Exception
+        - RuntimeException
+            - ArrayIndexOutOfBoundsException 数组访问超界
+            - NullPointerException 访问空指针
+            - 错误的类型转换
+            - ...
+        - other exception
+            - IOException 
+            - ...
+
+
+    "如果出现RuntimeException异常,就一定是你的问题"
+
+`RuntimeException` 和 `Error` 的异常成为 `uncheck` 异常,其他都为 `check` 异常.
+
+.声明已检查异常
+`public FileInputStream(String name) throws FileNotFoundException`
+
+NOTE: 子类方法抛出的异常必须小于该超类方法的异常范围.
+
+.自定义异常
+[source]
+------------------------------
+class FileFormatException extends IOException
+{
+    public FileFormatException() {}
+    public FileFormatException(String gripe)
+    {
+        super(gripe);
+    }
+}
+------------------------------
+
+.保存异常链
+[source]
+------------------------------
+try {
+    //do something
+} catch (SQLException e) {
+    Throwable se = new ServletException("error message");
+    se.setCause(e); //设置原始异常
+    // JDK 5.0后
+    // se.initCase(e);
+    throw se;
+} finally {
+    //do something
+}
+------------------------------
+
+.Finally
+[source]
+------------------------------
+InputStream in = ...;
+try {
+    try {
+        //..
+    } finally {
+        // 确保关闭流
+        // 注意:　此存的close依然可能抛出异常
+        // 所以将其嵌套到另一个try语句中
+        in.close();
+    }
+} catch (IOException e) {
+    // 保证输出出现的错误,包括输出finally语句中的错误
+    // show error message
+}
+------------------------------
+
+=== 记录日志 ===
+
+.自定义日志
+`Logger myLogger = Logger.getLogger("com.mycompany.myapp");`
+
+.日志级别
+    * SEVERE
+    * WARNING
+    * INFO
+    * CONFIG
+    * FINE
+    * FINER
+    * FINEST
+
+.常用方法
+[source]
+------------------------------
+logger.setLever(Level.FINE);
+logger.warning(message);
+logger.fine(message);
+logger.log(Level.FINE, message);
+------------------------------
+
+
+.设置Handler
+[source]
+------------------------------
+FileHandler handler = new FileHandler("d:/lds_java.log");
+logger.addHandler(handler);
+logger.info("logger lds");
+------------------------------
+
+.使用断言
+`assert x == 0  : x;`
+NOTE: 断言只应该用于开发阶段.
+
+.虚拟机监控
+`> jconsole`
+
+.模拟键盘鼠标操作
+[source]
+------------------------------
+GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+GraphicsDevice screen = env.getDefaultScreenDevice();
+
+Robot robot = new Robot(screen);
+robot.keyPress(KeyEvent.VK_UP);
+robot.delay(1000); //延迟
+------------------------------
+
+== 流和文件 ==
+
+`InputStream` 读取 *字节序列* 的对象 输入流
+`OutputStream` 写入 *字节序列* 的对象 输出流
+
+.InputStream
+read(),读取一个字节，返回该字节，读到EOF返回-1.
+
+.OutputStream
+flush(),刷新输出流，即将缓冲区中的所有数据发送到目的地。
+
+.Reader/Writer
+read(),和InputStream不同的，读取一个 *Unicode字符单位* ,而非 *字节序列* 。
+
+.字节输入 - DataInputStream
+[source]
+---------------------------
+DataInputStream din = new DataInputStream(
+        new BufferedInputStream(
+            new FileInputStream("employee.dat")));
+---------------------------
+
+.字节输出 - DataOutputStream
+writeChars/writeByte/writeInt/...
+
+
+.文本输出 - PrintWriter
+[source]
+---------------------------
+PrintWriter out = new PrintWriter(new FileWriter("e.txt"));
+out.print("Hello World");
+
+// 注意:
+FileWriter out = new FileWriter("output.txt");
+// 相当于
+FileWriter out = new FileWriter(new FileOutputStream("output.txt"));
+---------------------------
+
+.文本输入 - BufferedReader
+[source]
+---------------------------
+BufferedReader in = new BufferedReader(new FileReader("out.txt"));
+String line;
+while ( (line = in.readLine() ) != null )
+{
+    // do something
+}
+---------------------------
+
+.Zip读取
+[source]
+---------------------------
+ZipInputStream zin = new ZipInputStream(new FileInputStream("some.zip"));
+ZipEntry entry;
+while ( (entry = zip.getNextEntry() ) != null ) {
+    BufferedReader in = new BufferedReader(new InputStreamReader(zin));
+    // readLine...
+
+    // file name
+    String filename = entry.getName();
+
+    zin.closeEntry();
+}
+zin.close();
+---------------------------
+
+.StringTokenizer
+`StringTokenizer t = new StringTokenizer("lds|23", "|");`
+`String name = t.nextToken();`
+
+和 `String.slipt` (该方法返回 `String[]` 数组)类似.
+
+.StringBuilder
+JDK5.0, 大量字符串拼接或处理. 旧版为 `StringBuffer`
+
+.对象序列化
+[source]
+------------------------------
+
+Employee harry = new Employee("Harry", 23);
+Manager boss = new Manager("boss", 43);
+
+// 写入对象
+ObjectOutputStream out = new ObjectOutputStream(
+        new FileOutputStream("some.txt"));
+out.writeObject(harry);
+out.writeObject(boss);
+
+// 读取对象
+ObjectInputStream in = new ObjectInputStream(
+        new FileOutputStream("some.txt"));
+// readObject总是返回Object类型
+// 可保存对象的类,类的签名,以及该类及其超类的非静态,非临时的域的值.
+Employee e1 = (Employee) in.readObject();
+Employee e2 = (Employee) in.readObject();
+
+// 类必须实现Serializable接口
+// 但并不需要去覆盖任何方法
+class Employee implements Serializable {
+    // transient 标志不需要序列化的域
+    private transient String name;
+
+}
+
+// 手工控制如何序列化需要实现
+// Extrnalizable接口
+// 并覆盖readExternal(ObjectInput s)
+// writeEcternal(ObjectOutput s)
+
+// 对象指纹, 指纹相同,则可以读取旧版
+`> serialver Employee`
+`public static final long serialVersionUID = -12312312312313;;`
+------------------------------
+
+.FilenameFilter
+[source]
+------------------------------
+public class ExtensionFilter implements FilenameFilter
+{
+    private String extension;
+
+    public ExtensionFilter(Sting ext) {
+        extension = "." + ext;
+    }
+
+    @override
+    public boolean accept(File dir, String name) {
+        return name.endsWith(extension);
+    }
+}
+------------------------------
+
+NOTE: 利用 `getCanonicalPath` 代替 `getAbsolutePath()` .
+
+=== 正则表达式 ===
+
+例如 `X` 为表达式,那么 `X+ X* X?` 中的 `+` , `*` , `?` 都属于 *量词* (quantitifier).
+
+.量词
+    * `?` , 0个或1个
+    * `*` , 0个或N个
+    * `+` , 1个或N个
+
+.量词后缀:
+    * 量词后跟 `?` , 表示最小匹配
+    * 量词后跟 `+` , 表示最大匹配,开启 *贪婪模式*
+
+
+.贪婪模式
+例如 `String s = cab;`
+
+那么模式 `[a-z]*ab` 可以匹配成功,而 `[a-z]*+ab` 则无法匹配成功,因为开启贪婪模式后, `[a-z]` 匹配了字符 `c` , 而量词 `*` 为贪婪模式,则会将后面的字符串都匹配掉, 因此模式中的 `ab` 则无字符可配, 故匹配失败.
+
+
+[source]
+------------------------------
+Pattern pattern Pattern.compile("[a-z]*ab");
+// input 支持任何实现了CharSequence接口的类
+Matcher matcher = pattern.matcher(input);
+
+//if (matcher.matches()) { }
+while (matcher.find()) {
+    int start = matcher.start();
+    int end = matcher.end();
+    String match = input.substring(start, end);
+}
+------------------------------
+
+== 泛型程序设计 ==
+
+*泛型程序设计(generic programming)* 意味着编写的代码可以被很多不同类型的对象所重用.
+
+`ArrayList` 就是一个泛型类.
+
+[source]
+------------------------------
+// 自定义一个泛型类
+public class Pair<T>
+{
+    private T first;
+    private T second;
+
+    public Pair() {
+        first = null;
+        second = null;
+    }
+
+    // T 为类型参数
+    public Pair(T first, T second) {
+        this.first = first;
+        this.second = second;
+    }
+
+    // 泛型方法也可以在普通类中定义
+    public static <T> T getMiddle(T[] a) {
+        return a[a.length /2];
+    }
+
+    // 对泛型进行限制
+    public static <T extends Comparable & Serializable> T min(T[] a) {
+        // <code>extends Comparable</code> 确定了该类型可以使用
+        // compareTo 方法.
+        return (a[0].compareTo(a[1])) ? a[0] : a[1];
+    }
+}
+
+// 通配符的使用
+
+// 表示类型可以是 Employee 的所有子类型
+public class Pair2<? extends Employee> {} 
+
+// 表示类型可以是 Manager 的所有超类型
+public class Pair3<? super Manager> {} 
+
+
+// 调用泛型方法
+Pair.<String>getMiddle("string");
+// 也可以省略<String>, 让编译器自行判断
+Pair.getMiddle("string");
+
+------------------------------
+
+.虚拟机与泛型
+    * 虚拟机中没有泛型,只有普通的类和方法.
+    * 所有的类型参数都用它们的边界替换.
+    * 桥方法被合成为保持多态的.
+    * 为保持类型安全性,必要时插入强制类型转换.
+

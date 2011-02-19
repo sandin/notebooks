@@ -1,0 +1,163 @@
+= cs106a =
+lds <lds2012@gmail.com>
+{localdate}
+
+== lecture 3 ==
+
+    So we start at the high level and we break things down.
+
+    top-down design. 
+
+    what top-down design is is you start at the highest level, the top, and you go down from there. 
+
+    And it starts with the low-level stuff and this is actually the place most programmers, when they start out, this is what they begin doing is bottom-up design.
+
+    In some cases this makes sense, but a lot of times this just makes your life easier, to think about the most abstract level and break down from there. 
+
+    you have good style because that's just way more important than just getting the program working.
+
+    In terms of decomposition, the thing that you really wanna think about is every one of your methods should basically solve one problem,
+
+    One guideline is think about each method solving one problem, 
+
+    And here's just a rough guideline.  It's not a guideline that always holds, but a rough guideline is most of your methods will probably be somewhere between one and 15 lines long,
+
+    having good names.  The names should describe what the method is actually doing, what problem it's solving, because you want your programs to read like good English
+
+    programs are written for people.  Computers execute them, but they're really written for people to be able to go and look at and modify, so good names explains what the program actually does, and  every one of the methods that you have in terms of decomposition should also have some comments associated with it that explains either at some more detailed level what the method is doing, or if the method is very short and it's fairly self-explanatory, pre-conditions and post-conditions are sometimes a good idea as well.
+
+    Decomposition actually applies to both of them
+
+== lecture 4 ==
+
+    the difference between the two is that computer science or CS as we抣l just affectionately refer to it, really is the science or in some sense, the study of problem solving with computers, and you don抰 need to write his all down; it's just for your edification, with computers or I should say, computational devices.
+
+    But that's really what the science is, is thinking about problem-solving and the approaches to problem-solving, how you analyze how efficient a solution is to a problem, how solvable it actually is, the different approaches you take to it.
+
+    computer science is just as much about programming as astronomy is about building telescopes.
+
+    source code.
+
+    object code is essentially just the low-level instructions, the machine instructions that the computer understands and so going from source code to object code is basically what the compiler does.  It's the translation from this to this.
+
+    every time you run a Karel program, you can think of what it's doing is creating an instance of Karel 
+
+
+== lecture 5 ==
+
+    and basically all the variable is in the computer science worlds is it?a box.
+
+    this equals is not equals in mathematics; it's actually what?known as an assignment statement in Java or in most programming languages. 
+
+    So the name of the variable is the receiver and the method that?being called is called the message and so there?this whole notion of sending messages,
+
+    that's the modular operator.
+
+    It's not in Java; it's remainder an dif you try to apply it to negative numbers, unexpected things, what's not unexpected; it's just not what you would have expected in the mathematical sense.  So as far as you see it in the book and everything we do in this class, just apply it to positive integers and you can only apply it to integers so there's no remainder with valued doubles, there's no remainder.
+
+=== Variable ===
+
+name, type
+
+variable is like a BOX.
+
+.name
+make it descriptive
+
+.primitive type
+    * int, interger
+    * double, real-value
+    * boolean, logic( true or false )
+    * char, character
+
+.declare variable syntax:
+[source]
+---------------------
+// type name = value;
+int n1 = 123;
+---------------------
+NOTE: '=' is not equals in mathematic, is an assignment statement.
+
+'%' isn't 'MOD', but remainder in java
+
+:Log: 2010-09-06 review
+
+== lecture 6 ==
+
+[source]
+---------------------
+// int 相除将永远都只会得到一个int, 小数点后面的直接截去
+// 5/2 = 2 
+// 只要有一方为double, 则结果则为 double
+// 5/2.0 = 2.5
+
+int x = 5;
+double y = x/2; // y is 2.0 ,先对等号右边求值, 然后赋予等号左边的变量中.
+
+// CAST
+double y = (double) x / 2
+
+double y = 2.5
+int e = (int) y; // 2, 不是四舍五入,而是向下取值
+-----------------------
+
+.COUNSTANT
+unchange
+
+inside class
+`private static final double PI = 3.14;`
+
+NOTE: no `const` in java, only has `final`
+
+.Boolean
+[source]
+---------------------
+boolean p;
+p = ( 3 > 5 ); // false
+
+==, !=, >, <, >=, <=
+
+Short-circuit evaluation
+
+.statement block
+A compound statement (or block) is a set of statement encloseed in braces.
+The block is a scope.
+
+
+[source]
+---------------------
+for (int i = 0; i < 5; i++) {
+    printIn(i);
+}
+// when four loop is finished executing and i is gone away.
+---------------------
+
+.variable scope
+it's the lifetime of the variable 
+
+:Log: 2010-09-06
+
+== lecture 7 ==
+
+    in computer science or actually in computer programming, we really hate duplicated code.If we can avoid duplicating code, even if it’s one line, we generally try to do it.
+
+[source]
+---------------
+int total = 0;
+
+while (true) {
+    int vaule = readInt('');
+    if ( 0 == value ) break;  // break in here
+    total += value;
+}
+---------------
+
+.for versus while
+
+for::
+ we know how many times we want to do something.
+
+while::
+ indefinite loop, we don't know how many times we actually want to do something.
+
+20min
