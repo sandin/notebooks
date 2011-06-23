@@ -1,0 +1,230 @@
+= PHP 设计模式 =
+:language: php
+
+
+== 单例模式 ==
+
+其实单例模式一般都用得比较多, 特别是数据库类.
+
+单例模式被认为是职责模式，因为它将创建对象的控制权委托到一个单一的访问点上。
+
+单例类至少拥有以下三种公共元素： 
+1. 必须拥有一个构造函数 `__construct()` ，并且必须被标记为 `private`.
+2. 拥有一个保存类的实例的静态成员变量, `$_instance` .
+3. 拥有一个访问这个实例的公共的静态方法, `getInstance()` .
+
+单例类只能被自己实例化，不能被其他类直接实例化。为此，将 `__construct()` 标记为private
+
+[source, php]
+---------------------------------------
+<?php
+
+class Database {
+
+  private $_db;
+  private static $_instance; 
+
+  private function __construct() {
+    $this->_db = pg_connect('dbname=example_db');
+  }
+
+  public static function getInstance() {
+    if( ! (self::$_instance instanceof self) ) {
+      self::$_instance = new self();
+    }
+    return self::$_instance;
+  }
+
+  private __clone() {};  //防止被clone
+
+
+}
+---------------------------------------
+
+.使用方法
+[source]
+---------------------------------------
+<?php
+$db = Database::getInstance();
+$db->query('SELECT * FROM example_table');
+---------------------------------------
+
+
+== <PHP设计模式> 读书笔记 ==
+
+.遗留问题 
+**************************************************
+    * 伪对象非常有用，但暂时无法理解。 
+**************************************************
+
+
+=== 值对象模式（The Value Object Pattern) ===
+
+.简要 
+保护数据不会被错误的修改
+
+.实例 
+[source]
+-----------------------------------------------------------
+<?php
+class Dollar{
+    protected $amount;
+    function __construct($amount=0){
+           $this->amount = $amount;
+    }
+    function getAmount(){
+           return $this->amount;
+    }
+    function add($dollar){
+        // 重新实例化自己
+        return new Dollar($this->amount+$dollar);   
+    }
+}
+-----------------------------------------------------------
+
+.要点 
+1. 保护值对象的属性，禁止被直接访问。（protected） 
+2. 在构造函数中就对属性进行赋值。 
+3. 去掉任何一个会改变属性值的方式函数（setter），否则属性值很容易被改变。 
+
+=== 工厂模式 ===
+
+.简要：
+封装对象建立的过程
+
+暂略, 改日补上.
+
+
+=== 单态模式 MonoState ===
+
+`monostate` 模式的基本原理就是让 monostate 类的所有实例使用起来是同一个实
+例一样。实际上把类的所有属性都使用 static 声明即可. 
+MonoState模式将它的构造函数声明为public，而将类中所有的字段声明为static（类属）。换句话说，MonoState并不限制创建对象的个数，但是它的状态却只有一个状态。 
+
+[source]
+-----------------------------------------------------------------
+<?php
+
+ class monostate
+ {
+      private static $itsX=0;
+      
+      public function __construct()
+      {
+          
+      }
+      
+      public function setX($x)
+      {
+          self::$itsX=$x;
+      }
+      
+      public function getX()
+      {
+          return self::$itsX;
+      }
+ }
+-----------------------------------------------------------------
+
+
+=== 注册模式 Registry ===
+
+看法: 有些类似 `Zend_Registry` 之类的.
+
+[source]
+---------------------------------------------------------------
+<?php
+
+class RegistryMonoState {
+
+    protected static $store = array();
+
+    function isValid($key) {
+        return array_key_exists($key, RegistryMonoState::$store);
+    }
+
+    function get($key) {
+        if (array_key_exists($key, RegistryMonoState::$store))
+            return RegistryMonoState::$store[$key];
+    }
+
+    function set($key, $obj) {
+        RegistryMonoState::$store[$key] = $obj;
+    }
+
+}
+---------------------------------------------------------------
+
+=== 伪对象模式 mock ===
+
+伪对象模式是另一种测试模式ServerStub的扩展。伪对象是一个测试模式而不是设计模式。
+
+
+=== 策略模式 ===
+ 一系列的运算法则,每个运算法则都是封装在独立的类中。但是,每一个对象
+都是绑定到一个公共的容器对象中。并且,通过一个公共的API
+使用同样的方式在进行引用。而这个公共的 API的运行方式是
+与策略的选择无关的。
+
+[source]
+---------------------------------------------------
+<?php
+
+class VarCache    {
+     var $_name;
+     var $_type;
+
+     function VarCache($name, $type='serialize') {
+         $this­>_name = 'cache/'.$name;
+
+         switch (strtolower($type)) {
+                case  'string':
+                $strategy = 'String';
+                    break;   
+                case 'numeric':
+                $strategy = 'Numeric';
+                        break;         
+                case 'serialize':
+                default:
+                    $strategy = 'Serializing';
+        }
+
+        $strategy .=   'CacheWriter';
+        $this­>_type  =& new $strategy;
+
+    }
+
+    function isValid()    {
+        return file_exists($this­>_name.'.php');
+    }
+     
+    function get() {
+        if ($this­>isValid()) {
+            include   $this­>_name.'.php';
+            return   $cached_content;
+        }
+    }
+
+    function set($value) {
+        $file_handle = fopen($this­>_name.'.php',  :w');
+        $this­>_type­>store($file_handle,     $value);
+        fclose($file_handle);
+    }
+}
+
+/**********************************************/
+
+class SerializingCacheWriter   /* implements CacheWriter*/   
+{
+    function store($file_handle, $var)  {
+        $content = sprintf('<?php\n\$cached_content =
+                    unserialize(stripslashes('%s'));
+                    ,addslashes(serialize($var)));
+        fwrite($file_handle, $content);
+    }
+}
+
+---------------------------------------------------
+
+
+

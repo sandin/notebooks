@@ -281,7 +281,7 @@ class MyComputation implements Callable<Integer>
 
 Callable<Integer> myComputation = new MyComputation("args");
 // 将Callable转换成Future和Runable
-FuturnTast<integer> task = new FuturnTast<Integer>(myComputation);
+FutureTask<Integer> task = new FutureTask<Integer>(myComputation);
 
 Thread t = new Thread(task); // it's a Runnable
 t.start();

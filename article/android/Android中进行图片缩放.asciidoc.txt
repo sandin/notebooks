@@ -1,0 +1,84 @@
+= Android中进行图像压缩或缩放 =
+:language: java
+
+这里将的是只使用 Android 中自带的库进行简单的图像缩放和压缩, 如果对图像处理有更多要求的话, 建议使用其他的库, 这里使用自带库进行操作适合图片处理没不是主要逻辑的项目, 简单的只是想缩小或压缩图片.
+
+.压缩图片
+
+这里简单的将一个图片文件转换为 `Bitmap` ,并且在转换的过程中对图片质量进行简单压缩:
+[source]
+--------------------------------------------------------------------
+bitmap.compress(Bitmap.CompressFormat.JPEG, int quality, FileOutputStream fos);
+--------------------------------------------------------------------
+
+注意这里的 quality 的范围为 `0~100` ,经过测试如果这个值设置比较低的话图片会非常不清晰, 基本不可用, `0~100` 的值可以参考类似Photoshop之类输出图片时选择的图片质量.
+
+此方法只是单纯对图片质量进行处理, 并不会改变其大小, 如果需要改变图片文件的大小, 最好是使用缩放, 这个可以在保证一定的图片清晰度的情况下减少了图片大小, 毕竟手机屏幕就那么点, 你把 2000px * 1000px 的图片改为 500px * 250px 在手机用户看来也不会有太严重的不适感, 而如果你只设置图片的 `quality` 想来改变文件大小, 你最后会发现得到的是一个 2000px * 1000px 的几个色块.
+
+.缩放图片
+
+先提代码看看:
+[source]
+----------------------------------------------
+  /**
+     * 保持长宽比缩小Bitmap
+     * 
+     * @param bitmap
+     * @param maxWidth
+     * @param maxHeight
+     * @return
+     */
+    public Bitmap resizeBitmap(Bitmap bitmap, int maxWidth, int maxHeight) {
+        
+        int originWidth  = bitmap.getWidth();
+        int originHeight = bitmap.getHeight();
+        
+        // no need to resize
+        if (originWidth < maxWidth && originHeight < maxHeight) { 
+            return bitmap;
+        }
+        
+        int width  = originWidth;
+        int height = originHeight;
+        
+        // 若图片过宽, 则保持长宽比缩放图片
+        if (originWidth > maxWidth) {
+            width = maxWidth;
+            
+            double i = originWidth * 1.0 / maxWidth;
+            height = (int) Math.floor(originHeight / i);
+        
+            bitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);
+        }
+        
+        // 若图片过长, 则从上端截取
+        if (height > maxHeight) {
+            height = maxHeight;
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height);
+        }
+        
+//        Log.i(TAG, width + " width");
+//        Log.i(TAG, height + " height");
+        
+        return bitmap;
+    }
+------------------------------------------------------
+
+这里演示是将图片缩小到一个max范围内, 而不是直接将变成硬性的变成某个尺寸的图片, 因为一般来说这种设置max的方式符合大部分需要, 如果必须将图片变成某个指定尺寸可以直接使用 `Bitmap.createScaledBitmap` 方法, 也是下面要介绍的.
+
+此函数主要就是使用了 `Bitmap` 的两个静态方法, 一个是:
+[source]
+----------------------------------
+public static Bitmap createScaledBitmap (Bitmap src, int dstWidth, int dstHeight, boolean filter)
+----------------------------------
+此方法就会把一个 `Bitmap` 图片 *缩放* 成指定的尺寸.
+
+.剪切图片
+
+而这里还使用到了另一个方法:
+[source]
+----------------------------------
+public static Bitmap createBitmap (Bitmap source, int x, int y, int width, int height)
+----------------------------------
+此处使用该方法的目的是 *剪切* 图片, 就是只取图片的某个区域, 从而达到 *剪切* 图片的效果.
+

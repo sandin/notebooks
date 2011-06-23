@@ -1,0 +1,10 @@
+
+== IE6 'expected identifier, string or number' ==
+Object 属性最后一个不能有逗号
+[source]
+--------------------------------------
+var obj = {
+    name : 'lds',
+    age : 23, //这里的逗号导致此错误
+}
+--------------------------------------

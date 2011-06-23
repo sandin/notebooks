@@ -1,0 +1,855 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.5.2" />
+<title>Zend Framework - 生成HTML缓存</title>
+<style type="text/css">
+/* Debug borders */
+p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
+/*
+  border: 1px solid red;
+*/
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+tt {
+  color: navy;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  font-family: sans-serif;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+
+div.sectionbody {
+  font-family: serif;
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+span#author {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+span#email {
+}
+span#revnumber, span#revdate, span#revremark {
+  font-family: sans-serif;
+}
+
+div#footer {
+  font-family: sans-serif;
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+div#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+div#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #dddddd;
+  color: #777777;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-family: sans-serif;
+  font-weight: bold;
+}
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+
+@media print {
+  div#footer-badges { display: none; }
+}
+
+div#toc {
+  margin-bottom: 2.5em;
+}
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+/* Workarounds for IE6's broken and incomplete CSS2. */
+
+div.sidebar-content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+div.sidebar-title, div.image-title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-top: 0.0em;
+  margin-bottom: 0.5em;
+}
+
+div.listingblock div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+
+div.exampleblock-content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+window.onload = function(){asciidoc.footnotes(); asciidoc.toc(2);}
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  var cont = document.getElementById("content");
+  var noteholder = document.getElementById("footnotes");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      // Use [\s\S] in place of . so multi-line matches work.
+      // Because JavaScript has no s (dotall) regex flag.
+      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      spans[i].innerHTML =
+        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+        "' title='View footnote' class='footnote'>" + n + "</a>]";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+}
+
+}
+/*]]>*/
+</script>
+</head>
+<body>
+<div id="header">
+<h1>Zend Framework - 生成HTML缓存</h1>
+<div id="toc">
+  <div id="toctitle">Table of Contents</div>
+  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph"><p>使用HTML缓存可以使得一些对动态要求不高的页面请求更快,也缓解了服务器压力, 比如一些固定的文章页.</p></div>
+<div class="paragraph"><p>而使用Zend Framework构建的应用程序将 <strong>非常简单</strong> 的可以把服务器输出的内容缓存为html文件, 再之后的请求中, 完全就没有PHP和Zend Frameword什么事了, 只是简单的请求html文件即可, 快速而高效.</p></div>
+<div class="paragraph"><p>但是可惜的是介绍相关内容的资料非常之少, 就连官方手册中也只是对该功能提了一下, 并没有给出完成的用例说明.</p></div>
+<div class="paragraph"><p>这里不仅是介绍如何使用 <tt>Zend_Cache</tt> 将Zend Framework生成的页面缓存为HTML的方法, 也对其实现方法和原理进行了一些分析, 可不局限与ZF框架, 对PHP生成HTML静态缓存技术有进一步的了解, 同时也研究了ZF是如何利用这些基本缓存技术来实现对整个ZF应用生成的内容进行缓存.</p></div>
+</div>
+</div>
+<h2 id="_php_html">1. PHP生成HTML缓存</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>首先简单将一些PHP生成HTML缓存的原理, 这有助于我们理解Zend_Cache是如何缓存整个页面的.</p></div>
+<div class="paragraph"><p>首先我们大概都知道 <tt>ob_start</tt> 函数, 虽然可能很少用过, 但一定见过, 在一般情况下, 我们需要截获PHP输出内容, 一般会使用到这个函数, 例如:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">&lt;?php</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// 开始缓存输出</span></span>
+<span style="font-weight: bold"><span style="color: #000000">ob_start</span></span><span style="color: #990000">();</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// 模拟读取数据库之类等耗时操作</span></span>
+<span style="color: #009900">$foo</span> <span style="color: #990000">=</span> <span style="color: #009900">$db</span><span style="color: #990000">-&gt;</span><span style="font-weight: bold"><span style="color: #000000">fetchAll</span></span><span style="color: #990000">(</span><span style="color: #FF0000">"SELECT * FROM {node}"</span><span style="color: #990000">);</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// 模拟向客户端输出内容</span></span>
+<span style="font-weight: bold"><span style="color: #0000FF">echo</span></span> <span style="color: #009900">$foo</span><span style="color: #990000">;</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// 因为之前调用了ob_start(), 所以这里并不会立刻输出到客户端</span></span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// 而我们可以截获到输出内容</span></span>
+<span style="color: #009900">$buffer</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #000000">ob_get_contents</span></span><span style="color: #990000">();</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// 将输出内容缓存到文件</span></span>
+<span style="font-weight: bold"><span style="color: #000000">file_put_contents</span></span><span style="color: #990000">(</span><span style="color: #009900">$buffer</span><span style="color: #990000">,</span> <span style="color: #FF0000">'/tmp/cache.html'</span><span style="color: #990000">);</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// 将之前的ob缓存释放到客户端</span></span>
+<span style="font-weight: bold"><span style="color: #000000">ob_end_clean</span></span><span style="color: #990000">();</span>
+</tt></pre></div></div>
+<div class="paragraph"><p>而 <tt>ob_start</tt> 是提供另一种形式的, 就是 <tt>ob_start(callback)</tt> , 其中 <tt>callback</tt> 为指定的回调函数名, 该回调函数可能会在如下情况下被调用:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+调用 <tt>ob_flush()</tt> , 部分输出内容发送到客户端.
+</p>
+</li>
+<li>
+<p>
+调用 <tt>ob_clean()</tt> , 输出内容发送到客户端.
+</p>
+</li>
+<li>
+<p>
+该请求终止时, 输出内容自动发送到客户端.
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="title">例子</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">&lt;?php</span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">myCallback</span></span><span style="color: #990000">(</span><span style="color: #009900">$buffer</span><span style="color: #990000">)</span> <span style="color: #FF0000">{</span>
+    <span style="font-weight: bold"><span style="color: #000000">file_put_contens</span></span><span style="color: #990000">(</span><span style="color: #009900">$buffer</span><span style="color: #990000">,</span> <span style="color: #FF0000">'/tmp/cache.html'</span><span style="color: #990000">);</span>
+<span style="color: #FF0000">}</span>
+
+
+<span style="font-weight: bold"><span style="color: #000000">ob_start</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'myCallback'</span><span style="color: #990000">);</span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">echo</span></span> <span style="color: #FF0000">'&lt;html&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;'</span><span style="color: #990000">;</span>
+
+<span style="font-weight: bold"><span style="color: #000000">ob_end_flush</span></span><span style="color: #990000">();</span>
+</tt></pre></div></div>
+<div class="paragraph"><p>这里我们就基本了解了PHP生成HTML的原理, 接下来我们再来看Zend Framework这种具有比较复杂的系统如何来利用该原理实现HTML静态化的.</p></div>
+</div>
+<h2 id="_zend_cache_backend_static">2. Zend_Cache_Backend_Static</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Zend Frameword 中内置的实现HTML静态化的组件就是 <tt>Zend_Cache_Backend_Static</tt> , 其属于 <tt>Zend_Cache</tt> 模块. 因此在了解它之前, 你必须了解 <tt>Zend_Cache</tt> 的原理和使用方法, 这里并不简介, 可以查看手册 <a href="http://framework.zend.com/manual/en/zend.cache.html">Zend_Cache</a> .</p></div>
+<div class="paragraph"><p><tt>Zend_Cache_Backend_Static</tt> 作为cache backend, 其必须和cache frontend中的 <tt>Zend_Cache_Frontend_Capture</tt> 配合使用.</p></div>
+<h3 id="_">2.1. 内部实现</h3><div style="clear:left"></div>
+<div class="paragraph"><p>这里先讲解一下 <tt>Zend_Cache_Backend_Static</tt> 这个类, 在使用HTML静态化时可以不需要了解这个部分, Zend framework 提供了封住好的 <tt>helper</tt> 类, 不需要了解实现细节的可以跳过该小节.</p></div>
+<div class="paragraph"><p><tt>Zend_Cache_Backend_Static</tt> 的内部实现使用的其实只 <tt>Core, File</tt> 组合的一个 <tt>innerCache</tt> , 这里其实也很好理解, 因为它的功能就是将内容输出到文件, 所以就直接使用了 <tt>Zend_Cache_Backend_File</tt> 作为缓存到文件的功能, 当然这里并不需要去完全理解它, 除非你想要去自己实现 <tt>innerCache</tt> , 通过设置 <tt>Zend_Cache_Backend_Static</tt> 的 <tt>tag_cache</tt> 可以指定自己的 <tt>innerCache</tt> , 也可以调用 <tt>setInnerCache()</tt> 来完成.</p></div>
+<div class="paragraph"><p><tt>Zend_Cache_Backend_Static</tt> 基本上只有一个外部接口是最值得关注的, 就是 <tt>save</tt> 方法:
+<tt>boolean save (string $data, string $id, [array $tags = array()], [int $specificLifetime = false])</tt></p></div>
+<div class="ulist"><div class="title">参数:</div><ul>
+<li>
+<p>
+<tt>$data</tt> , 是需要缓存的内容.
+</p>
+</li>
+<li>
+<p>
+<tt>$id</tt> , 是缓存的ID.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>例如调用:
+<tt>$cache-&gt;save("bar : data to cache", bin2hex("/bar"));</tt></p></div>
+<div class="paragraph"><p>将会把 "bar : data to cache" 作为文件缓存到 "public/bar.html" (默认设置情况下).</p></div>
+<div class="paragraph"><p>这里也就了解了ZF将会如何去缓存输出到HTML了, 基本上就是通过截获 ob_start 储存起来的输出缓存, 然后把该缓存作为 <tt>save</tt> 中 <tt>$data</tt> 参数即可.</p></div>
+</div>
+<h2 id="_zend_controller_action_helper_cache">3. Zend_Controller_Action_Helper_Cache</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>该 <tt>action helper</tt> 则是ZF为我们提供的一个封装好的帮助类, 使用它, 我们基本不需要做任何额外的操作就可以把整个action页缓存成html文件.</p></div>
+<div class="paragraph"><p>既然是 <tt>action helper</tt> , 那么也就是说ZF提供 <tt>Zend_Cache_Backend_Static</tt> 这种缓存技术和其他的几个缓存组件并不一定, 它是属于 <tt>Controller</tt> 级别的缓存, 旨在将某几个 <tt>action</tt> 页面进行整体缓存, 使用方法也是在 <tt>Controller_Action#init</tt> 中进行使用的.</p></div>
+<div class="paragraph"><p>这里先讲准备功能, 就是提供少数几个推荐提供给 <tt>Zend_Cache_Backend_Static</tt> 的参数:</p></div>
+<h3 id="_1">3.1. 步骤1: 配置文件</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">;</span> Cache <span style="color: #990000">-</span> static
+<span style="color: #009900">resources.cachemanager.page.backend.options.public_dir </span><span style="color: #990000">=</span> APPLICATION_PATH <span style="color: #FF0000">"/../public/cached"</span>
+<span style="color: #009900">resources.cachemanager.pagetag.backend.options.cache_dir </span><span style="color: #990000">=</span> APPLICATION_PATH <span style="color: #FF0000">"/data/cache/tags"</span>
+<span style="color: #009900">resources.frontController.params.disableOutputBuffering </span><span style="color: #990000">=</span> true</tt></pre></div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">注意大小写, <tt>cachemanager</tt> 的 <tt>m</tt> 是小写, 而 <tt>frontController</tt> 的 <tt>C</tt> 是大写, 因为这个大小写的原因害我浪费了一天的时间.</td>
+</tr></table>
+</div>
+<div class="paragraph"><div class="title">public_dir</div><p>一个是 <tt>public_dir</tt> , 默认的是 <tt>../public</tt> , 而有时我们需要把静态文件放置到统一的文件夹中, 如果指定了该文件夹, 并且该文件夹不存在, 就必须确保PHP有 <tt>mkdir</tt> 此文件夹的权限, 如果该文件夹你创建好了, 那么就必须确保PHP有读写的权限. 我的建议是把这个文件夹创建好, 然后给个比较大的权限 0777 之类的做测试用, 已排除是文件权限导致的静态化失败, 特别是linux系统.</p></div>
+<div class="paragraph"><p>这个文件夹的制定很重要, 手册上推荐的是使用绝对路径(可以使用APPLICATION_PATH). 而且必须保存该文件夹可写, 而且创建HTML文件时就会失败.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">需要给linux系统的某些用户提醒下就是, PHP生成的HTML文件所有者会是 www-data 之类的apache用户, 而且缓存文件的权限可能只有所有者可读, 你可能会永远看都是空文件夹, 因为你可能没有权限查看该文件夹下的内容 可能ZF已经为你生成了缓存的HTML文件到缓存目录, 而你查看文件夹时会发现总是空, 这是权限问题, 如果你用su用户查看, 就会发现HTML文件已经在那里了.</td>
+</tr></table>
+</div>
+<div class="paragraph"><div class="title">disableOutputBuffering</div><p>手册上也明确写出了如果要使用该静态缓存功能, 就必须将 <tt>disableOutputBuffering</tt> 设置为 <tt>true</tt> , 该选项的功能是关闭 frontController的 outputBufering, 因为默认情况下, 在frontController里面是会使用到 <tt>ob_start</tt> 的, 而这里我们需要关闭它, 使得我们可以在 <tt>Zend_Cache_Backend_Static</tt> 中来调用 <tt>ob_start(callback)</tt> 来缓存所有内容.</p></div>
+<h3 id="_2_init">3.2. 步骤2: init()</h3><div style="clear:left"></div>
+<div class="paragraph"><p>唯一需要做的就是在 <tt>init()</tt> 内部利用cache helper来制定哪几个action是需要被缓存的即可.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">&lt;?php</span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">class</span></span> Node_IndexController <span style="font-weight: bold"><span style="color: #0000FF">extends</span></span> Zend_Controller_Action
+<span style="color: #FF0000">{</span>
+
+    public <span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">init</span></span><span style="color: #990000">()</span>
+    <span style="color: #FF0000">{</span>
+        <span style="color: #009900">$this</span><span style="color: #990000">-&gt;</span>_helper<span style="color: #990000">-&gt;</span><span style="font-weight: bold"><span style="color: #000000">cache</span></span><span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'index'</span><span style="color: #990000">,</span> <span style="color: #FF0000">'page'</span><span style="color: #990000">),</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'allentries'</span><span style="color: #990000">));</span>
+    <span style="color: #FF0000">}</span>
+
+    public <span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">indexAction</span></span><span style="color: #990000">()</span>
+    <span style="color: #FF0000">{</span>
+        <span style="font-weight: bold"><span style="color: #0000FF">echo</span></span> <span style="color: #FF0000">"index action cache"</span><span style="color: #990000">;</span>
+    <span style="color: #FF0000">}</span>
+
+    public <span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">pageAction</span></span><span style="color: #990000">()</span>
+    <span style="color: #FF0000">{</span>
+        <span style="font-weight: bold"><span style="color: #0000FF">echo</span></span> <span style="color: #FF0000">"page action cache"</span><span style="color: #990000">;</span>
+    <span style="color: #FF0000">}</span>
+
+<span style="color: #FF0000">}</span></tt></pre></div></div>
+<div class="paragraph"><p>这时你访问 <tt>/node/index/index</tt> 就会发现你指定的缓存目录下会出现 <tt>/node/index/index.html</tt> 文件了. 比如你访问 <tt>/node</tt> 那么就会在缓存目录下直接生成 <tt>/node.html</tt> , 都是请求路径和缓存目录的路径一一对应的.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">cache helper是支持 <tt>Zend_Layout</tt> 的, 生成的内容会包含layout.</td>
+</tr></table>
+</div>
+<h3 id="_3_htaccess">3.3. 步骤3: .htaccess</h3><div style="clear:left"></div>
+<div class="paragraph"><p>修改 .htaccess 重写规则可以使得你的静态页面路径和不使用静态缓存的url一样, 比如在不使用缓存的情况下, 你的url是 <tt>/node/get/</tt> , 而使用缓存后, 假如缓存的HTML文件储存在 <tt>public/cached/node/get.html</tt> 下, 那么使用重写规则就可以使得用户继续使用 <tt>/node/get/</tt> 这个url来访问它, 此时用户访问的就不再是PHP页面, 而是被重写到了 <tt>public/cached/node/get.html</tt> 这个静态页面. url依然保持一致.</p></div>
+<div class="paragraph"><p>重写规则可以参考手册上的 <a href="http://framework.zend.com/manual/en/zend.cache.backends.html#Zend_Cache_Backend_Static">Zend_Cache_Backend_Static</a> , 这里抄录一份:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>AddType application<span style="color: #990000">/</span>rss<span style="color: #990000">+</span>xml <span style="color: #990000">.</span>xml
+AddType application<span style="color: #990000">/</span>atom<span style="color: #990000">+</span>xml <span style="color: #990000">.</span>xml
+
+RewriteEngine On
+
+RewriteCond <span style="color: #990000">%</span>{REQUEST_URI} feed<span style="color: #990000">/</span>rss$
+RewriteCond <span style="color: #990000">%</span>{DOCUMENT_ROOT}<span style="color: #990000">/</span>cached<span style="color: #990000">/%</span>{REQUEST_URI}<span style="color: #990000">.</span>xml <span style="color: #990000">-</span>f
+RewriteRule <span style="color: #990000">.*</span> cached<span style="color: #990000">/%</span>{REQUEST_URI}<span style="color: #990000">.</span>xml <span style="font-weight: bold"><span style="color: #000000">[L,T=application/rss+xml]</span></span>
+
+RewriteCond <span style="color: #990000">%</span>{REQUEST_URI} feed<span style="color: #990000">/</span>atom$
+RewriteCond <span style="color: #990000">%</span>{DOCUMENT_ROOT}<span style="color: #990000">/</span>cached<span style="color: #990000">/%</span>{REQUEST_URI}<span style="color: #990000">.</span>xml <span style="color: #990000">-</span>f
+RewriteRule <span style="color: #990000">.*</span> cached<span style="color: #990000">/%</span>{REQUEST_URI}<span style="color: #990000">.</span>xml <span style="font-weight: bold"><span style="color: #000000">[L,T=application/atom+xml]</span></span>
+
+RewriteCond <span style="color: #990000">%</span>{DOCUMENT_ROOT}<span style="color: #990000">/</span>cached<span style="color: #990000">/</span>index<span style="color: #990000">.</span>html <span style="color: #990000">-</span>f
+RewriteRule <span style="color: #990000">^/*</span>$ cached<span style="color: #990000">/</span>index<span style="color: #990000">.</span>html <span style="font-weight: bold"><span style="color: #000000">[L]</span></span>
+RewriteCond <span style="color: #990000">%</span>{DOCUMENT_ROOT}<span style="color: #990000">/</span>cached<span style="color: #990000">/%</span>{REQUEST_URI}<span style="color: #990000">.(</span>html<span style="color: #990000">|</span>xml<span style="color: #990000">|</span>json<span style="color: #990000">|</span>opml<span style="color: #990000">|</span>svg<span style="color: #990000">)</span> <span style="color: #990000">-</span>f
+RewriteRule <span style="color: #990000">.*</span> cached<span style="color: #990000">/%</span>{REQUEST_URI}<span style="color: #990000">.%</span><span style="color: #993399">1</span> <span style="font-weight: bold"><span style="color: #000000">[L]</span></span>
+
+RewriteCond <span style="color: #990000">%</span>{REQUEST_FILENAME} <span style="color: #990000">-</span>s <span style="font-weight: bold"><span style="color: #000000">[OR]</span></span>
+RewriteCond <span style="color: #990000">%</span>{REQUEST_FILENAME} <span style="color: #990000">-</span>l <span style="font-weight: bold"><span style="color: #000000">[OR]</span></span>
+RewriteCond <span style="color: #990000">%</span>{REQUEST_FILENAME} <span style="color: #990000">-</span>d
+RewriteRule <span style="color: #990000">^.*</span>$ <span style="color: #990000">-</span> <span style="font-weight: bold"><span style="color: #000000">[NC,L]</span></span>
+
+RewriteRule <span style="color: #990000">^.*</span>$ index<span style="color: #990000">.</span>php <span style="font-weight: bold"><span style="color: #000000">[NC,L]</span></span></tt></pre></div></div>
+<div class="paragraph"><p>我测试出来是此重写规则在某些情况下是会失效的, 比如apache设置的virtualhost里会可能会出现问题(有些配置下), 原因是 <tt>%{REQUEST_URI}</tt> , 在有时候它会带前置的 <tt>/</tt> , 比如我请求 <tt>http://www.eriji.com/node</tt> , 按照重写规则,  <tt>%{REQUEST_URI}</tt> 应该被解析为 <tt>node</tt> , 而有些设置下它是会被设置为 <tt>/node</tt> 的, 多一个 <tt>/</tt> , 使得重写失败, apache将不会重写到我们的缓存文件, 如果你确认的ZF生成了HTML文件到文件系统, 但是因为重定向的问题导致缓存没有被读取, 可以开启 mod_rewrite 的 <tt>rewriteLog</tt> , 查看具体重定向日志, 检查重写规则是否命中.</p></div>
+<h3 id="__2">3.4. 内部实现</h3><div style="clear:left"></div>
+<div class="paragraph"><p>其实在了解了 <tt>ob_start(callback)</tt> 这个原理后, 我们自己都可以去实现HTML静态化,  但是在ZF里面, 唯一的问题是, 我们什么时候应该开启 <tt>ob_start</tt> , 而又到什么时候ZF才会把响应的内容(包括layout等)准备完毕, 也就是说什么时候使用 <tt>ob_end_lean</tt> ,特别是这个时机问题很重要, <tt>clean</tt> 早了可能缓存里面什么都没有, 也可能在使用了layout的情况下, 缓存里面只有action提供的view内容, 而没有 layout 部分.</p></div>
+<div class="paragraph"><p>我们可以细致的研究下ZF的分发过程, 并且在其中观察 <tt>Zend_Controller_Action_Helper_Cache</tt> 是怎么来完成这个工作的, 从中可以了解到ZF的分发系统.</p></div>
+<div class="paragraph"><p>首先我们从Controller_Action#init开始追踪, 因此我们在这一步里开始使用了cache helper.</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<tt>Controller_Action#init()</tt> , $this&#8594;_helper&#8594;cache(array(<em>index</em>), ..
+</p>
+</li>
+<li>
+<p>
+<tt>HelperBroker</tt>, 注册cache helper, Zend_Constroller_Action_Helper/Cache#direct
+</p>
+</li>
+<li>
+<p>
+<tt>Controller_Action#init()</tt>, 执行init()剩余部分
+</p>
+</li>
+<li>
+<p>
+<tt>Controller_Dispatcher()</tt>,  一系列分发
+</p>
+</li>
+<li>
+<p>
+<tt>Controller_Dispatcher_Standard#dispatch</tt>, 如果 <tt>disableOutputBuffering</tt> 没有指定则会调用 <tt>ob_start()</tt> 我们使用静态缓存的时候就必须关闭它.
+</p>
+</li>
+<li>
+<p>
+<tt>Controller_Action#dispatch()</tt>, action分发
+</p>
+</li>
+<li>
+<p>
+<tt>Controller_Action_Helper()</tt>, 分发到注册的action helper
+</p>
+</li>
+<li>
+<p>
+<tt>Constoller_Action_Helper_Cache()#preDispatch</tt>, 进入cache helper
+</p>
+</li>
+<li>
+<p>
+<tt>Zend_Cache_Frontend_Capture-&gt;start()</tt>, 调用 <span style="color:red;">ob_start(array(this, "_flush"))</span>
+</p>
+</li>
+<li>
+<p>
+<tt>Constoller_Front</tt>, 调用所有插件的postDispatch, $this&#8594;_plugins&#8594;postDispatch($this&#8594;_request)
+</p>
+</li>
+<li>
+<p>
+<tt>Zend_Layout_Controller_Plugin_Layout</tt> , layout插件对response&#8594;body进行处理, 目前的response&#8594;body中只有 action的view内容, 如果使用了layout, 这一步才会把layout的内容添加进来. 准确的说是把action view塞到layout里面去, 然后一起作为response&#8594;body.
+</p>
+</li>
+<li>
+<p>
+<tt>Zend_Cache_Frontend_Captrue#_flush($data)</tt> , 得到response&#8594;body, 将其作为data参数, 调用 Zend_Cache_Backend_Static#save($data, $id, $tag)
+</p>
+</li>
+<li>
+<p>
+<tt>Zend_Cache_Backend_Static#save</tt>, 调用 file_put_content 将响应内容输出到文件.
+</p>
+</li>
+<li>
+<p>
+请求结束.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>其中关键的就是 <tt>9</tt> 和 <tt>12</tt> , 都是 <tt>Zend_Cache_Frontend_Captrue</tt> 进行的操作, 使用的就是 <tt>ob_start(callback)</tt> 原理, 其中callback函数指定的是自己的 <tt>_flush</tt> 方法, 而在该方法里, 利用了 <tt>Zend_Cache_Backend_Static#save</tt> 来将缓存内容生成HTML文件.</p></div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2011-04-26 11:40:25 CST
+</div>
+</div>
+</body>
+</html>

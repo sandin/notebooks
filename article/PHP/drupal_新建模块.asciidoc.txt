@@ -1,0 +1,158 @@
+= Drupal 新建模块 =
+:language: php
+
+在Drupal开发中, 最重要也是最基本的内容就是新建一个属于自己的模块, 这样就可以不破坏系统代码的进行二次开发, 而分模块式的开发方式也被证明是复用性最高的一种, 比如你可以开发出一个模块, 然后可以在今后的项目中反复使用. 你也可以直接去利用别人开发好的模块来扩展你的系统, 这样的生态环境应该是比较好的.
+
+官方建议的是把属于自己的模块目录放置在 `/sites/all/modules/` 目录下, 这样就可以和系统模块做一些区别, 当然一般我们下载的第三方模块都是放置在 `/modules` 目录下的, 其实这个并没有硬性规定, 都是可以的, 不过为了清晰, 建议还是放置在官方推荐的那个目录.
+
+.钩子机制
+其中 `Drupal` 的整个模块都是建立在 `Hooks` 的机制上, 官方手册上对于 `Hooks` 的解释是:
+
+A hook can be thought of as an *event* in the sense that an event triggers something. The event in Drupal, such as deleting a node, would trigger the hook "hook_delete". If your module used that hook to call a function, the function would run at that moment. Just as an example, your function might be to decrease the count of the total number of nodes, so when a node was deleted, your function would run and lower the count by 1.
+
+Hooks机制简单的来说就像是一种事件驱动的模式, 当某个事件发生时, 就会通知所有绑定在该事件上的函数, 让这些函数可以自行的去修改一些内部数据, 比如把 *新建一个文章节点* 看作 `onNodeCreate` 事件, 而所有的注册到该事件上的处理器在该事件发生时都会收到通知, 并且会接收到原始数据, 而且该数据一般是 *引用传递* 进你的钩子函数内, 因此你不仅仅是可以读取到这些数据, 你甚至可以对数据进行写操作.
+
+关于钩子机制其实在 `wordpress` 里面也是存在的, 只是 `Drupal` 里面把这种机制做得到了极致, 关于这方面的内容, 今后再专门谈, 这里我们集中将如何新建一个模块, 毕竟这是第一步.
+
+.步骤
+
+首先新建一个目录, 将其放置到 `/sites/all/modules` 目录下, 这里我们直接用一个例子来介绍, 我们将新建一个名为 `products` 的模块, 现在的目录结构是这样的:
+
+.目录结构
+* /sites/all/products/ 我们的模块目录
+* /sites/all/products/products.info 模块基本信息文件
+* /sites/all/products/products.module 模块文件
+
+其实一个模块真正需要的就只有这两个文件而已, 我们来一一介绍:
+
+.products.info
+[source, ini]
+----------------------------------------------
+; $Id$
+name = products
+description = products manager
+package = Products
+version = "$Name$" 
+core ="6.x"
+----------------------------------------------
+
+这里需要主要的是这几个值基本都是必须的, 特别是 `core` 属性, 是必须指定的, 它将告诉 `drupal` 系统, 你的这个模块最低所需要的版本, `drupal 5` , `drupal 6` ,`drupal 7` 三者的区别其实是很大的, 通过官方手册你就可以看出来, 特别是你在查某个函数或钩子的用法时, 你会发现5/6两个版本的函数常常是名字一样, 但是用法完全不同了, 所以有时会出现你用的是 `drupal 6` , 结果搜索的时候点进了 `7` 的手册里面, 你照着手册上的用法, 结果出现报错的情况, 版本问题其实是应该注意的一个地方, 你下载模块或开发模块的时候都应该注意一下.
+
+
+.products.module
+这个是模块的主文件, 大多数模块的主要内容都放在其中, 其实还是建议另外在模块下独立写几个类文件来完成一些比较主要的逻辑, 而不是把所有逻辑都放在主文件里面, 这样维护起来会比较麻烦, 特别 `drupal` 还支持模板系统, 所以在开发模块的时候可以使用 `MVC` 方法来组织自己的模块, 这样会比较清晰. 
+
+官方文档里明确说明了该文件中应该提供的的几个函数.
+
+.必备函数
+    * hook_help() , 模块帮助信息
+    * hook_perm() , 模块权限信息
+    * hook_block(), 模块的区块内容
+    * hook_menu() , 模块的菜单内容
+
+我们一个个来看.
+
+这其中我把 `menu` 和 `block` 两个函数中的代码删除了一些, 因为比较长, 基本结构就是这样的, 到时候如果讲到了相关内容, 再具体讲.
+
+首先所有的钩子函数 `hook_xxx` 之类的, 在你自己的模块里的命名都是用你的模块名去替换 `hook` ,  比如 `hook_help` 在我们这里的例子就是 `products_help` .
+
+.hook_help
+`products_help` 我们只是返回一个空字符串, 你可以返回任意的帮助信息.
+
+[source]
+--------------------------------------------------
+<?php
+
+function products_help($path, $arg) {
+    return "";
+}
+--------------------------------------------------
+
+.hook_perm
+`products_perm` 返回的是一个数组, 其中设置了拥有什么样的权限的用户可以使用该模块, 当我们的模块被启动都, 你可以在 [权限设置] 里面看到这个值, 比如我们在这里设置了一个 `access products content` 的权限, 那么就只有在 [权限设置] 里面把某个用户组的权限勾选了这个权限后, 该用户组的用户才能够使用这个模块,这里其实可以设置多个权限, 比如浏览该模块, 管理该模块之类的权限分割, 具体的可以根据你的需求来定.
+
+[source]
+--------------------------------------------------
+<?php
+
+// permission
+function products_perm() {
+    return array('access products content');
+}
+--------------------------------------------------
+
+
+.hook_menu
+`products_menu` 中我们将新建一个该模块的后台管理页面, 将其路径设置为 `admin/settings/products` , 这个路径就将成为一个新的页面, 可以用来对该模块进行一些后台的管理和设置, 我们这里只将最基本的内容.
+
+其实 `hook_menu` 的用处还有许多, 比如新建一个前台页面 `page` , 新建一个区块 `block` , 这个灵活性比较大, 而且因为路径可以自由设置, 所以带来了许多方便性, 我们可以为我们的模块提供多个区块, 这样可以在任意的页面上进行调用, 也可以建立一个独立的页面, 来实现一些功能, 比如我们的这个例子就是用来显示所有产品列表, 和几个产品的区块.
+
+这里我们可以通过下面的这一部分代码来先了解一下大致的结构:
+
+[source]
+--------------------------------------------------
+<?php
+
+// Menu
+function products_menu() {
+    $items = array();
+
+    $items['admin/settings/products'] = array(
+        'title' => t('Products'),
+        'description' => 'product module settings page',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('products_admin'),
+        'access arguments' => array('access administration pages'),
+        'type' => MENU_NORMAL_ITEM,
+    );
+    
+    return $items;
+}
+--------------------------------------------------
+
+这里需要注意的就是两个地方:
+
+一个是 `page callbacck` , 它的值就是一个回调函数名, 一般的该函数可以由我们自己来提供, 就是你可以在本文件里面任意新建一个函数, 然后把该函数名传递进来, 而这个页面的内容是什么, 就是由这个回调函数的返回值来决定的, 你返回内容就是该网页或区块的内容, 我们这里只是一个简单的后台设置页面, 所以使用的是系统自带的 `drupal_get_form` 函数, 该函数返回的就是一个表单 `form` , 至于这个表单的内容具体是怎么是通过 `drupal form hook api` 来完成的, 这里可以先不用去了解, 只用知道这个callback返回的内容就是你网页要显示的内容即可. 所以指定的回调函数一般返回的都是 HTML 格式的字符串, 它就会直接被显示在主内容区域.
+
+另外一个就是 `access arguments` , 这里的就是单独为这个网页来设置一个权限, 比如我们这里指定的是 `access administration pages` , 这是一个系统自带的权限, 意思就是有权进入后台管理页面的所有用户.
+
+.hook_block
+这个函数就是定义你模块的几个区块的, 新建区块和新建页面的方法基本相同, 我将在以后单独来讲述这两个问题, 这里我们随便在该函数里放置一些内容即可, 其中的具体代码的意思是什么你现在并不需要知道, 以后再具体讲, 需要知道的是它返回的就是 `block` 内容, 而一个模块又常常不止含有一个 `block` , 所以我把这部分的代码基本都删除了, 这里是保留了一些最基本的内容, 看下就可以了.
+
+[source]
+--------------------------------------------------
+<?php
+
+// Products list block
+function products_block($op = 'list', $delta = '', $edit = array()) {
+    if ($op == "list") {
+        // Generate listing of blocks from this module, for the admin/block page
+        $block = array();
+        $block[PRODUCTS_NEW_KEY]["info"] = t('New Products List');
+        $block[NEWS_ALL_KEY]["info"] = t('News List');
+        
+        return $block;
+    } else if ($op == 'view') {
+        $block = array();
+        $block_content = '';
+
+        return $block;
+    }
+}
+--------------------------------------------------
+
+.安装模块
+此时我们的模块基本上什么功能都没有实现, 但这并不妨碍我们先体验一下新建一个模块的成就感, 我们将直接安装这个模块先.
+
+进入 `/admin/build/modules` 页面, 如果你没有人品问题的话, 应该就可以看到我们刚才新建的那个模块, 直接勾选安装即可, 然后我们需要做的是到 [权限设置] 里面, 把需要使用该模块的用户组勾上我们最开始指定的权限名, 不然用户是无法看到这个模块的. 
+
+检验是否安装成功, 可以通过方位我们在 `hook_menu` 中新建的那个后台管理页面地址来完成, 如果你可以访问到, 那么说明模块已经安装成功.
+
+.结束语
+关于 `Drupal` 模块的相关内容, 今后还将会一点一点的详细来讲述, 此文只先介绍最基本的内容, 相当于先打个地基, 慢慢再来一砖一瓦的建房子.
+
+需要对刚开始用 `Drupal` 的开发者指出的就是, *版本问题* 很重要, 你查找到的资料很有可能不是你正在使用的版本, 所以就算你一步一步的照着别人说的做也可能出现问题.
+
+如果没有太大的英文障碍的话还是建议根据官方提供的http://drupal.org/documentation/develop[开发手册] 来做, 选择你所使用的版本手册, 一口气基本就可以把前面几章看完, 然后就可以照着做, 最重要的是它肯定是对的, 如果出现问题, 那一定是你的问题, 而不像网上的其他资料, 很有可能你跟着做, 到最后却不知道到底是自己的问题, 还是版本的问题, 或者根本就是这篇资料的作者的问题.
+
+本文使用的 `drupal` 版本是 6.20 , 代码是直接从过去的项目中节选出来的, 没有问题, 但因为是节选代码, 有许多部分都省略了, 所以只以启发思路为主, 不保证你COPY去就可以运行.

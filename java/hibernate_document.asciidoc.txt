@@ -1,0 +1,134 @@
+= hibernate =
+lds <lds2012@gmail.com>
+{localdate}
+
+:language: java
+
+Maven
+JavaBean
+
+== 
+
+.maven 
+项目根目录 pom.xml
+
+.class 
+所有的持久化类（persistent classes）都要求有无参的构造器，因为 Hibernate 必须使用 Java 反射机制来为你创建对象。
+
+.映射文件(xml)
+
+`somemap.hbm.xml` , 文件随便放, 但需要在 `hibernate.cfg.xml` 中指明它的位置.
+
+[source]
+------------------------------------------------------------
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.hibernate.tutorial.domain">
+
+    <class name="Event" table="EVENTS">
+        <id name="id" column="EVENT_ID">
+            <generator class="native"/>
+        </id>
+        <property name="date" type="timestamp" column="EVENT_DATE"/>
+        <property name="title"/>
+    </class>
+
+</hibernate-mapping>
+------------------------------------------------------------
+
+NOTE: 明确定义数据类型, 可以提高速度(省去了利用JAVA反射机制去判断类型的时间)
+
+.Hibernate配置文集
+
+`hibernate.properties` 或 `hibernate.cfg.xml`
+
+[source]
+-------------------------------------------------------------
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+
+        <!-- Database connection settings -->
+        <property name="connection.driver_class"
+>org.hsqldb.jdbcDriver</property>
+        <property name="connection.url"
+>jdbc:hsqldb:hsql://localhost</property>
+        <property name="connection.username"
+>sa</property>
+        <property name="connection.password"
+></property>
+
+        <!-- JDBC connection pool (use the built-in) -->
+        <property name="connection.pool_size"
+>1</property>
+
+        <!-- SQL dialect -->
+        <property name="dialect"
+>org.hibernate.dialect.HSQLDialect</property>
+
+        <!-- Enable Hibernate's automatic session context management -->
+        <property name="current_session_context_class"
+>thread</property>
+
+        <!-- Disable the second-level cache  -->
+        <property name="cache.provider_class"
+>org.hibernate.cache.NoCacheProvider</property>
+
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql"
+>true</property>
+
+        <!-- Drop and re-create the database schema on startup -->
+        <property name="hbm2ddl.auto"
+>update</property>
+
+        <mapping resource="org/hibernate/tutorial/domain/Event.hbm.xml"/>
+
+    </session-factory>
+
+</hibernate-configuration
+>
+-----------------------------------------------------------
+
+
+[source]
+------------------------------------------------------
+package org.hibernate.tutorial.util;
+
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+public class HibernateUtil {
+
+    private static final SessionFactory sessionFactory = buildSessionFactory();
+
+    private static SessionFactory buildSessionFactory() {
+        try {
+            // Create the SessionFactory from hibernate.cfg.xml
+            return new Configuration().configure().buildSessionFactory();
+        }
+        catch (Throwable ex) {
+            // Make sure you log the exception, as it might be swallowed
+            System.err.println("Initial SessionFactory creation failed." + ex);
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+
+    public static SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+}
+------------------------------------------------------
+
+    这个类不但在它的静态初始化过程（仅当加载这个类的时候被 JVM 执行一次）中产生全局的 org.hibernate.SessionFactory，而且隐藏了它使用了静态 singleton 的事实。它也可能在应用程序服务器中的 JNDI 查找 org.hibernate.SessionFactory。
+
+在JVM第一次加载这个类时, 会去加载 sessionFacitory 域, 而该域调用了 buildSessionFactory , 又因为它是 final, 所以只会被初始化一次(有且只有只有一次). 这种封装单例的方式很巧妙.

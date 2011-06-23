@@ -1,0 +1,235 @@
+= PHPCMS中标签使用和缓存机制 =
+:language: php
+
+== 标签 ==
+
+.中文标签
+提到PHPCMS标签, 首先值得一提的当然就是前端设计者最喜欢的中文标签, 对于不懂PHP和SQL的设计人员来说, 看夹杂着中文标签的HTML模板可以算作一种享受, 简单的可以看看效果就知道:
+[source]
+----------------------------------------------
+<!-- 我们服务 -->
+<div class="ourServer mainBox mod">
+    <h3><span>我们服务</span><a href="list.php?catid=36" class="btn more-1"></a></h3>
+    <div class="modContent">
+        <ul class="dotList mList">
+            {tag_首页我们服务}
+        </ul>
+    </div><!-- /modContent -->
+</div><!-- /ourServer -->
+----------------------------------------------
+
+这样的中文标签非常适合设计人员, 如果把基本的区块都包装成中文标签, 然后把视图的部分就可以完全交给他们.
+
+至于中文标签的制作, 因为在后台是可视化的编辑模式, 所以并没有什么可多讲的, 唯一可以说的是, 有时偷懒需要的话, 你可以先用可视化编辑, 然后再把它输出的SQL代码作为你直接写 *GET标签* 的参考, 所以我们再来看看 *GET标签* .
+
+.GET标签
+基本来说GET标签就是对 `query` 和 `fetch` 的一个包装, 重要的是对分页也有所支持.
+
+先来看看基本的:
+[source]
+---------------------------------------------------
+<ul class="List dotList">
+    {get sql="SELECT b.content,a.contentid,a.catid,a.title,
+        a.style,a.thumb,a.keywords,b.copyfrom,a.description,
+        a.userid,a.updatetime,a.islink,a.inputtime,a.url
+        FROM `phpcms_content` a, `phpcms_c_news` b 
+        WHERE a.contentid=b.contentid AND a.status=99
+        AND `catid` IN($event_arrchildid) 
+        ORDER BY a.contentid DESC" rows="9"}
+
+        <li><a href="{$r[url]}">{str_cut($r[title], 25)}</a></li>
+    {/get}
+</ul>
+---------------------------------------------------
+
+这里我们可以看到, 其实只要懂得SQL语句的就基本都没有什么问题了, 在sql属性中书写任意的SQL语句, 然后rows中其实就相当与 `LIMIT` .
+
+默认的在两个 `{get}{/get}` 之间我们使用 `$r` 变量来读取数据库返回的数组结果, 也可自己指定返回的变量名, `return="book"` , 然后就可以通过 `$book` 变量来读取, 类似于 `foreach` 中的 `as` , 使得代码的可读性更高一些, 也没太大用处, 简单的使用默认值也比较方便 `$r` 代表的就是 `result` 意思, 方便记忆.
+
+
+这里我并没有使用过GET标签的分页功能, 因为使用的PHPCMS版本存在分页BUG, 所以这里并不介绍, 可以看官方资料.
+
+.LOOP标签
+
+先看代码
+[source, html]
+-------------------------------------------------------------
+{loop $AREA $a}
+	{php if($a[parentid]==1) break;}
+	<a href="area.php?areaid={$a[areaid]}&catid={$catid}">{$a[name]}</a>
+{/loop}
+-------------------------------------------------------------
+
+`{loop $AREA $A}` 其实就是 `foreach ($AREA as $a)` , 我不明白为什么PHPCMS不直接使用 `foreach` 关键词.
+
+这里其实我还演示了 *PHP标签* 的使用方法, `{php}`, 其实它也就是 `<?php ?>` 的简写方式, PHP自带的短标签其实也可以达到类似的简介效果.
+
+.TAG标签
+如果你的页面开启了缓存, 那么你其实可以在缓存的输出文件中看到更为底层的 *tag标签* . 
+
+先贴代码:
+[source]
+----------------------------------------------------------
+<?php
+
+echo tag('phpcms', 'tag_category_menu_group',
+        "", 0, 0, array (  'module' => 'phpcms',
+        'catid' => $lds_group_id,  'class' => 'url',
+        'target' => '_blank','group_url' => $lds_group_url));
+----------------------------------------------------------
+
+这里我们演示的是调用 `cateid` 为某个特定值的所有子栏目名, 作为一排导航菜单, `tag_category_menu_group` 则是模板文件:
+
+[source, html]
+------------------------------------------------
+{php $data = subcat($module, $catid);}
+{loop $data $n $r}
+    {if $r[ismenu]}
+        <li><a href="{$r[url]}" id="menu_{$r[catid]}"><span>{$r[catname]}</span></a></li>
+    {/if}
+{/loop}
+------------------------------------------------
+
+唯一难得理解的是 `subcat` 这个函数是什么, 这就是PHPCMS不好的地方, 它自带的函数没有前缀, 这个函数第一眼看你的反应就是去查手册, 以为是PHP自带函数, 其实它是phpcms提供的函数, 如果使用 `phpcms_subcat` 作为函数名, 则更好, 如果使用顶层函数, 那么在函数名前加上你自己的命名空间是非常有必要的, 包括类名, 都应该提供前缀, 起码在PHP真正支持 *namespace* 这个概念前.
+
+这是 `subcat` 的源码:
+[source]
+-------------------------------------------------------
+<?php
+
+function subcat($module = 'phpcms', $parentid = NULL, $type = NULL)
+{
+        global $CATEGORY;
+        $subcat = array();
+        foreach($CATEGORY as $id=>$cat) {
+           if ($cat['module'] == $module 
+                && ($parentid === NULL || $cat['parentid'] == $parentid) 
+                && ($type === NULL || $cat['type'] == $type)) {
+             $subcat[$id] = $cat;
+           }
+        }
+        return $subcat;
+}
+-------------------------------------------------------
+
+这里就需要介绍一下 `global $CATEGORY` 这个变量了, 它包含了所有的分类, 不管是一级分类还是二级分类, 它是一个数组, 以分类的ID为索引, 然后包含了该分类的所有信息, 这里贴出一个给大家看看, 其实也可以简单的在你的页面使用 `var_dump($CATEGORY)` 把它打印出来看看:
+[source]
+--------------------------------------------
+<?php
+
+return array (
+  34 => 
+  array (
+    'catid' => '34',
+    'module' => 'phpcms',
+    'type' => '0',
+    'modelid' => '1',
+    'parentid' => '0',
+    'arrparentid' => '0',
+    'child' => '1',
+    'arrchildid' => '34,43,44,45,46',
+    'catname' => '狮子会简介',
+    'style' => '',
+    'image' => '',
+    'description' => '',
+    'parentdir' => '',
+    'catdir' => 'info',
+    'url' => 'list.php?catid=34',
+    'content' => '',
+    'items' => '1',
+    'hits' => '0',
+    'listorder' => '1',
+    'ismenu' => '1',
+    'letter' => '',
+    'citems' => '0',
+    'pitems' => '0',
+    'workflowid' => '1',
+    'meta_title' => '',
+    'meta_keywords' => '',
+    'meta_description' => '',
+    'presentpoint' => '1',
+    'defaultchargepoint' => '0',
+    'repeatchargedays' => '1',
+    'template_category' => 'category',
+    'template_list' => 'list',
+    'template_show' => 'show',
+    'template_print' => 'print',
+    'upload_allowext' => 'mp3|wma|doc|docx|xls|ppt|wps|zip|rar|txt|jpg|jpeg|gif|bmp|swf|png',
+    'upload_maxsize' => '5024000',
+    'thumb_enable' => '1',
+    'thumb_width' => '300',
+    'thumb_height' => '300',
+    'watermark_enable' => '0',
+    'ishtml' => '0',
+    'content_ishtml' => '0',
+    'category_urlruleid' => '4',
+    'show_urlruleid' => '10',
+  ),
+  // ... 这里省略了,结构一样.
+);
+-----------------------------------------------------------------
+
+这里需要注意的是该数组不是每次都从数据库读出来的, 而是从PHPCMS提供的缓存文件读取出来的, 只有在后台修改了分类的情况下该缓存才会刷新, 有时还不会自动刷新, 需要手动点击刷新缓存.
+
+== 缓存 ==
+
+缓存文件在 `/data/cache` 文件夹里面, 看看就知道了, 里面有大量缓存文件都是返回数组数据. 如果你不了解有这种缓存的机制, 那么在开发时会遇到很多莫名奇妙的问题, 最后发现原因都是因为缓存没有被刷新, 所以需要时刻记住这点.
+
+`PHPCMS` 默认的也提供HTML静态缓存机制, 这对网站来说是件好处, 但是开发的时候就是种折磨, 你会发现大部分时间都浪费在刷新缓存上去了, 所以建议是关闭它, 但默认的开启和关闭选项有时候并不十分有效,
+
+.关闭开发阶段不需要的缓存机制
+系统设置 -> 网站配置 -> 基本设置 -> 生成HTML 选否. +
+系统设置 -> 网站配置 -> 性能优化 -> 动模板缓存自动更新 选是, 启用PHP页面缓存选否
+
+NOTE: 需要注意的是如果你的栏目是先就建立好的, 那么 [生成HMTL] 选否后, 会发现并没有效果, 因为PHPCMS默认的给每个栏目都分类了一个是否生成HTML的值, 而且这个值还不能被继承, 也就是说父栏目设置了不生成HTML, 子栏目还是会生成, 这对于开发者来说是种折磨, 你将要把整个网站的HTML缓存功能都关闭和开启一次都得费很大的劲, 特别是中途为了开发原因想去关闭此功能. 为什么不为DEBUG专门设置一个强制行的全局关闭选项, 比如判断是否生成HTML时先去判断这个全局性的 `force` 值, `force` 为 `false` 再去检查此栏目的自身设置的值.
+
+这种细节就是看出系统是否对开发者友好的地方. 我觉的 `CMS` 这种应用的目标应该是成为一个扩展性及其优秀的底层平台, 而不是完备而封闭的内容管理系统, 它应该提供的是一个设计非常精妙的核心架构, 然后分模块的把各种功能性扩展都交给其他开发者, 这也是国内CMS和国外CMS的主要区别, 没有一个CMS可以满足所有类型的网站需求, 扩展性才是 `CMS` 的核心竞争力.
+
+.更新缓存
+系统设置 -> 栏目管理 -> 更新栏目缓存 +
+我的面板 -> 常用操作 -> 更新缓存
+
+.修复栏目数据
+这里必须提一下 *修复栏目数据* 这个功能: 
+
+系统设置 -> 栏目管理 -> 修复栏目数据 
+
+这个地方其实很奇怪, 当你每次去新建几个栏目的时候, 你可以直接先去看看 数据库里面的栏目数据, 你会发现他们的父子关系 `parentid` , `arrparentid` , `arrchildid` ,这几个值其中的几个会和之前的栏目数据有所不一样, 如果你去按之前的栏目数据来判断刚刚新建的栏目数据, 你会发现其实新建的这排数据是不完整的, 它有规律, 但是不符合已有数据的规律, 只有当你点击了 *修复栏目数据* 以后, 再去检查数据库, 这些数据才能够被理解, 至于为什么要这样设计, 我是很奇怪的, 甚至我都觉得整个层级关系的设计都不是很优秀, 你很难一眼通过数据看出他们之间的关系. 而且你想去更用这些数据进行比较复杂的层级分析是比较不舒服的事情.
+
+
+这里附带提供的一个函数, 专用于一个目的: 就是查找某个栏目的一级栏目, 也就是说不管你是第几层栏目, 总是去找到它属于的第一级栏目ID:
+[source]
+-----------------------------------------------------------
+<?php
+
+/**
+ * 查找当前栏目的root category
+ * 
+ * @param mixed $catid 
+ * @access public
+ * @return int category id
+ */
+function lds_cat_root($catid)
+{
+    global $CATEGORY;
+    if(!isset($CATEGORY[$catid])) return false;
+    // itself is root
+    if('0' === $CATEGORY[$catid]['arrparentid']) return $catid;
+
+    $arrparentid = array_filter(explode(',', $CATEGORY[$catid]['arrparentid']));
+
+    // first item
+    return array_shift($arrparentid);
+}
+-----------------------------------------------------------
+
+.结束语
+
+整个PHPCMS开发起来, 就是感觉它更适合不懂PHP的人去用的系统, 没有模块式开发的架构, 没有钩子系统, 你要想去在它上面进行二次开发, 很难做到不去修改它的源代码, 而如果一个CMS的二次开发必须通过去修改其系统的源代码来进行, 只能说它的结构是有问题的.
+
+这几乎是所有国产CMS的通病, 一口想吃个胖子, 把系统越做越庞大, 想去支持所有类型的需求, 而不是去成为一个吸引第三方开发者的平台, 这也是为什么国产CMS没有像国外CMS那么多的模块/插件市场, 其实我也怀疑就算有一个那么样的平台, 是否也有足够的开源分享思想能在国内建立其一个足够完备的第三方插件/模块市场.
+
+当然国产CMS也有一个好处, 就是后台符合中国人的使用习惯. 这也是我唯一想得出来的好处了, 操作够弱智, 这点很好, 适合我们这里大多数人的需求.
+
+国外的CMS我比较推荐的 `drupal` , 它的 `hook` 机制可以说是非常方便进行二次开发的. 关于相关内容, 今后的文章里再详细介绍.
+

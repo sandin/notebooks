@@ -1,0 +1,54 @@
+= Apache Expires .htaccess =
+
+在Apache下设置 Expires Header , 使得图片,CSS, JS得以被浏览器缓存, 已加快页面载入速度.
+
+首先确定apache加载了 `mod_expires` .
+
+
+.错误示范
+网上提供在 `.htaccess` 里面使用 expires 的方法都是:
+
+------------------------------------------------
+ExpiresActive On
+ExpiresDefault A0
+ExpiresByType image/gif A2592000
+ExpiresByType image/png A2592000
+ExpiresByType image/jpg A2592000
+ExpiresByType image/jpeg A2592000
+ExpiresByType image/ico A2592000
+ExpiresByType text/css A2592000
+ExpiresByType text/javascript A2592000
+ExpiresByType text/html M604800
+------------------------------------------------
+
+NOTE: 以上设置只会缓存图片, image/* .
+
+*但是* 实验证明将它们写入 `.htaccess` 后，会只有image/* , text/css 会被加上 expires　头，而javascript和ico都 *不会* 被长期缓存.
+
+原因是因为apache的 `expiresByType` 是根据浏览器请求头中 `Accept` 来决定的, 浏览器在请求图片的时候会自动在请求头上根据图片类型加上:
+
+------------------------------------------------
+Accept:  image/png, image/*;q=0.8, */*;q=0.5
+------------------------------------------------
+
+而在请求javascript脚本的时候只会发送
+
+---------------------------------------
+Accept: */*
+---------------------------------------
+
+浏览器并不会指明请求类型为 `text/javascript` , 所以apache的 `ExpiresByType` 就捕捉不到该类型, 也就不会加上 expires 头.
+
+.正确方法
+因此正确的替代方法是使用 FilesMatch 来替代 ExpiresByType, 例如:
+
+------------------------------------------------------
+<FilesMatch "\.(ico|pdf|flv|jpe?g|png|gif|js|css|swf)$">
+    ExpiresActive On
+    ExpiresDefault "access plus 1 year"
+</FilesMatch>
+------------------------------------------------------
+
+同样可以加入到 .htaccess 里使用.
+
+

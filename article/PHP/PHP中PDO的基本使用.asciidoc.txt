@@ -1,0 +1,131 @@
+= PHP中PDO的基本使用 =
+:language: php
+
+其实只要服务器支持PDO, 就应该使用PDO来进行数据库操作, 而不是使用更底层的数据库操作函数.
+
+== 建立/关闭数据库连接 ==
+
+.建立连接
+[source]
+-----------------------------------------------------------
+<?php
+
+$dbh = new PDO('mysql:host=localhost;dbname=yourDbName', $username, $password);
+-----------------------------------------------------------
+
+
+.关闭连接
+令人奇怪的是不像一般的数据库连接类, `PDO` 并没有为关闭数据库连接提供一个 `close()` , 而是使用:
+[source]
+-----------------------------------------------------------
+<?php
+
+$dbh = null;
+-----------------------------------------------------------
+
+NOTE: PDO默认提供的不是长连接, 如果需要则需要设置 `PDO::ATTR_PERSISTENT => true` , 一般来说, 没有特别的原因并不建议使用长连接, 长连接很容易出问题.
+
+== Prepare 语句 ==
+
+[source]
+-----------------------------------------------------------
+<?php
+
+$st = $db->prepare('DELETE FROM family WHERE name LIKE ?');
+-----------------------------------------------------------
+
+prepare后,则方便多次执行,  而且prepare会自动转义,防止代码注入
+最重要的是建立在 `prepare` 的基础上,许多数据库后台都会对查询进行解析和优化, 因此如果有大量相同语句, 使用 `prepare` 语句会比自建字符串查询语句要快速许多.
+[source]
+-----------------------------------------------------------
+<?php
+
+$st->execute(array('Fredo'));
+$st->execute(array('Sonny'));
+$st->execute(array('lau'));
+-----------------------------------------------------------
+
+prepare也支持命名占位符
+[source]
+-----------------------------------------------------------
+<?php
+
+$st = $db->prepare('DELETE FROM family WHERE name LIKE :name');
+$st->execute(array('name' => 'lau'));
+-----------------------------------------------------------
+
+
+利用binkParam()绑定参数
+[source]
+-----------------------------------------------------------
+<?php
+
+$pairs = array('Mars' => 'water',
+               'Moon' => 'water',
+               'Sun'  => 'fire');
+
+$st = $db->prepare(
+        "SELECT sign FROM zodiac 
+        WHERE element LIKE :element 
+        AND planet LIKE :planet");
+
+$st->bindParam(':planet', $planet);
+
+// 强制转换为字符串
+$st->bindParam(':element',$element, PDO::PARAM_STR);
+
+foreach ($pairs as $planet => $element) {
+    // 自动读取$element,$planet的值
+    // 不需要提供参数
+    $st->execute();
+    var_dump($st->fetch());
+}
+-----------------------------------------------------------
+
+.手工转义引号
+[source]
+-----------------------------------------------------------
+<?php
+
+$safe = $db->quote($_GET['searchTrem]);
+-----------------------------------------------------------
+
+.让所有数据库错误抛出异常
+[source]
+-----------------------------------------------------------
+<?php
+
+$db->setAttribute(PDO::ATTR_ERRMOD, PDO::ERRMOD_EXCEPTION);
+-----------------------------------------------------------
+
+
+.使用 `implode` 来构建查询语句
+[source]
+-----------------------------------------------------------
+<?php
+
+$fields = array('symbol', 'planet', 'element');
+
+$update_fields = array();
+$update_values = array();
+
+foreach ($fields as $field) {
+    $update_fields[] = "$field = ?";
+    // 注意实际中要考虑转义问题,避免代码注入
+    $update_values[] = $_POST[$field];
+}
+
+$st = $db->prepare("UPDATE zodiac SET " . 
+                    implode(',', $update_fields) .
+                    'WHERE sign = ?');
+
+// WHERE
+$update_values[] = $_GET['sign'];
+
+$st->execute($update_values);
+
+-----------------------------------------------------------
+
+注意: 在 `magic_quotes_gpc` 开启的情况下,再使用 `quote` 之类的函数会使得数据重复转义,应该避免这种情况,最好将 `magic_quotes_gpc` 关闭(不能在运行时关闭),如果没有权限关闭,那么在使用转义函数时应该先去判断下是否开启, 然后决定是否转义.
+
+其实个人推荐的是连 `PDO` 都不用, 直接使用更为高层次的 `Zend_Db` 来进行数据库操作, 关于相关内容将在今后的文章中详述.

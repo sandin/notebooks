@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="myNotebooks" default="default">
+    <description>
+            description
+    </description>
+
+    <property name="build.dir" value="output" />
+    <property name="src.dir" value="src" />
+
+	<target name="default">
+        <mkdir dir="${build.dir}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="prepare">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${build.dir}/article" />
+        <mkdir dir="${build.dir}/english" />
+        <mkdir dir="${build.dir}/java" />
+        <mkdir dir="${build.dir}/javascript" />
+        <mkdir dir="${build.dir}/linux" />
+        <mkdir dir="${build.dir}/math" />
+        <mkdir dir="${build.dir}/other" />
+        <mkdir dir="${build.dir}/php" />
+        <mkdir dir="${build.dir}/sql" />
+	</target>
+
+    <target name="docs" depends="prepare" description="mk docs">
+        <echo message="正在输出文档..." />
+        <apply executable="asciidoc" parallel="false">
+            <fileset dir="${src.dir}">
+                <include name="*/*.asciidoc.txt" />
+            </fileset>
+			<arg line="-a" />
+			<arg path="toc" />
+            <arg value="-n" />
+            <arg value="-o" />
+            <mapper type="glob" from="*" to="${build.dir}/*.html" />
+			<targetfile />
+		</apply>
+    </target>
+</project>

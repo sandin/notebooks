@@ -1,0 +1,21 @@
+= Android中Activity的生命周期 =
+
+.一个activity有三种状态:
+    * `Running` 运行状态, 此时该Activity在Android系统的Activity stack的顶端, 其实这个很好理解, 就是用户可见状态, 该Acticity是用户可以看见到的.
+    * `Paused` 暂定状态, 此时该Acitvity依然是用户可见状态, 但是被另一个Acitivity遮盖了,这里需要注意的是, 该Acitivity依然有部分可见(并没有100%的全部被遮盖), 但是失去了焦点, 用户可见但不可操作, 常见的是Dialog出现时, 原Acitivity黑掉, 这是你依然可以看见底层Acctivity, 但是你不能进行操作(此时的焦点已经交给了Dialog).
+    * `Stopped` 停止状态, 此时该Acitivity完全被另一个Acitivity遮盖掉, 处于完全不可见状态. 它将继续保留 `all state` 和 `member information` , 也就是说该对象的生命期并未结束, 这个Acitivity只是用户不可见状态, 但并未立即死亡, 它只有在手动调用 `finish()` 方法或系统资源不足时GC才会销毁它.
+
+需要注意的是 `停止状态` 在系统看来并不表示立即销毁, 但对于开发者来说应该将其视为 `死亡状态` , 因为系统可以随时GC就把它给销毁了, 可以理解为是已经判了死刑, 只是缓期执行而已, 所以不要在它身上做别的指望, 虽然这家伙还是有可以被放出来的. ( `onStop()` 和 `onPause()` 都可能被重新回到用户可见状态, 不过中间会调用 `onRestart()`, 然后再重新调用 `onStart()` . 因此就算被放出来了, 也是个被改造的人了. 
+
+.关于几个状态的流程其实官方文档中的插图已经画得很清晰了, 这里只是列出来:
+    * onCreate() , 第一次创建时. 只会调用一次.
+    * onStart() , 启动时, 此方法可能被 `onCreate` , `onPause`, `onStop` 调用.
+    * onResume() 激活状态, 用户可见并可操作(该Acitivity可见并拥有焦点) .
+    * onPause() -> 下一步可能是 onStop() 或 onRestart() .
+    * onStop() -> 下一步可能是 onRestart() 或 onDestory().
+    * onDestory() , 真正销毁. 调用 `finish()` 会调用则方法, 或被系统调用.
+
+NOTE: 这里需要注意的是 `onPause()` 和 `onStop` 两个状态都可以随时被系统Kill掉其进程(连 `onDesotry()` 都不进入), 只要是系统资源不足.
+
+.Activity Stack
+要理解多个Activity的生命周期, 只要理解Android系统的 `Activities Stack` 这种以 *栈* 的形式来管理Activity的机制就很好理解了, 也可以很形象的视为一个Activity把另个Activity遮盖掉, 一个压一个的感觉, 类似与PS中的 *层* 的概念.

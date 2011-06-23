@@ -39,13 +39,14 @@ lds <lds2012[at]gmail.com>
 折腾好久才发现 1.10.* 的ZF .10.* 后Modular(多模块) model命名方法:
 
 首先,你的application.ini中
-[source]
------------------------
+
+[source, bash]
+----------------------------------
 ;这排很好理解
 resources.frontController.moduleDirectory = APPLICATION_PATH "/modules"
 ;这排才是关键
 resources.modules[] =
-----------------------
+--------------------------------------
 
 这里说明下第二排的作用，官方手册是这样写的：
 
@@ -55,12 +56,12 @@ resources.modules[] =
     resources.modules[] =
 
 然后, 在你的模块目录下新建一个 `Bootstrap.php` 
-[source]
+
+[source, bash]
 -----------------------------
 <?php
 
-class User_Bootstrap extends Zend_Application_Module_Bootstrap
-{
+class User_Bootstrap extends Zend_Application_Module_Bootstrap {
 
 }
 
@@ -82,16 +83,16 @@ class User_Bootstrap extends Zend_Application_Module_Bootstrap
 
 NOTE: model的复数形式不一样,疑似大小写自动转换。但library中的命名规则更为严格,若要自动加载,路径和名称的大小写都得匹配
 
-[source]
---------------
->>bootstrap.php
-protected function _initAutoload()
-{
-$autoloader = new Zend_Application_Module_Autoloader(array(
-'namespace' => 'Default',
-'basePath' => dirname(__FILE__),
-));
-return $autoloader;
-}
----------------
+[source, bash]
+--------------------------------------
+// bootstrap.php
 
+protected function _initAutoload() {
+    $autoloader = new Zend_Application_Module_Autoloader(array(
+        'namespace' => 'Default',
+        'basePath' => dirname(__FILE__),
+    ));
+
+    return $autoloader;
+}
+----------------------------------

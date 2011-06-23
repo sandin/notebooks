@@ -1,0 +1,1738 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.5.2" />
+<title>PHP经典实例 笔记</title>
+<style type="text/css">
+/* Debug borders */
+p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
+/*
+  border: 1px solid red;
+*/
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+tt {
+  color: navy;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  font-family: sans-serif;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+
+div.sectionbody {
+  font-family: serif;
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+span#author {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+span#email {
+}
+span#revnumber, span#revdate, span#revremark {
+  font-family: sans-serif;
+}
+
+div#footer {
+  font-family: sans-serif;
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+div#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+div#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #dddddd;
+  color: #777777;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-family: sans-serif;
+  font-weight: bold;
+}
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+
+@media print {
+  div#footer-badges { display: none; }
+}
+
+div#toc {
+  margin-bottom: 2.5em;
+}
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+/* Workarounds for IE6's broken and incomplete CSS2. */
+
+div.sidebar-content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+div.sidebar-title, div.image-title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-top: 0.0em;
+  margin-bottom: 0.5em;
+}
+
+div.listingblock div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+
+div.exampleblock-content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+window.onload = function(){asciidoc.footnotes(); asciidoc.toc(2);}
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  var cont = document.getElementById("content");
+  var noteholder = document.getElementById("footnotes");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      // Use [\s\S] in place of . so multi-line matches work.
+      // Because JavaScript has no s (dotall) regex flag.
+      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      spans[i].innerHTML =
+        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+        "' title='View footnote' class='footnote'>" + n + "</a>]";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+}
+
+}
+/*]]>*/
+</script>
+</head>
+<body>
+<div id="header">
+<h1>PHP经典实例 笔记</h1>
+<span id="author">lds</span><br />
+<span id="email"><tt>&lt;<a href="mailto:lds2012@gmail.com">lds2012@gmail.com</a>&gt;</tt></span><br />
+<span id="revdate">2011-02-21</span>
+<div id="toc">
+  <div id="toctitle">Table of Contents</div>
+  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="sidebar-content">
+<div class="sidebar-title">LOG</div>
+<div class="ulist"><ul>
+<li>
+<p>
+2010-06-19
+</p>
+</li>
+<li>
+<p>
+2010-06-20 p96
+</p>
+</li>
+<li>
+<p>
+2010-07-xx p204
+</p>
+</li>
+<li>
+<p>
+2010-07-27
+</p>
+</li>
+<li>
+<p>
+2010-07-28 p276
+</p>
+</li>
+<li>
+<p>
+2010-07-30 p335
+</p>
+</li>
+<li>
+<p>
+2010-08-14 p370
+</p>
+</li>
+<li>
+<p>
+2010-08-21 p379
+</p>
+</li>
+<li>
+<p>
+2010-08-31 p665~p703
+</p>
+</li>
+</ul></div>
+</div></div>
+<div class="sidebarblock">
+<div class="sidebar-content">
+<div class="sidebar-title">TODO</div>
+<div class="ulist"><ul>
+<li>
+<p>
+7-19 反射类 new ReflectionClass();
+</p>
+</li>
+<li>
+<p>
+set_exception_handler()?
+</p>
+</li>
+<li>
+<p>
+SimpleTest:WebTestCase
+</p>
+</li>
+<li>
+<p>
+Selenium
+</p>
+</li>
+<li>
+<p>
+XAMPP
+</p>
+</li>
+</ul></div>
+</div></div>
+</div>
+</div>
+<h2 id="_">1. 字符串</h2>
+<div class="sectionbody">
+<h3 id="_heredoc">1.1. heredoc</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>heredoc</tt> 定义的字符串可以识别所有的插入变量以及双引号能够识别的转义序列,却不要求对双引号进行转义.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$className = 'nav';
+$content   = 'It\'s content';
+
+$html = &lt;&lt;&lt; END
+<span style="font-weight: bold"><span style="color: #0000FF">&lt;div</span></span> <span style="color: #009900">class</span><span style="color: #990000">=</span><span style="color: #FF0000">"$className"</span><span style="font-weight: bold"><span style="color: #0000FF">&gt;</span></span>
+    $content;
+    /$3.23
+<span style="font-weight: bold"><span style="color: #0000FF">&lt;/div&gt;</span></span>
+END;
+
+echo $html;</tt></pre></div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content"><tt>heredoc</tt> 可以识别其中的变量,因此需要对 <tt>$</tt> 符号转义.</td>
+</tr></table>
+</div>
+<h3 id="_strpos">1.2. strpos</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>strpos</tt> 返回子字符串的起始位置,若未找到则返回false,在利用它去检查一个字符串是否包含一个子字符串时,需要用 <tt>=== false</tt>,用来区分0和false.</p></div>
+<h3 id="_substr_replace">1.3. substr_replace</h3><div style="clear:left"></div>
+<div class="paragraph"><p>对于长字符串,只显示前25个字符,其后用 <tt>...</tt> 代替
+<tt>substr_replace($longText, '...', 25);</tt></p></div>
+<h3 id="__2">1.4. 字符串中插入表达式</h3><div style="clear:left"></div>
+<div class="paragraph"><p>双引号下的字符串中可用大括号插入复杂的表达式:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>print "MY circle's diameter is {$circle-&gt;getDiameter()} inches"</tt></pre></div></div>
+<h3 id="_or">1.5. or</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$fh = fopen('sales.csv,'w') or dir("can't open sales.csv");</tt></pre></div></div>
+<h3 id="_impload">1.6. impload</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>echo '<span style="font-weight: bold"><span style="color: #0000FF">&lt;tr&gt;&lt;td&gt;</span></span>' . implode('<span style="font-weight: bold"><span style="color: #0000FF">&lt;/td&gt;&lt;td&gt;</span></span>',$total_line) . <span style="font-weight: bold"><span style="color: #0000FF">&lt;/td&gt;&lt;/tr&gt;</span></span>';</tt></pre></div></div>
+<h3 id="__3">1.7. 不用相信用户输入</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>//不要直接使用 $format = $_GET['format']
+//你不能知道(控制)用户给format传递什么值
+$format = $_GET['format'] == 'csv' ? 'csv' : 'html';</tt></pre></div></div>
+</div>
+<h2 id="__4">2. 数字</h2>
+<div class="sectionbody">
+<h3 id="_is_numeric">2.1. is_numeric</h3><div style="clear:left"></div>
+<div class="paragraph"><p>检查是否为数字(或可以被转换成数字的字符串)</p></div>
+<h3 id="__5">2.2. 比较浮点型数字</h3><div style="clear:left"></div>
+<div class="paragraph"><p>不要直接 <tt>$a == $b</tt> 来检查两个浮点型数字是否相等.而应该:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>//一个非常小的浮动范围
+$delta = 0.00001;
+
+$a = 1.000000001;
+$b = 1.000000000;
+
+if (abs($a - $b) &lt; $delta ) {/* 则认为$a,$b相等 */}</tt></pre></div></div>
+<h3 id="__6">2.3. 对浮点数取整</h3><div style="clear:left"></div>
+<div class="ulist"><ul>
+<li>
+<p>
+四舍五入, <tt>round(2.4)</tt> //2
+</p>
+</li>
+<li>
+<p>
+向上取整, <tt>ceil(2.4)</tt> //3
+</p>
+</li>
+<li>
+<p>
+向下取整, <tt>floor(2.4)</tt> //2
+</p>
+</li>
+</ul></div>
+<h3 id="__7">2.4. 随机数</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>mt_rand</tt> 比 <tt>rand</tt> 更好更快.</p></div>
+<h3 id="__8">2.5. 计算指数</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>pow(2,10)</tt> 表示2的10次方.</p></div>
+</div>
+<h2 id="__9">3. 时间和日期</h2>
+<div class="sectionbody">
+<h3 id="__10">3.1. 检验日期</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>checkdate($mounth,$day,$year)</tt></p></div>
+<h3 id="__11">3.2. 当前日期</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>list($this_year,$this_mounth,$this_day) = explode(',',date('Y,m,d'));</tt></p></div>
+<h3 id="__12">3.3. 从字符串中解析日期和时间</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$a = strtotime('march 10');
+$b = strtotime('last thursday');
+$c = strtotime('now + 3 months');
+$f = strtotime('now + 3 days');
+
+
+$d = strtotime('now');
+print strftime('%c',$d);
+
+$e = strtotime('today');
+
+//解析mysql时间格式
+$date = '2010-06-22 05:23:23';
+$ar   = preg_split('/[- :]/',$date);</tt></pre></div></div>
+<h3 id="__13">3.4. 对日期进行加减运算</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>//直接利用strtotime
+$birthday = 'March 10, 1975';
+$whoopee_made = strtotime("$birthday - 9 months age");
+
+//或使用时间戳
+$birthday = 163727100;
+$gestation = 36 * 7 * 86400; //36周
+$whoopee_made = $birthday - $gestation;</tt></pre></div></div>
+<h3 id="__14">3.5. 根据时区计算时间</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$now = time();
+date_default_timezone_set('America/New York');
+print date('c',$now);
+date_default_timezone_set('Europe/Paris');
+print date('c',$now);</tt></pre></div></div>
+</div>
+<h2 id="__15">4. 数组</h2>
+<div class="sectionbody">
+<h3 id="_list">4.1. list</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$fruits = array('apples','bananas','Cantaloupes');
+list($red, $yellow, $beige) = $fruits;
+//$red = 'apples'; $yellow = 'bananas';...</tt></pre></div></div>
+<h3 id="_1">4.2. 从1开始索引</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>array(1 = &gt; 'apples', 'bananas', 'Cantaloupes')</tt></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">可以从任意数值开始索引.甚至是负数,因为PHP中关联数组和数字数组的界限很模糊.</td>
+</tr></table>
+</div>
+<h3 id="__16">4.3. 删除数组元素</h3><div style="clear:left"></div>
+<div class="ulist"><div class="title">删除单个元素或不连续的多个元素</div><ul>
+<li>
+<p>
+<tt>unset($arr[0])</tt>
+</p>
+</li>
+<li>
+<p>
+<tt>unset($arr[1], $arr[5])</tt>
+</p>
+</li>
+</ul></div>
+<div class="ulist"><div class="title">删除连续的多个元素</div><ul>
+<li>
+<p>
+<tt>array_splice($array, $offset, $length)</tt>
+</p>
+</li>
+</ul></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">array_splice函数直接对数组本身进行操作(值传递).</td>
+</tr></table>
+</div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">unset只是将该元素删除,并不重新索引数组.array_splice会重新索引数组.</td>
+</tr></table>
+</div>
+<h3 id="__17">4.4. 合并数组</h3><div style="clear:left"></div>
+<div class="paragraph"><p>两种方法:
+    *  <tt>array_merge($arr1, $arr2)</tt> ,避免冲突,会重新索引. 适用于数字数组.
+    *  <tt>$arr1 + $arr2</tt>  ,不会避免冲突,直接用右边去覆盖左边的同名键值, 适用于关键数组.</p></div>
+<h3 id="__18">4.5. 在数组中寻找元素</h3><div style="clear:left"></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<tt>in_array</tt> &amp; <tt>array_search</tt>
+用 <tt>in_array</tt> 可以查找是否数组包含某一值,用 <tt>array_search</tt>  可以找到该值所在的位置.但是,由于 <tt>array_search</tt> 能够适当的处理找不到相应值的情况,所以使用 <tt>array_search</tt> 更好,且速度相差不大.
+</p>
+</li>
+<li>
+<p>
+<tt>foreach</tt> &amp; <tt>array_filter</tt>
+使用 <tt>foreach</tt> 寻找某种符合条件的值时,若只需要找一个,可使用break提前退出循环,节约资源.而 <tt>array_filter</tt> 则不行,必须所有元素都循环一遍, 在这种情况下就没有 <tt>foreach</tt> 灵活.
+</p>
+</li>
+</ol></div>
+</div>
+<h2 id="__19">5. 变量</h2>
+<div class="sectionbody">
+<h3 id="__20">5.1. 检查变量是否为空</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>empty($var)</tt> ,对未定义的变量也不会报错(也就是说不需先使用 <tt>isset</tt> 去判断该变量是否被定义,而避免报错).</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">对未定义的变量, <tt>0</tt> ,空字符串等空值情况它都会返回 <tt>true</tt> .</td>
+</tr></table>
+</div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">如果仅仅只是去判断变量是否被定义,而不管它是不是空值,则应该使用 <tt>isset</tt> .</td>
+</tr></table>
+</div>
+<h3 id="_tt_tt_tt_tt">5.2. 消除 <tt>=</tt> 和 <tt>==</tt> 的困挠</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>// 使用:
+if (12 == $num) { /* ... */ }
+
+// 而不使用:
+if ($num == 12) { /* ... */ }
+
+// 因为前者如果错把'=='写成了'=',会引发一个错误
+// 而后者只会默默错误的执行
+
+
+// 假如你本来以为$num是一个整型数字,但实际上它确是一个字符串
+// 那么你用它去和一个整型做比较时,该字符串会自动转化为整型
+// 而很有可能被直接转换为0,当你再与0去做比较时
+// 则永远都会得到一个true,为避免应该使用全等符号
+$num = 'string';
+
+var_dump( 0 == $num ); //总是true
+var_dump( 0 === $num); //正确的方法
+</tt></pre></div></div>
+<h3 id="__21">5.3. 为变量设置一个默认值</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+$default_cars = 'car'; //默认值
+
+$cars = isset($_REQUEST['cars']) ? $_REQUEST['cars'] : $default_cars;
+
+// 判断数组元素则应该这样, 可以避免元素恰好为逻辑值:
+$cars = array_key_exists('cars', $_REQUEST) ? $_REQUEST['cars'] :$default_cars;
+
+// 在数组中,isset和array_key_exists的区别是对待null值时
+$va = array('cars' =&gt; null);
+var_dump(array_key_exists('cars', $va); // true
+var_dump(isset($va['cars']))            // false
+
+</tt></pre></div></div>
+<h3 id="__22">5.4. 为一个数组设置默认值</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+$request = array('a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C');
+
+$default = array('a' =&gt; 'aa', 'd' =&gt; '默认值');
+
+foreach($default as $k =&gt; $v) {
+    if (! isset($request[$k]) ) $request[$k] = $v;
+}
+
+var_dump($request);
+</tt></pre></div></div>
+<h3 id="__23">5.5. 静态变量</h3><div style="clear:left"></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<tt>static</tt> 
+</dt>
+<dd>
+<p>
+    把一个变量声明为 <strong>静态变量</strong> 会使得函数记住这个变量的值.
+</p>
+</dd>
+</dl></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">静态变量也只存活于一个请求中.</td>
+</tr></table>
+</div>
+<h3 id="__24">5.6. 在进程中共享变量</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>shmop</tt> 或 <tt>System V</tt> 共享内存.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">该节略过,未读.</td>
+</tr></table>
+</div>
+<h3 id="_serialize">5.7. serialize</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>magic_quotes_gpc</tt> 和 <tt>magic_quotes_runtime</tt> 会影响 <tt>unserialize</tt></p></div>
+<div class="paragraph"><p><tt>magic_quotes_gpc</tt> 开启后,使用serialize会自动调用addslashes,所以在使用unserialize时需要先使用stripslashes.</p></div>
+<div class="paragraph"><p>如果 <tt>magix_quotes_runtime</tt> 开启,则应该在使用serialize前手工去调用addslashes.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$new_cart = unserialize(stripslashes($cart)); //gpc开启
+$new_cart = unserialize($cart);               //gpc未开启
+
+//runtime开启时,写入文件和数据库必须先addslashes
+$fp = fopen('/tem/cart', 'w');
+fputs($fp, addslashes(serialize($a)));       //runtime开启
+fclose($fp);
+
+
+//runtime开启时,读也必须先stripslashes
+$new_cart = unserialize(stripslashes(file_get_contents('/tmp/cart')));</tt></pre></div></div>
+</div>
+<h2 id="__25">6. 函数</h2>
+<div class="sectionbody">
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">函数定义位置不分先后,但不允许定义同名函数,会抛出致命错误,中止脚本运行.</td>
+</tr></table>
+</div>
+<h3 id="__26">6.1. 函数的参数</h3><div style="clear:left"></div>
+<div class="paragraph"><p>PHP中函数的参数默认是值传递(及复制值,而不会改变参数变量的本身).引用传递加 <tt>&amp;</tt> 符号即可.</p></div>
+<div class="paragraph"><p>定义函数时,也可以不指定参数的个数,而使用 <tt>func_num_args</tt> 来获得此信息, 并使用 <tt>func_get_arg($i)</tt> 来获取指定参数.</p></div>
+<h3 id="__27">6.2. 返回变量的引用</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>function &amp;pc_array_find_value($needle, &amp;$haystack) {
+    foreach ($haystack as $key =&gt; $value) {
+        if ($needle == $value) {
+            return $haystack[$key];
+        }
+    }
+}//end of function
+
+// 调用时必须使用 =&amp; 符号来传递
+// 如果用 = 号则依然是返回值,而不是返回变量的引用.
+$html =&amp; pc_array_find_value('The Doors', $artists);
+</tt></pre></div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">建议,如果在一个函数中要修改一个变量的值,最好是返回这个值,然后将其赋给一个变量.</td>
+</tr></table>
+</div>
+<h3 id="__28">6.3. 返回失败信息</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>return false</tt></p></div>
+<h3 id="__29">6.4. 调用可变函数</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>function get_file($filename) {
+    return file_get_content($filename);
+}
+
+$functionname = 'get_file';
+$filename     = 'graphic.png';
+
+// 相当于调用 get_file('graphic.png');
+call_user_func($functionname, $filename);
+call_user_func_array($functionname, array($filename));
+
+// 实例
+// 允许的命令列表
+$dispatch = array(
+        'add'      =&gt; 'do_add',
+        'commit'   =&gt; 'do_commit',
+        'checkout' =&gt; 'do_checkout',
+        'update'   =&gt; 'do_update'
+        );
+
+$cmd = (isset($_REQUEST['command']) ? $_REQUEST['command'] : '';
+
+// 必须要检查请求的命令是否在允许的命令列表中
+// 否则会引起严重的安全隐患.如用户直接请求phpinfo,或系统命令
+if (array_key_exists($cmd, $dispatch)) {
+    $function = $dispatch[$cmd];
+    call_user_func($function); //调用函数
+} else {
+    error_log("Unknown command $cmd");
+}
+</tt></pre></div></div>
+<h3 id="__30">6.5. 在函数内部访问全局变量</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>function eat_fruit($fruit) {
+    global $chew_count;
+
+    for ($i = $chew_count; $i &gt; 0; $i--) {
+        //...
+    }
+
+    //或者
+    for ($i = $GLOBALS['chew_count']; $i &gt; 0; $i-- ) {
+       //...
+    }
+
+}//end of function</tt></pre></div></div>
+<div class="paragraph"><p>用global 标记的全局变量上使用unset,只会删除函数中的该变量,全局变量依然存在.
+而在$GLOBALS使用的全局变量上使用unset,会直接删除该全局变量.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">在函数中修改全局变量,会使得该全局变量在全局范围内真的发生变化.即函数中的全局变量并非复制值,而是可以看作为引用值(只有在使用unset时有所矛盾).</td>
+</tr></table>
+</div>
+<h3 id="__31">6.6. 动态创建函数</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+$add = create_function('$i, $j', 'return $i + $j');
+
+// 以上相当于
+function add($i, $j) {
+    return $i + $j;
+}
+
+
+// 常用于 usort, array_walk 之类
+usort($file, create_function('$a, $b', 'return strnatcmp($b, $a);'));
+</tt></pre></div></div>
+</div>
+<h2 id="__32">7. 类和对象</h2>
+<div class="sectionbody">
+<h3 id="__33">7.1. 调用父类方法</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>parent::dosomething()</tt></p></div>
+<h3 id="__34">7.2. 访问权限</h3><div style="clear:left"></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<tt>public</tt> 
+</dt>
+<dd>
+<p>
+    任何地方都可以访问.
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>protected</tt> 
+</dt>
+<dd>
+<p>
+    只有该类内部或该子类内部才能访问.(可被继承)
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>private</tt> 
+</dt>
+<dd>
+<p>
+    只有该类内部才能访问.(不会被子类继承,子类也不能访问,访问则报错Fatal error).
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><div class="title"><tt>protected</tt> 和 <tt>private</tt> 选择问题</div><p>原则是你是否认为有人有必要在子类中调用改方法.</p></div>
+<div class="paragraph"><p>推荐使用 <tt>protected</tt> ,除非你有100%的把握认为使用 <tt>private</tt> 是正确的选择,也就是说确定没有任何情况下某人会使用到该方法.</p></div>
+<h3 id="__35">7.3. 防止修改</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>final</tt> 标记函数,则可以防止在继承过程中,改方法或类被修改.</p></div>
+<div class="paragraph"><p><tt>final class</tt> 不能被继承和修改.</p></div>
+<h3 id="__36">7.4. 接口</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>interface</tt> 定义一个接口.</p></div>
+<div class="listingblock">
+<div class="title">检查一个类是否实现了特定的接口</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>/******************************************************/
+// 用class_implements 查看一个类是否为另一个类的子类
+class Book implements Nameable {
+    //..
+}
+
+// 返回Book类实现的所有接口,返回数组
+$interfaces = class_implements('Book');
+
+if (isset($interfaces['Nameable'])) {
+    // Book 实现了 Nameable 接口
+}
+
+/******************************************************/
+// 用class_parents 查看一个类是否为另一个类的子类
+class foo { }
+class bar extends foo {}
+
+print_r(class_parents(new bar));
+
+// since PHP 5.1.0 you may also specify the parameter as a string
+print_r(class_parents('bar'));
+
+
+/******************************************************/
+// 或用 instanceof 去判断继承而是否实现接口
+
+// 接口
+interface MyInterface { }
+class MyClass implements MyInterface { }
+$a = new MyClass;
+var_dump($a instanceof MyClass);
+var_dump($a instanceof MyInterface);
+
+// 继承
+class ParentClass {}
+class MyClass2 extends ParentClass { }
+$b = new MyClass2;
+var_dump($b instanceof MyClass);
+var_dump($b instanceof ParentClass);
+</tt></pre></div></div>
+<h3 id="__37">7.5. 抽象类</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>abstract</tt> [<em>æbstrækt</em>] 定义一个抽象类,抽象类不能直接实例化,只能被继承.</p></div>
+<div class="paragraph"><p><tt>abstract class</tt> 至少要包含一个 <tt>abstract function</tt> ,<tt>abstract function</tt> 必须被子类实现,否则报错.</p></div>
+<div class="paragraph"><p>一个抽象类B可以继承另一个抽象类A,B不用实现A的所有抽象方法,而可以只实现部分.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">是否使用抽象类,考虑 <strong>是一个</strong> 原则, 比如<em>MYSQL 是一个 DATABASE</em>.</td>
+</tr></table>
+</div>
+<h3 id="__38">7.6. 引用传递</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>$dave = $adam</tt> 两个变量实际指向同一个对象.</p></div>
+<div class="paragraph"><p>PHP5中的 <tt>clone</tt> 是浅克隆,可以手工使用 <tt>__clone</tt> 是修改为深克隆(对所有属性都进行值赋值,而非引用赋值).</p></div>
+<h3 id="_em_get_em_set">7.7. <em>get() </em>set()</h3><div style="clear:left"></div>
+<div class="paragraph"><p>不建议使用魔术访问器的原因:
+    * 子类不会去自动执行父类的 <tt>__get</tt> , <tt>__set</tt>
+    * 必须重写 <tt>__isset</tt> , <tt>__unset</tt>
+    * 速度相对较慢
+    * 不能使用反射类,以及 <tt>phpdocumentor</tt> 来自动文档化.
+    * 不能将其用于静态属性.</p></div>
+<h3 id="__39">7.8. 检查是否存在某个方法</h3><div style="clear:left"></div>
+<div class="paragraph"><p>method_exists($objectname, $methodName);</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>class myclass {
+    // constructor
+    function myclass() {
+        return(TRUE);
+    }
+
+    // method 1
+    function myfunc1() {
+        return(TRUE);
+    }
+
+    // method 2
+    function myfunc2() {
+        return(TRUE);
+    }
+}
+
+$my_object = new myclass();
+
+$class_methods = get_class_methods(get_class($my_object));
+
+// 原书源代码错误
+is_callable(array('my_object', 'myfunc1'));
+// 应该为:
+is_callable(array('myclass', 'myfunc1'));</tt></pre></div></div>
+<h3 id="__40">7.9. 链式结构</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>$orange = $fruit-&gt;get('citrus')-&gt;peel();</tt></p></div>
+<h3 id="__41">7.10. 聚合对象</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+class Address {
+    protected $city;
+
+    public functino setCity($city) {
+        $this-&gt;city = $city;
+    }
+
+    public function getCity() {
+        return $this-&gt;city;
+    }
+}
+
+class Person {
+    protected $name;
+    protected $address;
+
+    public function __construct() {
+        $this-&gt;address = new Address();
+    }
+
+    public functino setName($name) {
+        $this-&gt;name = $name;
+    }
+
+    // 聚合Address类
+    // 如果调用的方法不存在,则在Address类中去寻找
+    public functino __call($method, $args) {
+        if (method_exists($this-&gt;address, $method)) {
+                return call_user_func_array(
+                    array($this-&gt;address,$method),$args);
+        }
+    }
+
+
+
+    // 个人觉得可以这样写,而避免使用__call
+    // 如此一来,可更方便去聚合其他类
+    public function callAddressMethod($method, $args) {
+
+        //如果参数不是以数组形式提供的则将其变为数组
+        if (!is_array($args) {
+            //剔除第一个参数,因为第一个参数为method名
+            $args = array_slice(func_get_args(), 1);
+        }
+
+        if (method_exists($this-&gt;address, $method)) {
+                return call_user_func_array(
+                    array($this-&gt;address,$method),$args);
+        }
+    }
+
+}
+
+$resums = new Person();
+// 如果resums是Person的一个实例
+// 但因为Person聚合了Address,所以它同样可以使用Address的方法
+$resums-&gt;getCity();</tt></pre></div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">聚合对象,考虑 <strong>有一个</strong> 原则,例如本例中 <tt>Person</tt> <strong>有一个</strong> <tt>Address</tt></td>
+</tr></table>
+</div>
+<h3 id="_sleep">7.11. __sleep</h3><div style="clear:left"></div>
+<div class="paragraph"><p>只应该在 <tt>__sleep</tt> 中用于排除那些由于会占有过多磁盘空间而不应该被序列化的动作,而不要做任何会妨碍序列化或反序列化的事.</p></div>
+<h3 id="__42">7.12. 反射类</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+// 打印Person类的所有信息
+Reflection::export(new ReflectionClass('Person'));
+</tt></pre></div></div>
+<h3 id="_autoload">7.13. __autoload</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+// 使用PEAR命名约定自动加载类,和ZF的一致
+function __autoload($package_name) {
+    // 按下划线分割
+    $floders = split('_', $package_name);
+    // 基于目录结构重组
+    // 使用 DIRECTORY_SEPARATOR 常量以适应所有平台
+    $path = join(DIRECTORY_SEPARATOR, $floders);
+    // 添加扩张名
+    $path .= '.php';
+
+    include $path;
+}
+</tt></pre></div></div>
+<h3 id="__43">7.14. 动态实例化对象</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$prefix = 'LDS_';
+$className = 'Proson';
+
+
+// $b = new LDS_Preson
+$class_name = $prefix . $className;
+$b = new $class_name;
+
+// 注意，如下方式为不合法的：
+// $b = new 'LDS_Proson';
+</tt></pre></div></div>
+</div>
+<h2 id="_web">8. Web基础</h2>
+<div class="sectionbody">
+<h3 id="_cookie">8.1. 设置cookie</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>bool setcookie ( string name [, string value [, int expire [, string path [, string domain [, bool secure]]]]] )</tt></p></div>
+<div class="paragraph"><p>32位系统的最大纪元时间戳: 2147483647</p></div>
+<div class="paragraph"><p>NOTE:　<tt>cookie</tt> 是随着 <tt>HTTP-HEADER</tt> 一起发送的,也就是说必须在未输出任何内容之前设置cookie.</p></div>
+<h3 id="_cookie_2">8.2. 读取cookie</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>$_COOKIE[$cookieName]</tt></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">setcookie后不会立即更新$_COOKIE变量,而是在下一次请求才会更新.</td>
+</tr></table>
+</div>
+<h3 id="_cookie_3">8.3. 删除cookie</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>setcookie($cookieName, '', 1);</tt></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">删除cookie时必须提供与设置该cookie时相同的参数,如路径,域名,安全标记等(值和过期时间除外).</td>
+</tr></table>
+</div>
+<h3 id="__44">8.4. 重定向</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>header('Location: http://www.google.com?keyword=lds')</tt></p></div>
+<h3 id="_get">8.5. 生成GET字符串</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$var = array('name' =&gt; 'LDS','age' =&gt; 23);
+
+$string = http_build_query($var);
+
+$url = 'http://www.google.com?' . $string;
+// $url = http://www.google.com?name=LDS&amp;age=23;</tt></pre></div></div>
+<h3 id="_post">8.6. 读取POST请求的主体</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>$post_body = file_get_contents('php://input');</tt></p></div>
+<h3 id="_cookie_4">8.7. cookie认证</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>// 用户安全码
+$secret_word = 'if i ate spinach';
+
+// 登录成功后将 username, secret_word 联合加密，存入cookie
+if ( pc_validate($_POST['username'], $_POST['password']) ) {
+    setcookie('login',
+            $_POST['username'] . ',' .
+            md5($_POST['username'] . $secret_word));
+}
+
+// 验证登录cookie
+unset($username);
+
+if ($_COOKIE['login']) {
+    list($c_username, $cookie_hash) = split(',', $_COOKIE['login']);
+    if (md5($c_username . $secret_word) == $cookie_hash) {
+        $username = $c_username;
+    } else {
+        print "You Have sent a bad cookie";
+    }
+}
+
+if ($username) {
+    print "Welcome, $username";
+} else {
+    print "Welcome, anonymous user.";\
+}</tt></pre></div></div>
+<h3 id="_web_2">8.8. 压缩Web输出</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>php.ini</tt> 中 <tt>zlib.output_compression=1</tt></p></div>
+</div>
+<h2 id="__45">9. 表单</h2>
+<div class="sectionbody">
+<h3 id="_get_post">9.1. 判断是GET还是POST</h3><div style="clear:left"></div>
+<div class="paragraph"><p>` <em>GET</em> == $_SERVER[<em>REQUESTS_METHOD</em>] `</p></div>
+<div class="paragraph"><p>如果是GET则是请求页面,如果是POST则是提交表单.</p></div>
+<h3 id="__46">9.2. 必填字段</h3><div style="clear:left"></div>
+<div class="paragraph"><p>` if( ! (isset($_POST[<em>flavor</em>]) &amp;&amp; strlen($_POST[<em>flavor</em>])) ) {} `</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">如果使用 <tt>empty</tt> 代替 <tt>strlen</tt> 则会出现问题,因为 <tt>empty</tt> 会将 <tt>0</tt> 也看作空值,而在表单字段中很显然 <tt>0</tt> 是有意义的值,而非空值.</td>
+</tr></table>
+</div>
+<h3 id="__47">9.3. 检查数字</h3><div style="clear:left"></div>
+<div class="paragraph"><p>检查表单的一个值是否为integer, 不能直接使用 <tt>is_int</tt> ,因为POST过来的数据始终都是字符串类型.</p></div>
+<div class="paragraph"><p>可以通过正反两次转换后和原值进行比较来测试是否为整数:</p></div>
+<div class="paragraph"><p><tt>if ($_POST['rating'] != strval(intval($_POST['rating']))) {}</tt></p></div>
+<div class="paragraph"><p>判断是否为浮点数
+<tt>if ($_POST['rating'] != strval(floatval($_POST['rating']))) {}</tt></p></div>
+<h3 id="__48">9.4. 验证多选和单选表单</h3><div style="clear:left"></div>
+<div class="paragraph"><p>必须要去验证所选的内容是否在可选项目的数组中(in_array&amp;array_key_exists),避免恶意用户.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>// 验证一组复选框
+$choices = array('eggs'   =&gt; 'eggssomething',
+                 'toast'  =&gt; 'fnihsfd',
+                 'coffee' =&gt; 'erwrew');
+foreach ($choice as $key =&gt; $choice) {
+    echo "<span style="font-weight: bold"><span style="color: #0000FF">&lt;input</span></span> <span style="color: #009900">type</span><span style="color: #990000">=</span><span style="color: #FF0000">'checkbox'</span> <span style="color: #009900">name</span><span style="color: #990000">=</span><span style="color: #FF0000">'food[]'</span> <span style="color: #009900">value</span><span style="color: #990000">=</span><span style="color: #FF0000">'$key'</span> <span style="font-weight: bold"><span style="color: #0000FF">/&gt;</span></span> $choice \n";
+}
+
+// 验证,所选的都是在所提供的数组中
+// $_POST['food']和array_keys($choices)的交集即为$_POST['food']自己
+// 即集合$_POST['food']是集合array_keys($choices)的真子集
+if (array_intersect($_POST['food'], array_keys($choices)) != $_POST['food'])
+{
+    echo "You must select only valid choice.";
+}</tt></pre></div></div>
+<h3 id="__49">9.5. 验证时间和日期</h3><div style="clear:left"></div>
+<div class="paragraph"><div class="title">验证日期是否有效</div><p><tt>checkdate($mouth, $day, $year)</tt></p></div>
+<div class="paragraph"><div class="title">制作unix时间戳</div><p><tt>int mktime ( [int hour [, int minute [, int second [, int month [, int day [, int year [, int is_dst]]]]]]] )</tt></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">比较两个时间的前后或检验时间是否在某个范围内,都应该使用时间戳进行比较.</td>
+</tr></table>
+</div>
+<h3 id="__50">9.6. 预防跨站点脚本</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>htmlentities($sting, ENT_QUOTES, 'UTF-8')</tt></p></div>
+<h3 id="__51">9.7. 防止重复提交表单</h3><div style="clear:left"></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+::LDS
+</dt>
+<dd>
+<p>
+具体如何操作?
+</p>
+</dd>
+</dl></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">&lt;form</span></span> <span style="color: #009900">method</span><span style="color: #990000">=</span><span style="color: #FF0000">"post"</span> <span style="color: #009900">action</span><span style="color: #990000">=</span><span style="color: #FF0000">"&lt;?php echo $_SERVER['SCRIPT_NAME'] ?&gt;"</span>
+    <span style="color: #009900">onsubmit</span><span style="color: #990000">=</span><span style="color: #FF0000">"document.getElementById('submit-button').disabled = true;"</span><span style="font-weight: bold"><span style="color: #0000FF">&gt;</span></span>
+<span style="font-weight: bold"><span style="color: #0000FF">&lt;input</span></span> <span style="color: #009900">type</span><span style="color: #990000">=</span><span style="color: #FF0000">'hidden'</span> <span style="color: #009900">name</span><span style="color: #990000">=</span><span style="color: #FF0000">'token'</span> <span style="color: #009900">value</span><span style="color: #990000">=</span><span style="color: #FF0000">'&lt;?php echo md5(uniqid()); ?&gt;'</span> <span style="font-weight: bold"><span style="color: #0000FF">/&gt;</span></span>
+<span style="font-weight: bold"><span style="color: #0000FF">&lt;input</span></span> <span style="color: #009900">type</span><span style="color: #990000">=</span><span style="color: #FF0000">'submit'</span> <span style="color: #009900">value</span><span style="color: #990000">=</span><span style="color: #FF0000">'Save Data'</span> <span style="color: #009900">id</span><span style="color: #990000">=</span><span style="color: #FF0000">'submit-button'</span> <span style="font-weight: bold"><span style="color: #0000FF">/&gt;</span></span>
+<span style="font-weight: bold"><span style="color: #0000FF">&lt;/form&gt;</span></span>
+</tt></pre></div></div>
+<h3 id="__52">9.8. 处理上传文件</h3><div style="clear:left"></div>
+<h3 id="_input_image">9.9. input image</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>&lt;input type="image" name="locations" src="locations.gif"&gt;</tt></p></div>
+<div class="paragraph"><p>提交时,还会自动传递 <tt>locations_x</tt> , <tt>locations_y</tt>
+给服务器,表示用户点击了图片的哪里(坐标).</p></div>
+<h3 id="_input">9.10. input 传递多值</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>&lt;input id="" name="pop[NY][NYC]" type="checkbox" /&gt;</tt></p></div>
+<div class="paragraph"><p>可通过 <tt>$_POST['pop']['NY']['NYC']</tt> 访问到.</p></div>
+<h3 id="__53">9.11. 日期</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>list($hour, $minute, $second, $month, $day, $year) =
+    split(':', date('h:i:s:m:d:Y'))</tt>
+这样的好处是,一快捷,二,格式可直接用于mktime()函数.</p></div>
+</div>
+<h2 id="__54">10. 数据库</h2>
+<div class="sectionbody">
+<h3 id="_prepare">10.1. prepare</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$st = $db-&gt;prepare('DELETE FROM family WHERE name LIKE ?');
+
+// prepare会,则方便多次执行
+// prepare会自动转义,防止代码注入
+// 建立在prepare的基础上,许多数据库后台都会对查询进行解析和优化
+// 每次调用会比自建字符串查询语句要快速
+$st-&gt;execute(array('Fredo'));
+$st-&gt;execute(array('Sonny'));
+$st-&gt;execute(array('lau'));
+
+// prepare也支持命名占位符
+$st = $db-&gt;prepare('DELETE FROM family WHERE name LIKE :name');
+
+$st-&gt;execute(array('name' =&gt; 'lau'));
+
+//---------------------------------------------------------
+
+// 利用binkParam()绑定参数
+$pairs = array('Mars' =&gt; 'water',
+               'Moon' =&gt; 'water',
+               'Sun'  =&gt; 'fire');
+
+$st = $db-&gt;prepare(
+        'SELECT sign FROM zodiac WHERE element LIKE :element AND planet LIKE
+        :planet");
+$st-&gt;bindParam(':planet', $planet);
+// 强制转换为字符串
+$st-&gt;bindParam(':element',$element, PDO::PARAM_STR);
+foreach ($pairs as $planet =&gt; $element) {
+    // 自动读取$element,$planet的值
+    // 不需要提供参数
+    $st-&gt;execute();
+    var_dump($st-&gt;fetch());
+}
+
+//---------------------------------------------------------
+
+// 手工转义引号
+$safe = $db-&gt;quote($_GET['searchTrem]);
+
+//---------------------------------------------------------
+
+// 让所有数据库错误抛出异常
+$db-&gt;setAttribute(PDO::ATTR_ERRMOD, PDO::ERRMOD_EXCEPTION);
+
+//---------------------------------------------------------
+
+// 使用implode来构建查询语句
+$fields = array('symbol', 'planet', 'element');
+
+$update_fields = array();
+$update_values = array();
+
+foreach ($fields as $field) {
+    $update_fields[] = "$field = ?";
+    // 注意实际中要考虑转义问题,避免代码注入
+    $update_values[] = $_POST[$field];
+}
+
+$st = $db-&gt;prepare("UPDATE zodiac SET " .
+                    implode(',', $update_fields) .
+                    'WHERE sign = ?');
+
+// WHERE
+$update_values[] = $_GET['sign'];
+
+$st-&gt;execute($update_values);
+</tt></pre></div></div>
+<div class="paragraph"><p>在magic_quotes_gpc开启的情况下,再使用quote之类的函数会使得数据重复转义,应该避免这种情况,最好将magic_quotes_gpc关闭(不能在运行时关闭),如果没有权限关闭,那么在使用转义函数时应该注意此问题.</p></div>
+<div class="paragraph"><p>magic_quotes_sybase 只转义单引号</p></div>
+</div>
+<h2 id="__55">11. 错误处理,故障排除和测试</h2>
+<div class="sectionbody">
+<h3 id="__56">11.1. 输出栈轨迹</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>debug_print_backtrace()</tt> &amp; <tt>debug_backtrace()</tt></p></div>
+<h3 id="_e_all">11.2. E_ALL</h3><div style="clear:left"></div>
+<div class="paragraph"><p><tt>E_STRICT</tt> 是PHP 5新引入的错误级别,其不包含在E_ALL中,在开发过程中十分有用.为PHP有关改进代码质量的修改建议.</p></div>
+<h3 id="__57">11.3. 空白符</h3><div style="clear:left"></div>
+<div class="paragraph"><p>如果包含文件中带有位于&lt;?php ?&gt;标签之外的空白符, 那么这个空白符也会被发送到客户端,从而可能导致 <tt>headers already sent</tt> 错误.</p></div>
+<div class="paragraph"><p>一种合法的解决方法是,如果脚本时纯PHP文件, 可以通过不书写尾部的 <tt>?&gt;</tt> PHP关闭标签来保证不再对该文件中的空白符进行处理.</p></div>
+<h3 id="__58">11.4. 调试函数</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>// 筛选信息: 为不同的调试注释类型指定不同的优先级
+// 之后调试函数只输出那些高于当前优先级的调试信息
+define('DEBUG', 2);
+
+function pc_debug($message, $level = 0) {
+    if (defined('DEBUG') &amp;&amp; $level &gt; DEBUG) {
+        error_log($message);
+    }
+}
+
+pc_debug('debug it', 1); //不输出, 因为当前debug级别小于1
+pc_debug('debug it', 3); //输出</tt></pre></div></div>
+<h3 id="_xdebug">11.5. Xdebug</h3><div style="clear:left"></div>
+<div class="paragraph"><p>代码剖析与kcachegrind兼容</p></div>
+<div class="paragraph"><p><tt>debugclient</tt> 工具</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">XDEBUG_CONFiG</span><span style="color: #990000">=</span><span style="color: #FF0000">"idekey=session_name remote_enable=1"</span>
+php myscript<span style="color: #990000">.</span>php
+</tt></pre></div></div>
+<div class="paragraph"><p>远程服务器调试需在URL后加 <tt>?XDEBUG_SESSION_START=name</tt></p></div>
+</div>
+<h2 id="__59">12. 性能调谐和负载测试</h2>
+<div class="sectionbody">
+<div class="paragraph"><p><tt>microtime()</tt> 计算速度</p></div>
+<div class="paragraph"><p><tt>PEAR Benchmark</tt> 详细分析速度</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+function profile($display = false) {
+    static $times;
+
+    switch ($display) {
+        case false:
+            $times[] = microtime();
+            break;
+        case true:
+            $start = array_shift($times);
+
+            $start_mt = explode(' ', $start);
+            $start_total = doubleval($start_mt[0] + $start_mt[1]);
+
+            foreach ($times as $stop) {
+                $stop_mt = explode(' ', $stop);
+                $stop_total = doubleval($stop_mt[0] + $stop_mt[1]);
+                $elapsed[] = $stop_total - $start_total;
+            }
+
+            unset($times);
+            return $elapsed;
+            break;
+    }
+}</tt></pre></div></div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2011-02-21 21:36:11 CST
+</div>
+</div>
+</body>
+</html>

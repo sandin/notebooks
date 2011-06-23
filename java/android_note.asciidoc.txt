@@ -1,3 +1,9 @@
+= android note =
+lds <lds2012[at]gmail.com>
+{localdate}
+
+:language: java
+
 .遗留问题
 *************************************************************
     * ActivityInstrumentationTestCase2 中无法使用getIntent() ?

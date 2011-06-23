@@ -1,0 +1,793 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.5.2" />
+<title>php maunal</title>
+<style type="text/css">
+/* Debug borders */
+p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
+/*
+  border: 1px solid red;
+*/
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+tt {
+  color: navy;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  font-family: sans-serif;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+
+div.sectionbody {
+  font-family: serif;
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+span#author {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+span#email {
+}
+span#revnumber, span#revdate, span#revremark {
+  font-family: sans-serif;
+}
+
+div#footer {
+  font-family: sans-serif;
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+div#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+div#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #dddddd;
+  color: #777777;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-family: sans-serif;
+  font-weight: bold;
+}
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+
+@media print {
+  div#footer-badges { display: none; }
+}
+
+div#toc {
+  margin-bottom: 2.5em;
+}
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+/* Workarounds for IE6's broken and incomplete CSS2. */
+
+div.sidebar-content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+div.sidebar-title, div.image-title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-top: 0.0em;
+  margin-bottom: 0.5em;
+}
+
+div.listingblock div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+
+div.exampleblock-content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+window.onload = function(){asciidoc.footnotes(); asciidoc.toc(2);}
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  var cont = document.getElementById("content");
+  var noteholder = document.getElementById("footnotes");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      // Use [\s\S] in place of . so multi-line matches work.
+      // Because JavaScript has no s (dotall) regex flag.
+      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      spans[i].innerHTML =
+        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+        "' title='View footnote' class='footnote'>" + n + "</a>]";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+}
+
+}
+/*]]>*/
+</script>
+</head>
+<body>
+<div id="header">
+<h1>php maunal</h1>
+<span id="author">lds</span><br />
+<span id="email"><tt>&lt;<a href="mailto:lds2012@gmail.com">lds2012@gmail.com</a>&gt;</tt></span><br />
+<span id="revdate">2011-02-21</span>
+<div id="toc">
+  <div id="toctitle">Table of Contents</div>
+  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="sidebar-content">
+<div class="sidebar-title">遗留问题</div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<tt>REMOTE_ADDR</tt>
+</dt>
+<dd>
+<p>
+    正在浏览当前页面用户的 IP 地址。
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>declare (directive)</tt>
+</dt>
+<dd>
+<p>
+    statement
+</p>
+</dd>
+</dl></div>
+</div></div>
+</div>
+</div>
+<h2 id="_">1. 主要内容</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>定界符文本表现的就和双引号字符串一样</p></div>
+<div class="paragraph"><p>NULL == '' //true</p></div>
+<div class="paragraph"><p>Xor（逻辑异或）
+$a xor $b，如果 $a 或 $b 任一为 TRUE，但不同时是。</p></div>
+<div class="paragraph"><p>在 PHP 中可以调用递归函数。但是要避免递归函数／方法调用超过 100-200 层(递归超过100会报错)</p></div>
+<div class="paragraph"><p>从函数返回一个引用</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">&lt;?php</span>
+<span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="color: #990000">&amp;</span><span style="font-weight: bold"><span style="color: #000000">returns_reference</span></span><span style="color: #990000">()</span>
+<span style="color: #FF0000">{</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">return</span></span> <span style="color: #009900">$someref</span><span style="color: #990000">;</span>
+<span style="color: #FF0000">}</span>
+
+<span style="color: #009900">$newref</span> <span style="color: #990000">=&amp;</span> <span style="font-weight: bold"><span style="color: #000000">returns_reference</span></span><span style="color: #990000">();</span>
+<span style="color: #990000">?&gt;</span>
+
+//变量函数示例
+<span style="color: #990000">&lt;?php</span>
+<span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">foo</span></span><span style="color: #990000">()</span> <span style="color: #FF0000">{</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">echo</span></span> <span style="color: #FF0000">"In foo()&lt;br /&gt;\n"</span><span style="color: #990000">;</span>
+<span style="color: #FF0000">}</span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">bar</span></span><span style="color: #990000">(</span><span style="color: #009900">$arg</span> <span style="color: #990000">=</span> <span style="color: #FF0000">''</span><span style="color: #990000">)</span> <span style="color: #FF0000">{</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">echo</span></span> <span style="color: #FF0000">"In bar(); argument was '$arg'.&lt;br /&gt;\n"</span><span style="color: #990000">;</span>
+<span style="color: #FF0000">}</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// This is a wrapper function around echo</span></span>
+<span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">echoit</span></span><span style="color: #990000">(</span><span style="color: #009900">$string</span><span style="color: #990000">)</span>
+<span style="color: #FF0000">{</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">echo</span></span> <span style="color: #009900">$string</span><span style="color: #990000">;</span>
+<span style="color: #FF0000">}</span>
+
+<span style="color: #009900">$func</span> <span style="color: #990000">=</span> <span style="color: #FF0000">'foo'</span><span style="color: #990000">;</span>
+<span style="color: #009900">$func</span><span style="color: #990000">();</span>        <span style="font-style: italic"><span style="color: #9A1900">// This calls foo()</span></span>
+
+<span style="color: #009900">$func</span> <span style="color: #990000">=</span> <span style="color: #FF0000">'bar'</span><span style="color: #990000">;</span>
+<span style="color: #009900">$func</span><span style="color: #990000">(</span><span style="color: #FF0000">'test'</span><span style="color: #990000">);</span>  <span style="font-style: italic"><span style="color: #9A1900">// This calls bar()</span></span>
+
+<span style="color: #009900">$func</span> <span style="color: #990000">=</span> <span style="color: #FF0000">'echoit'</span><span style="color: #990000">;</span>
+<span style="color: #009900">$func</span><span style="color: #990000">(</span><span style="color: #FF0000">'test'</span><span style="color: #990000">);</span>  <span style="font-style: italic"><span style="color: #9A1900">// This calls echoit()</span></span>
+<span style="color: #990000">?&gt;</span></tt></pre></div></div>
+<div class="listingblock">
+<div class="title">解释代码</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">&lt;?php</span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">class</span></span> A
+<span style="color: #FF0000">{</span>
+    public  <span style="color: #009900">$name</span> <span style="color: #990000">=</span> <span style="color: #FF0000">'liudingsaqn'</span><span style="color: #990000">;</span>
+    private <span style="color: #009900">$age</span>  <span style="color: #990000">=</span> <span style="color: #993399">23</span><span style="color: #990000">;</span>
+    public  <span style="color: #009900">$arr</span>  <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #993399">1</span><span style="color: #990000">,</span><span style="color: #993399">2</span><span style="color: #990000">,</span><span style="color: #993399">3</span><span style="color: #990000">,</span><span style="color: #993399">4</span><span style="color: #990000">);</span>
+
+    public <span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">getName</span></span><span style="color: #990000">()</span>
+    <span style="color: #FF0000">{</span>
+        <span style="font-style: italic"><span style="color: #9A1900">//var_dump($this-&gt;name);</span></span>
+    <span style="color: #FF0000">}</span>
+
+    public <span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">staticFun</span></span><span style="color: #990000">()</span>
+    <span style="color: #FF0000">{</span>
+        <span style="font-weight: bold"><span style="color: #000000">var_dump</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'static'</span><span style="color: #990000">);</span>
+    <span style="color: #FF0000">}</span>
+<span style="color: #FF0000">}</span>
+
+<span style="color: #009900">$a</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">new</span></span> <span style="font-weight: bold"><span style="color: #000000">A</span></span><span style="color: #990000">();</span>
+<span style="color: #009900">$a</span><span style="color: #990000">-&gt;</span><span style="font-weight: bold"><span style="color: #000000">getName</span></span><span style="color: #990000">();</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">//序列化</span></span>
+<span style="color: #009900">$serialize</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #000000">serialize</span></span><span style="color: #990000">(</span><span style="color: #009900">$a</span><span style="color: #990000">);</span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($serialize);</span></span>
+
+<span style="font-style: italic"><span style="color: #9A1900">//反序列化，必须确定该序列化对象所属的类定义包含在当前文件中</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">//反序列化的过程，其实是根据序列的字符串重新实例化对象的过程。</span></span>
+<span style="color: #009900">$aa</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #000000">unserialize</span></span><span style="color: #990000">(</span><span style="color: #009900">$serialize</span><span style="color: #990000">);</span>
+<span style="color: #009900">$aa</span><span style="color: #990000">-&gt;</span><span style="font-weight: bold"><span style="color: #000000">getName</span></span><span style="color: #990000">();</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">//转换为数组,会暴露private属性</span></span>
+<span style="color: #009900">$arr</span> <span style="color: #990000">=</span> <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">)</span> <span style="color: #009900">$a</span><span style="color: #990000">;</span>
+
+
+
+<span style="font-style: italic"><span style="color: #9A1900">/*</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">    //循环对象</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">    foreach ($a as $value)</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">    {</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">        var_dump($value);</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">    }</span></span>
+<span style="font-style: italic"><span style="color: #9A1900"> */</span></span>
+
+<span style="color: #009900">$arr</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #993399">1</span><span style="color: #990000">,</span><span style="color: #993399">2</span><span style="color: #990000">,</span><span style="color: #993399">3</span><span style="color: #990000">,</span><span style="color: #993399">4</span><span style="color: #990000">);</span>
+<span style="font-style: italic"><span style="color: #9A1900">//$arr = array('name' =&gt; 'liudingsan','age' =&gt; 23);</span></span>
+<span style="color: #009900">$newArr</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #000000">array_chunk</span></span><span style="color: #990000">(</span><span style="color: #009900">$arr</span><span style="color: #990000">,</span><span style="color: #993399">3</span><span style="color: #990000">);</span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($newArr);</span></span>
+
+<span style="color: #009900">$array1</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span> <span style="color: #990000">(</span><span style="color: #FF0000">"a"</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">"green"</span><span style="color: #990000">,</span> <span style="color: #FF0000">"b"</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">"brown"</span><span style="color: #990000">,</span> <span style="color: #FF0000">"c"</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">"blue"</span><span style="color: #990000">,</span> <span style="color: #FF0000">"red"</span><span style="color: #990000">,</span><span style="color: #FF0000">'black'</span><span style="color: #990000">);</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($array1);</span></span>
+
+<span style="font-style: italic"><span style="color: #9A1900">//将array('a','b')当一个value填充进去，而非a,b分开作为元素填充</span></span>
+<span style="color: #009900">$array2</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #000000">array_fill</span></span><span style="color: #990000">(</span><span style="color: #993399">2</span><span style="color: #990000">,</span><span style="color: #993399">2</span><span style="color: #990000">,</span><span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'a'</span><span style="color: #990000">,</span><span style="color: #FF0000">'b'</span><span style="color: #990000">));</span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($array2);</span></span>
+
+
+<span style="color: #009900">$arr1</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #993399">2</span><span style="color: #990000">,</span><span style="color: #993399">1</span><span style="color: #990000">,</span><span style="color: #993399">3</span><span style="color: #990000">,</span><span style="color: #993399">4</span><span style="color: #990000">);</span>  <span style="font-style: italic"><span style="color: #9A1900">//升序</span></span>
+<span style="color: #009900">$arr2</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #993399">9</span><span style="color: #990000">,</span><span style="color: #993399">8</span><span style="color: #990000">,</span><span style="color: #993399">7</span><span style="color: #990000">,</span><span style="color: #993399">6</span><span style="color: #990000">);</span>  <span style="font-style: italic"><span style="color: #9A1900">//降序</span></span>
+
+<span style="font-weight: bold"><span style="color: #000000">array_multisort</span></span><span style="color: #990000">(</span><span style="color: #009900">$arr1</span><span style="color: #990000">,</span><span style="color: #009900">$arr2</span><span style="color: #990000">);</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($arr1);</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($arr2);</span></span>
+
+<span style="color: #009900">$ar</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span>
+       <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">"10"</span><span style="color: #990000">,</span> <span style="color: #993399">11</span><span style="color: #990000">,</span> <span style="color: #993399">100</span><span style="color: #990000">,</span> <span style="color: #993399">100</span><span style="color: #990000">,</span> <span style="color: #FF0000">"a"</span><span style="color: #990000">),</span>
+       <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span>   <span style="color: #993399">1</span><span style="color: #990000">,</span>  <span style="color: #993399">2</span><span style="color: #990000">,</span> <span style="color: #FF0000">"2"</span><span style="color: #990000">,</span>   <span style="color: #993399">3</span><span style="color: #990000">,</span>   <span style="color: #993399">1</span><span style="color: #990000">)</span>
+      <span style="color: #990000">);</span>
+<span style="font-style: italic"><span style="color: #9A1900">//根据第一个arr进行 行 排序</span></span>
+<span style="font-weight: bold"><span style="color: #000000">array_multisort</span></span><span style="color: #990000">(</span>
+                <span style="color: #009900">$ar</span><span style="color: #990000">[</span><span style="color: #993399">1</span><span style="color: #990000">],</span> SORT_NUMERIC<span style="color: #990000">,</span> SORT_DESC<span style="color: #990000">,</span>
+                <span style="color: #009900">$ar</span><span style="color: #990000">[</span><span style="color: #993399">0</span><span style="color: #990000">],</span> SORT_ASC<span style="color: #990000">,</span> SORT_STRING<span style="color: #990000">);</span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($ar);</span></span>
+
+<span style="color: #009900">$last</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #000000">array_pop</span></span><span style="color: #990000">(</span><span style="color: #009900">$arr</span><span style="color: #990000">);</span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($arr);</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($last);</span></span>
+<span style="color: #009900">$arr</span><span style="color: #990000">[]</span> <span style="color: #990000">=</span> <span style="color: #993399">100</span><span style="color: #990000">;</span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($arr);</span></span>
+<span style="color: #009900">$random</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #000000">array_rand</span></span><span style="color: #990000">(</span><span style="color: #009900">$arr</span><span style="color: #990000">,</span><span style="color: #993399">2</span><span style="color: #990000">);</span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($arr);</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($random);</span></span>
+
+
+
+<span style="color: #009900">$arr</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'r'</span><span style="color: #990000">,</span><span style="color: #FF0000">'g'</span><span style="color: #990000">,</span><span style="color: #FF0000">'b'</span><span style="color: #990000">,</span><span style="color: #FF0000">'y'</span><span style="color: #990000">);</span>
+
+<span style="color: #009900">$r</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #000000">array_splice</span></span><span style="color: #990000">(</span><span style="color: #009900">$arr</span><span style="color: #990000">,</span><span style="color: #993399">1</span><span style="color: #990000">,</span><span style="color: #993399">0</span><span style="color: #990000">,</span><span style="color: #FF0000">'p'</span><span style="color: #990000">);</span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($arr);</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">//</span></span>
+<span style="color: #009900">$sweet</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'a'</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">'apple'</span><span style="color: #990000">,</span> <span style="color: #FF0000">'b'</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">'banana'</span><span style="color: #990000">);</span>
+<span style="color: #009900">$fruits</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'sweet'</span> <span style="color: #990000">=&gt;</span> <span style="color: #009900">$sweet</span><span style="color: #990000">,</span> <span style="color: #FF0000">'sour'</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">'lemon'</span><span style="color: #990000">);</span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">test_print</span></span><span style="color: #990000">(&amp;</span><span style="color: #009900">$item</span><span style="color: #990000">,</span> <span style="color: #009900">$key</span><span style="color: #990000">)</span>
+<span style="color: #FF0000">{</span>
+    <span style="color: #009900">$item</span> <span style="color: #990000">=</span>  <span style="color: #FF0000">"$key holds $item\n"</span><span style="color: #990000">;</span>
+<span style="color: #FF0000">}</span>
+
+<span style="font-weight: bold"><span style="color: #000000">array_walk_recursive</span></span><span style="color: #990000">(</span><span style="color: #009900">$fruits</span><span style="color: #990000">,</span> <span style="color: #FF0000">'test_print'</span><span style="color: #990000">);</span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($fruits);</span></span>
+
+<span style="font-style: italic"><span style="color: #9A1900">//双引号中必须用花括号引用数组元素</span></span>
+<span style="color: #009900">$foo</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'bar'</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">'baz'</span><span style="color: #990000">,</span><span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'name'</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">'lds'</span><span style="color: #990000">));</span>
+<span style="font-weight: bold"><span style="color: #000000">var_dump</span></span><span style="color: #990000">(</span><span style="color: #FF0000">"Hello {$foo[0]['name']}!"</span><span style="color: #990000">);</span> <span style="font-style: italic"><span style="color: #9A1900">// Hello baz!</span></span>
+
+<span style="color: #009900">$arr</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'c'</span><span style="color: #990000">,</span><span style="color: #FF0000">'b'</span><span style="color: #990000">,</span><span style="color: #FF0000">'a'</span><span style="color: #990000">,</span><span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'d'</span><span style="color: #990000">,</span><span style="color: #FF0000">'f'</span><span style="color: #990000">));</span>
+<span style="font-weight: bold"><span style="color: #000000">asort</span></span><span style="color: #990000">(</span><span style="color: #009900">$arr</span><span style="color: #990000">);</span>
+<span style="font-weight: bold"><span style="color: #000000">var_dump</span></span><span style="color: #990000">(</span> <span style="font-weight: bold"><span style="color: #000000">array_search</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'b'</span><span style="color: #990000">,</span><span style="color: #009900">$arr</span><span style="color: #990000">)</span> <span style="color: #990000">);</span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($arr);</span></span>
+
+<span style="color: #009900">$foo</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">"bob"</span><span style="color: #990000">,</span> <span style="color: #FF0000">"fred"</span><span style="color: #990000">,</span> <span style="color: #FF0000">"jussi"</span><span style="color: #990000">,</span> <span style="color: #FF0000">"jouni"</span><span style="color: #990000">,</span> <span style="color: #FF0000">"egon"</span><span style="color: #990000">,</span> <span style="color: #FF0000">"marliese"</span><span style="color: #990000">);</span>
+<span style="color: #009900">$bar</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">each</span></span><span style="color: #990000">(</span><span style="color: #009900">$foo</span><span style="color: #990000">);</span>
+<span style="font-style: italic"><span style="color: #9A1900">//var_dump($bar);</span></span>
+
+
+<span style="color: #009900">$fruits</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">"d"</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">"lemon"</span><span style="color: #990000">,</span> <span style="color: #FF0000">"a"</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">"orange"</span><span style="color: #990000">,</span> <span style="color: #FF0000">"b"</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">"banana"</span><span style="color: #990000">,</span> <span style="color: #FF0000">"c"</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">"apple"</span><span style="color: #990000">);</span>
+<span style="font-weight: bold"><span style="color: #000000">sort</span></span><span style="color: #990000">(</span><span style="color: #009900">$fruits</span><span style="color: #990000">);</span>
+
+<span style="font-weight: bold"><span style="color: #000000">var_dump</span></span><span style="color: #990000">(</span><span style="color: #009900">$fruits</span><span style="color: #990000">);</span>
+
+<span style="color: #009900">$info</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'coffee'</span><span style="color: #990000">,</span> <span style="color: #FF0000">'brown'</span><span style="color: #990000">,</span> <span style="color: #FF0000">'caffeine'</span><span style="color: #990000">);</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// Listing all the variables</span></span>
+<span style="font-weight: bold"><span style="color: #0000FF">list</span></span><span style="color: #990000">(</span><span style="color: #009900">$drink</span><span style="color: #990000">,</span> <span style="color: #009900">$color</span><span style="color: #990000">,</span> <span style="color: #009900">$power</span><span style="color: #990000">)</span> <span style="color: #990000">=</span> <span style="color: #009900">$info</span><span style="color: #990000">;</span>
+<span style="font-weight: bold"><span style="color: #0000FF">echo</span></span> <span style="color: #FF0000">"$drink is $color and $power makes it special.\n"</span><span style="color: #990000">;</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// Listing some of them</span></span>
+<span style="font-weight: bold"><span style="color: #0000FF">list</span></span><span style="color: #990000">(</span><span style="color: #009900">$drink</span><span style="color: #990000">,</span> <span style="color: #990000">,</span> <span style="color: #009900">$power</span><span style="color: #990000">)</span> <span style="color: #990000">=</span> <span style="color: #009900">$info</span><span style="color: #990000">;</span>
+<span style="font-weight: bold"><span style="color: #0000FF">echo</span></span> <span style="color: #FF0000">"$drink has $power.\n"</span><span style="color: #990000">;</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// Or let's skip to only the third one</span></span>
+<span style="font-weight: bold"><span style="color: #0000FF">list</span></span><span style="color: #990000">(</span> <span style="color: #990000">,</span> <span style="color: #990000">,</span> <span style="color: #009900">$power</span><span style="color: #990000">)</span> <span style="color: #990000">=</span> <span style="color: #009900">$info</span><span style="color: #990000">;</span>
+<span style="font-weight: bold"><span style="color: #0000FF">echo</span></span> <span style="color: #FF0000">"I need $power!\n"</span><span style="color: #990000">;</span>
+
+
+<span style="color: #009900">$str</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">false</span></span><span style="color: #990000">;</span><span style="font-style: italic"><span style="color: #9A1900">// '' , 0</span></span>
+<span style="font-weight: bold"><span style="color: #000000">var_dump</span></span><span style="color: #990000">(</span><span style="color: #009900">$str</span><span style="color: #990000">);</span>
+<span style="font-weight: bold"><span style="color: #000000">var_dump</span></span><span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">empty</span></span><span style="color: #990000">(</span><span style="color: #009900">$str</span><span style="color: #990000">));</span>
+<span style="color: #990000">?&gt;</span></tt></pre></div></div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2010-09-01 10:17:30 CST
+</div>
+</div>
+</body>
+</html>

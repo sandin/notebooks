@@ -1,0 +1,47 @@
+:language: java
+
+= 利用Parcelabel在Acitivity间传递复杂数据 =
+
+一般在两个Acitivity之间传递数据使用简单的 `Bundle` 就可以做到, 但是只能传递一些基本类型的数据, 如果需要传递一个对象作为数据携带者, 就需要使用 `Parcelable` 接口, 实现该方法的类就可以传递到 `Bundle` 中去, 作为一个对象进行数据传递.
+
+这里直接使用一个例子来说明如果实现 `Parcelable` 接口:
+[source]
+---------------------------------------------
+class Tweet implements Parcelable {
+
+ public Tweet(Parcel in) {
+	  id = in.readString();
+	  text = in.readString();
+  }
+
+ // For interface Parcelable
+  
+  public int describeContents() {
+      return 0;
+  }
+
+  public void writeToParcel(Parcel out, int flags) {
+	  out.writeString(id);
+	  out.writeString(text);
+  }
+
+  public static final Parcelable.Creator<Tweet> CREATOR
+          = new Parcelable.Creator<Tweet>() {
+      public Tweet createFromParcel(Parcel in) {
+    	  return new Tweet(in);
+      }
+
+      public Tweet[] newArray(int size) {
+//          return new Tweet[size];
+          throw new UnsupportedOperationException();   
+      }
+  };
+------------------------------------------------------
+
+.注解:
+1. 首先实现 `writeToParel()` 抽象方法, 在其中将需要传递的数据写入到 `Parcel out` 中去,  `Parcel` 有一整套的各种类型数据 `write` 和 `read` 方法. 一般性的是把该类的成员变量写入其中去, 当然你想附带传递点其他数据都是可以的(亲, 包邮哦), 这里没有限制, 唯一的限制是顺序, 这里写入的顺序决定了你读取时的顺序, 这可以考虑第3点即明.
+
+2. 实例化一个 Parcelable.Creator<E> ,在其中实现 `createFromParcel()` 方法, 该方法返回该类的一个实例, 则这个实例是通过读取 `Parcel` 中写入的数据来进行实例化对象的. 这里的例子是 `return new Tweet(in)` .
+
+3. 实现一个构造函数 其参数是 `Parcel` 类型, 这里例子里是 `public Tweet(Parcel in)` , 在其中利用 `Parcel` 里的数据来初始化对象, 而 `Parcel` 里有哪些数据,即数据的顺序都由我们第一步里面利用 `write` 方法写入操作来决定, 也就是说比如我在第一步里面先 `writeString(id)` , 然后再 `writeString(text)` , 那么我读的时候就必须按照这个顺序 , 先 `readString()` 出来的就是 `id` ,在read一个就是 `text` , 数据的类型和顺序都必须一一对应.
+

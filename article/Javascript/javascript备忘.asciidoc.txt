@@ -1,3 +1,5 @@
+:language: javascript
+
 == undefined 不等于 null ==
 
 `null` 是一个对象，`undefined` 是一个属性、方法或变量。存在null是因为对象被定义。如果对象没有被定义，而测试它是否是null，但因为没有被定义，它无法测试到，而且会抛出错误。
@@ -122,8 +124,9 @@ javascript中两个感叹号用于判断变量是否为null,undefined,'',0。
 注意：该变量必须声明过，否则报错。 
 
 测试代码如下： 
+
 [source]
-------------------------------- 
+------------------------------------------------------
 var a = 123; 
 alert(!!a); 
 //output true 
@@ -145,59 +148,14 @@ alert(!!b);
 b=1; 
 alert(!!b); 
 //output true 
-------------------------------- 
+---------------------------------------------------------
 
-== Javascript中的面向对象(类的定义与继承) ==
-
-在javascript中定义类(class)，并实现类的继承。 
-
-[source]
-------------------------------------- 
-//构造函数中储存类的属性 
-function ClassA(name) 
-{ 
-    this.name = name; 
-} 
-
-//原型对象中储存类的方法 
-ClassA.prototype.getName = function() 
-{ 
-    alert(this.name); 
-} 
-
-//类的继承 
-function ClassB(name, age) 
-{ 
-    //使用对象冒充方式实现类的属性继承 
-    ClassA.call(this,name); 
-    //定义子类的新属性 
-    this.age = age; 
-} 
-
-//使用原型链实现类的方式继承 
-ClassB.prototype = new ClassA(); 
-//定义子类的新方法 
-ClassB.prototype.getAge = function() 
-{ 
-    alert(this.age); 
-} 
-
-//实例化 
-var jack = new ClassA('jack'); 
-jack.getName(); 
-//alert 'jack' 
-var john = new ClassB('john',18); 
-john.getName(); 
-//output 'john' 
-john.getAge(); 
-//output 18 
------------------------------------- 
 
 == Javascript设计模式--工厂模式(factory) ==
 
 .定义一个父类
 [source]
-------------------------------------- 
+-----------------------------------------------------------
 /**  
  * class Command 
  * Command的超类 
@@ -214,11 +172,11 @@ Command.prototype.setParams = function(params)
 { 
   this.params = params; 
 } 
-------------------------------------- 
+-----------------------------------------------------------
 
 .定义一系统子类
 [source]
-------------------------------------- 
+-----------------------------------------------------------
 /**  
  * class AddNoteCommand extends Command 
  *  
@@ -267,10 +225,11 @@ CreateCategoryCommand.prototype.getExtraData = function()
 { 
   //some code 
 } 
+-----------------------------------------------------------
 
 .定义工厂类
 [source]
-------------------------------------- 
+-----------------------------------------------------------
 
 /**  
  * Class CommandFactory 
@@ -292,17 +251,17 @@ function CommandFactory(commandType)
         return new Command(); 
   } 
 } 
-------------------------------------- 
+-----------------------------------------------------------
 
 .实例化 
 [source]
-------------------------------------- 
+-----------------------------------------------------------
   var command_1 = ‘addNote'; 
   var command_2 = 'createCategory'; 
   var c1 = new CommandFactory(‘addNote'); //返回AddNoteCommand的实例 
   var c2 = new CommandFactory('createCategory'); //返回CreateCategory的实例 
   var c3 = new CommandFactory('unexistedCommand'); //返回Command的实例 
-------------------------------------- 
+-----------------------------------------------------------
 
 
 == addLoadEvent ==
@@ -310,7 +269,7 @@ function CommandFactory(commandType)
 在没有jQuery情况下兼容IE,FF的window.onload事件绑定函数
 
 [source]
-------------------------------------- 
+-----------------------------------------------------------
 function addLoadEvent(func) {
     var oldonload = window.onload;
     if (typeof window.onload != 'function' ) {
@@ -322,11 +281,12 @@ function addLoadEvent(func) {
         }
     }
 } 
-------------------------------------- 
+-----------------------------------------------------------
 
 
 == javascript中array和object的关系 ==
 
+Javascript中存在一个叫做伪数组的的东西, 它介于Object和Array之间, 最重要的使用就是函数的参数数组 arguments , 这里我们来讨论下 Array 和 Object 之间到底是个怎样的关系,  为什么可以出现类似伪数组的灰色地带出现. 
 
 如所有对象一样，Array也继承于Object，因此Array和Object的内部结构其实差不多，也可以利用Array的内置方法来操作Object对象，使其具有伪数组的功能； 
 代码示范： 
@@ -334,57 +294,54 @@ function addLoadEvent(func) {
 .首先来看看Array的内部结构 
 
 [source]
-------------------------------------- 
-// firebug控制台 
+-----------------------------------------------------------
 
 //确定Array继承于Object 
->>> Array instanceof Object 
-true 
+Array instanceof Object 
+// true 
 
->>> var arr = [0,1,2]; 
-//相当于以数字索引为key，以数组各值为value,然后带一个length属性的Object对象 
-
->>> var obj = {0:0, 1:1, 2:2, length:3}； 
-------------------------------------- 
+var arr = [0,1,2]; 
+// 相当于以数字索引为key，以数组各值为value,然后带一个length属性的Object对象 
+var obj = {0:0, 1:1, 2:2, length:3}； 
+-----------------------------------------------------------
 
 .用Array内置方法操作Object对象： 
-[source]
-------------------------------------- 
+[source, bash]
+-----------------------------------------------------------
 
-// firebug控制台
 // 使用Array的push方法操作Object对象
 
->>> var obj = {};
->>> Array.prototype.push.call(obj,123);
-1
+var obj = {};
+Array.prototype.push.call(obj,123);
+// 1
 
-//push后，Object对象自动添加length属性，并以数字索引做key
->>> obj
-Object 0=123 length=1
+// push后，Object对象自动添加length属性，并以数字索引做key
+console.log(obj);
+// Object 0=123 length=1
 
-//使用Array的slice方法操作Object对象
->>> Array.prototype.slice.call(obj);
-[123]
+// 使用Array的slice方法操作Object对象
+Array.prototype.slice.call(obj);
+// [123]
 
 //手工添加数字索引的属性，将不会被pop/slice等函数读取到。
->>> obj[1] = 312;
-312
->>> obj
-Object 0=123 length=1 1=312
+obj[1] = 312;
+// 312
+console.log(obj);
+// Object 0=123 length=1 1=312
 
 //使用slice或pop去读取该伪数组
 //只会读出push方法写入的属性
->>> Array.prototype.slice.call(obj，0);
-[123]
->>> Array.prototype.pop.call(obj);
-123
->>> obj
-Object length=0 1=312
-------------------------------------- 
+Array.prototype.slice.call(obj，0);
+// [123]
+Array.prototype.pop.call(obj);
+// 123
+console.log(obj);
+// Object length=0 1=312
+-----------------------------------------------------------
 
 .也可以直接让Object拥有Array方法： 
-[source]
-------------------------------------- 
+[source, bash]
+-----------------------------------------------------------
 
 // firebug控制台
 
@@ -415,14 +372,32 @@ Object length=3 0=1 1=2 2=3
 >>> obj[0];
 1
 
-------------------------------------- 
+-----------------------------------------------------------
+
+.将普通对象转为为 arguments 的伪数组
+
+[source]
+-----------------------------------------------------------
+
+var obj = {};
+Array.prototype.push.call(obj, 'arg1');
+// 注意,这里push的调用主体是obj,所有push将会直接对原数组(这里是obj对象)直接进行操作,返回值也和push方法的返回值是一样的, 返回的是一个数值, 而非返回该数组本身.
+
+args = Array.prototype.slice.call(obj);
+// 这里的slice方法也是Array.slice方法一样, 不会对原数组进行操作, 而是返回一个新数组.
+
+// 此时args 已经是个伪数组, 和arguments一样使用
+SomeFunc.apply(this, args);
+
+-----------------------------------------------------------
 
 == javascript 设计模式 - 观察者模式(Observer) ==
 
-http://zh.wikipedia.org/zh-cn/观察者模式[观察者模式WIKI]
+这里主要介绍一些观察者模式在Javascript中的实现方法:
 
+.Observer接口
 [source]
-------------------------------------- 
+-----------------------------------------------------------
 
 /*-------------- IObserver.interface.js ----------------*/ 
 /**  
@@ -432,8 +407,12 @@ http://zh.wikipedia.org/zh-cn/观察者模式[观察者模式WIKI]
  */ 
 function IObserver(){} 
 IObserver.prototype.update = function(sender,msg){}  
+-----------------------------------------------------------
 
 
+.Subject接口
+[source]
+-----------------------------------------------------------
 
 /*-------------- ISubject.interface.js ----------------*/
 
@@ -462,7 +441,11 @@ this._ObserverList[i].update(this,msg);
 console.log('notify at ' + new Date()); 
   } 
 }  
+-----------------------------------------------------------
 
+.Subject实现类
+[source]
+-----------------------------------------------------------
 /**  
  * class BindCenter implements ISubject 
  *  
@@ -473,8 +456,12 @@ function BindCenter()
   ISubject.call(this); 
 }  
 BindCenter.prototype = new ISubject();  
+-----------------------------------------------------------
 
 
+.Observer实现类
+[source]
+-----------------------------------------------------------
 /**  
  * class BindAjaxForm implements IObserver 
  *  
@@ -489,41 +476,42 @@ BindAjaxForm.prototype.update = function()
     //some code 
     alert('yes,i do'); 
 } 
+-----------------------------------------------------------
 
+.使用方法
+[source]
+-----------------------------------------------------------
 
 /*------------------------ main.js ----------------------*/ 
-     //绑定中心初始化 
     var bindCenter = new BindCenter(); 
-    //注册绑定 
+
+    // 注册观察者
     bindCenter.addObserver(new BindHighLight) 
-                      .addObserver(new BindAjaxForm) 
-                      .addObserver(new BindDelButton) 
-                      .addObserver(new BindNotes) 
-                      .addObserver(new BindLoginForm); 
+              .addObserver(new BindAjaxForm) 
+              .addObserver(new BindDelButton) 
+              .addObserver(new BindNotes) 
+              .addObserver(new BindLoginForm); 
 
-
-    //执行全部绑定 
+    // 通知所有观察者
     bindCenter.notify(); 
-
-
-------------------------------------- 
+-----------------------------------------------------------
 
 == jQuery源代码研究--伪数组 ==
 
 在读jQuery源代码的过程中，发现一个不解的一小段代码： 
      
 [source]
-------------------------------------- 
+-----------------------------------------------------------
 toArray: function() { 
     return slice.call( this, 0 ); 
 }, 
 //其中slice = Array.prototype.slice; 
-------------------------------------- 
+-----------------------------------------------------------
 
 从平时使用可得知，jQuery对象是一个Object，而非Array。例如：
 
 [source]
-------------------------------------- 
+-----------------------------------------------------------
 $('div') 
 //实质为： 
 //Object
@@ -547,13 +535,13 @@ $('div').toArray();
 //3: HTMLDivElement
 //4: HTMLDivElement
 //5: HTMLDivElement
-------------------------------------- 
+-----------------------------------------------------------
 
-jQuery对象在转换成Array时只留下了DOM对象，神奇的去掉了其他属性。由此看出，jQuery具有一种伪数组的特性。 
+jQuery对象在转换成Array时只留下了DOM对象，神奇的去掉了其他属性。由此看出，jQuery运用了伪数组的特性。 
 
 将jQuery相关的源代码简化如下：
 [source]
-------------------------------------- 
+-----------------------------------------------------------
 
       var arr = [1,2]; 
       var jq = function(){ 
@@ -589,7 +577,7 @@ jQuery对象在转换成Array时只留下了DOM对象，神奇的去掉了其他
     var a = o.toArray(); 
     // [1,2]  
     //length属性濡 
-------------------------------------- 
+-----------------------------------------------------------
 
 
 == filter() ==
@@ -601,11 +589,11 @@ jQuery对象在转换成Array时只留下了DOM对象，神奇的去掉了其他
 == 确保一个变量不为'undefined','',null ==
 
 [source]
-------------------------------------- 
+-----------------------------------------------------------
 if (typeof b != 'undefined' && !!b) {
 	console.log('b 存在,并且不为空')
 }
-------------------------------------- 
+-----------------------------------------------------------
 
 == jQuery的CSS类选择器在不同浏览器下性能 ==
 
@@ -617,5 +605,3 @@ if (typeof b != 'undefined' && !!b) {
 `$('[name=xxx]')和 `$('div[name=xxx'])` 在性能上是一样的.
 
 `$('[name=xxx'])` 在 `Sizzle.js` 模式中, 其实就是直接在调用 `document.getElementsByName('xxx')` , 只是它可以避免在IE6下 `id` 和 `name` 不分的BUG.
-
-

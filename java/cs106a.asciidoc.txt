@@ -2,6 +2,8 @@
 lds <lds2012@gmail.com>
 {localdate}
 
+:language: java
+
 == lecture 3 ==
 
     So we start at the high level and we break things down.
@@ -142,7 +144,7 @@ it's the lifetime of the variable
     in computer science or actually in computer programming, we really hate duplicated code.If we can avoid duplicating code, even if it’s one line, we generally try to do it.
 
 [source]
----------------
+----------------------------------------------
 int total = 0;
 
 while (true) {
@@ -150,7 +152,8 @@ while (true) {
     if ( 0 == value ) break;  // break in here
     total += value;
 }
----------------
+
+----------------------------------------------
 
 .for versus while
 

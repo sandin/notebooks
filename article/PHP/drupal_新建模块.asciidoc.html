@@ -1,0 +1,720 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.5.2" />
+<title>Drupal 新建模块</title>
+<style type="text/css">
+/* Debug borders */
+p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
+/*
+  border: 1px solid red;
+*/
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+tt {
+  color: navy;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  font-family: sans-serif;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+
+div.sectionbody {
+  font-family: serif;
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+span#author {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+span#email {
+}
+span#revnumber, span#revdate, span#revremark {
+  font-family: sans-serif;
+}
+
+div#footer {
+  font-family: sans-serif;
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+div#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+div#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #dddddd;
+  color: #777777;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-family: sans-serif;
+  font-weight: bold;
+}
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+
+@media print {
+  div#footer-badges { display: none; }
+}
+
+div#toc {
+  margin-bottom: 2.5em;
+}
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+/* Workarounds for IE6's broken and incomplete CSS2. */
+
+div.sidebar-content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+div.sidebar-title, div.image-title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-top: 0.0em;
+  margin-bottom: 0.5em;
+}
+
+div.listingblock div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+
+div.exampleblock-content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+window.onload = function(){asciidoc.footnotes(); asciidoc.toc(2);}
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  var cont = document.getElementById("content");
+  var noteholder = document.getElementById("footnotes");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      // Use [\s\S] in place of . so multi-line matches work.
+      // Because JavaScript has no s (dotall) regex flag.
+      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      spans[i].innerHTML =
+        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+        "' title='View footnote' class='footnote'>" + n + "</a>]";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+}
+
+}
+/*]]>*/
+</script>
+</head>
+<body>
+<div id="header">
+<h1>Drupal 新建模块</h1>
+<div id="toc">
+  <div id="toctitle">Table of Contents</div>
+  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph"><p>在Drupal开发中, 最重要也是最基本的内容就是新建一个属于自己的模块, 这样就可以不破坏系统代码的进行二次开发, 而分模块式的开发方式也被证明是复用性最高的一种, 比如你可以开发出一个模块, 然后可以在今后的项目中反复使用. 你也可以直接去利用别人开发好的模块来扩展你的系统, 这样的生态环境应该是比较好的.</p></div>
+<div class="paragraph"><p>官方建议的是把属于自己的模块目录放置在 <tt>/sites/all/modules/</tt> 目录下, 这样就可以和系统模块做一些区别, 当然一般我们下载的第三方模块都是放置在 <tt>/modules</tt> 目录下的, 其实这个并没有硬性规定, 都是可以的, 不过为了清晰, 建议还是放置在官方推荐的那个目录.</p></div>
+<div class="paragraph"><div class="title">钩子机制</div><p>其中 <tt>Drupal</tt> 的整个模块都是建立在 <tt>Hooks</tt> 的机制上, 官方手册上对于 <tt>Hooks</tt> 的解释是:</p></div>
+<div class="paragraph"><p>A hook can be thought of as an <strong>event</strong> in the sense that an event triggers something. The event in Drupal, such as deleting a node, would trigger the hook "hook_delete". If your module used that hook to call a function, the function would run at that moment. Just as an example, your function might be to decrease the count of the total number of nodes, so when a node was deleted, your function would run and lower the count by 1.</p></div>
+<div class="paragraph"><p>Hooks机制简单的来说就像是一种事件驱动的模式, 当某个事件发生时, 就会通知所有绑定在该事件上的函数, 让这些函数可以自行的去修改一些内部数据, 比如把 <strong>新建一个文章节点</strong> 看作 <tt>onNodeCreate</tt> 事件, 而所有的注册到该事件上的处理器在该事件发生时都会收到通知, 并且会接收到原始数据, 而且该数据一般是 <strong>引用传递</strong> 进你的钩子函数内, 因此你不仅仅是可以读取到这些数据, 你甚至可以对数据进行写操作.</p></div>
+<div class="paragraph"><p>关于钩子机制其实在 <tt>wordpress</tt> 里面也是存在的, 只是 <tt>Drupal</tt> 里面把这种机制做得到了极致, 关于这方面的内容, 今后再专门谈, 这里我们集中将如何新建一个模块, 毕竟这是第一步.</p></div>
+<div class="paragraph"><div class="title">步骤</div><p>首先新建一个目录, 将其放置到 <tt>/sites/all/modules</tt> 目录下, 这里我们直接用一个例子来介绍, 我们将新建一个名为 <tt>products</tt> 的模块, 现在的目录结构是这样的:</p></div>
+<div class="ulist"><div class="title">目录结构</div><ul>
+<li>
+<p>
+/sites/all/products/ 我们的模块目录
+</p>
+</li>
+<li>
+<p>
+/sites/all/products/products.info 模块基本信息文件
+</p>
+</li>
+<li>
+<p>
+/sites/all/products/products.module 模块文件
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>其实一个模块真正需要的就只有这两个文件而已, 我们来一一介绍:</p></div>
+<div class="listingblock">
+<div class="title">products.info</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">;</span> $Id$
+<span style="color: #009900">name </span><span style="color: #990000">=</span> products
+<span style="color: #009900">description </span><span style="color: #990000">=</span> products manager
+<span style="color: #009900">package </span><span style="color: #990000">=</span> Products
+<span style="color: #009900">version </span><span style="color: #990000">=</span> <span style="color: #FF0000">"$Name$"</span>
+<span style="color: #009900">core </span><span style="color: #990000">=</span><span style="color: #FF0000">"6.x"</span></tt></pre></div></div>
+<div class="paragraph"><p>这里需要主要的是这几个值基本都是必须的, 特别是 <tt>core</tt> 属性, 是必须指定的, 它将告诉 <tt>drupal</tt> 系统, 你的这个模块最低所需要的版本, <tt>drupal 5</tt> , <tt>drupal 6</tt> ,<tt>drupal 7</tt> 三者的区别其实是很大的, 通过官方手册你就可以看出来, 特别是你在查某个函数或钩子的用法时, 你会发现5/6两个版本的函数常常是名字一样, 但是用法完全不同了, 所以有时会出现你用的是 <tt>drupal 6</tt> , 结果搜索的时候点进了 <tt>7</tt> 的手册里面, 你照着手册上的用法, 结果出现报错的情况, 版本问题其实是应该注意的一个地方, 你下载模块或开发模块的时候都应该注意一下.</p></div>
+<div class="paragraph"><div class="title">products.module</div><p>这个是模块的主文件, 大多数模块的主要内容都放在其中, 其实还是建议另外在模块下独立写几个类文件来完成一些比较主要的逻辑, 而不是把所有逻辑都放在主文件里面, 这样维护起来会比较麻烦, 特别 <tt>drupal</tt> 还支持模板系统, 所以在开发模块的时候可以使用 <tt>MVC</tt> 方法来组织自己的模块, 这样会比较清晰.</p></div>
+<div class="paragraph"><p>官方文档里明确说明了该文件中应该提供的的几个函数.</p></div>
+<div class="ulist"><div class="title">必备函数</div><ul>
+<li>
+<p>
+hook_help() , 模块帮助信息
+</p>
+</li>
+<li>
+<p>
+hook_perm() , 模块权限信息
+</p>
+</li>
+<li>
+<p>
+hook_block(), 模块的区块内容
+</p>
+</li>
+<li>
+<p>
+hook_menu() , 模块的菜单内容
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>我们一个个来看.</p></div>
+<div class="paragraph"><p>这其中我把 <tt>menu</tt> 和 <tt>block</tt> 两个函数中的代码删除了一些, 因为比较长, 基本结构就是这样的, 到时候如果讲到了相关内容, 再具体讲.</p></div>
+<div class="paragraph"><p>首先所有的钩子函数 <tt>hook_xxx</tt> 之类的, 在你自己的模块里的命名都是用你的模块名去替换 <tt>hook</tt> ,  比如 <tt>hook_help</tt> 在我们这里的例子就是 <tt>products_help</tt> .</p></div>
+<div class="paragraph"><div class="title">hook_help</div><p><tt>products_help</tt> 我们只是返回一个空字符串, 你可以返回任意的帮助信息.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">&lt;?php</span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">products_help</span></span><span style="color: #990000">(</span><span style="color: #009900">$path</span><span style="color: #990000">,</span> <span style="color: #009900">$arg</span><span style="color: #990000">)</span> <span style="color: #FF0000">{</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">return</span></span> <span style="color: #FF0000">""</span><span style="color: #990000">;</span>
+<span style="color: #FF0000">}</span></tt></pre></div></div>
+<div class="paragraph"><div class="title">hook_perm</div><p><tt>products_perm</tt> 返回的是一个数组, 其中设置了拥有什么样的权限的用户可以使用该模块, 当我们的模块被启动都, 你可以在 [权限设置] 里面看到这个值, 比如我们在这里设置了一个 <tt>access products content</tt> 的权限, 那么就只有在 [权限设置] 里面把某个用户组的权限勾选了这个权限后, 该用户组的用户才能够使用这个模块,这里其实可以设置多个权限, 比如浏览该模块, 管理该模块之类的权限分割, 具体的可以根据你的需求来定.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">&lt;?php</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// permission</span></span>
+<span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">products_perm</span></span><span style="color: #990000">()</span> <span style="color: #FF0000">{</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">return</span></span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'access products content'</span><span style="color: #990000">);</span>
+<span style="color: #FF0000">}</span></tt></pre></div></div>
+<div class="paragraph"><div class="title">hook_menu</div><p><tt>products_menu</tt> 中我们将新建一个该模块的后台管理页面, 将其路径设置为 <tt>admin/settings/products</tt> , 这个路径就将成为一个新的页面, 可以用来对该模块进行一些后台的管理和设置, 我们这里只将最基本的内容.</p></div>
+<div class="paragraph"><p>其实 <tt>hook_menu</tt> 的用处还有许多, 比如新建一个前台页面 <tt>page</tt> , 新建一个区块 <tt>block</tt> , 这个灵活性比较大, 而且因为路径可以自由设置, 所以带来了许多方便性, 我们可以为我们的模块提供多个区块, 这样可以在任意的页面上进行调用, 也可以建立一个独立的页面, 来实现一些功能, 比如我们的这个例子就是用来显示所有产品列表, 和几个产品的区块.</p></div>
+<div class="paragraph"><p>这里我们可以通过下面的这一部分代码来先了解一下大致的结构:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">&lt;?php</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// Menu</span></span>
+<span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">products_menu</span></span><span style="color: #990000">()</span> <span style="color: #FF0000">{</span>
+    <span style="color: #009900">$items</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">();</span>
+
+    <span style="color: #009900">$items</span><span style="color: #990000">[</span><span style="color: #FF0000">'admin/settings/products'</span><span style="color: #990000">]</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span>
+        <span style="color: #FF0000">'title'</span> <span style="color: #990000">=&gt;</span> <span style="font-weight: bold"><span style="color: #000000">t</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'Products'</span><span style="color: #990000">),</span>
+        <span style="color: #FF0000">'description'</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">'product module settings page'</span><span style="color: #990000">,</span>
+        <span style="color: #FF0000">'page callback'</span> <span style="color: #990000">=&gt;</span> <span style="color: #FF0000">'drupal_get_form'</span><span style="color: #990000">,</span>
+        <span style="color: #FF0000">'page arguments'</span> <span style="color: #990000">=&gt;</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'products_admin'</span><span style="color: #990000">),</span>
+        <span style="color: #FF0000">'access arguments'</span> <span style="color: #990000">=&gt;</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'access administration pages'</span><span style="color: #990000">),</span>
+        <span style="color: #FF0000">'type'</span> <span style="color: #990000">=&gt;</span> MENU_NORMAL_ITEM<span style="color: #990000">,</span>
+    <span style="color: #990000">);</span>
+
+    <span style="font-weight: bold"><span style="color: #0000FF">return</span></span> <span style="color: #009900">$items</span><span style="color: #990000">;</span>
+<span style="color: #FF0000">}</span></tt></pre></div></div>
+<div class="paragraph"><p>这里需要注意的就是两个地方:</p></div>
+<div class="paragraph"><p>一个是 <tt>page callbacck</tt> , 它的值就是一个回调函数名, 一般的该函数可以由我们自己来提供, 就是你可以在本文件里面任意新建一个函数, 然后把该函数名传递进来, 而这个页面的内容是什么, 就是由这个回调函数的返回值来决定的, 你返回内容就是该网页或区块的内容, 我们这里只是一个简单的后台设置页面, 所以使用的是系统自带的 <tt>drupal_get_form</tt> 函数, 该函数返回的就是一个表单 <tt>form</tt> , 至于这个表单的内容具体是怎么是通过 <tt>drupal form hook api</tt> 来完成的, 这里可以先不用去了解, 只用知道这个callback返回的内容就是你网页要显示的内容即可. 所以指定的回调函数一般返回的都是 HTML 格式的字符串, 它就会直接被显示在主内容区域.</p></div>
+<div class="paragraph"><p>另外一个就是 <tt>access arguments</tt> , 这里的就是单独为这个网页来设置一个权限, 比如我们这里指定的是 <tt>access administration pages</tt> , 这是一个系统自带的权限, 意思就是有权进入后台管理页面的所有用户.</p></div>
+<div class="paragraph"><div class="title">hook_block</div><p>这个函数就是定义你模块的几个区块的, 新建区块和新建页面的方法基本相同, 我将在以后单独来讲述这两个问题, 这里我们随便在该函数里放置一些内容即可, 其中的具体代码的意思是什么你现在并不需要知道, 以后再具体讲, 需要知道的是它返回的就是 <tt>block</tt> 内容, 而一个模块又常常不止含有一个 <tt>block</tt> , 所以我把这部分的代码基本都删除了, 这里是保留了一些最基本的内容, 看下就可以了.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">&lt;?php</span>
+
+<span style="font-style: italic"><span style="color: #9A1900">// Products list block</span></span>
+<span style="font-weight: bold"><span style="color: #0000FF">function</span></span> <span style="font-weight: bold"><span style="color: #000000">products_block</span></span><span style="color: #990000">(</span><span style="color: #009900">$op</span> <span style="color: #990000">=</span> <span style="color: #FF0000">'list'</span><span style="color: #990000">,</span> <span style="color: #009900">$delta</span> <span style="color: #990000">=</span> <span style="color: #FF0000">''</span><span style="color: #990000">,</span> <span style="color: #009900">$edit</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">())</span> <span style="color: #FF0000">{</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #990000">(</span><span style="color: #009900">$op</span> <span style="color: #990000">==</span> <span style="color: #FF0000">"list"</span><span style="color: #990000">)</span> <span style="color: #FF0000">{</span>
+        <span style="font-style: italic"><span style="color: #9A1900">// Generate listing of blocks from this module, for the admin/block page</span></span>
+        <span style="color: #009900">$block</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">();</span>
+        <span style="color: #009900">$block</span><span style="color: #990000">[</span>PRODUCTS_NEW_KEY<span style="color: #990000">][</span><span style="color: #FF0000">"info"</span><span style="color: #990000">]</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #000000">t</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'New Products List'</span><span style="color: #990000">);</span>
+        <span style="color: #009900">$block</span><span style="color: #990000">[</span>NEWS_ALL_KEY<span style="color: #990000">][</span><span style="color: #FF0000">"info"</span><span style="color: #990000">]</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #000000">t</span></span><span style="color: #990000">(</span><span style="color: #FF0000">'News List'</span><span style="color: #990000">);</span>
+
+        <span style="font-weight: bold"><span style="color: #0000FF">return</span></span> <span style="color: #009900">$block</span><span style="color: #990000">;</span>
+    <span style="color: #FF0000">}</span> <span style="font-weight: bold"><span style="color: #0000FF">else</span></span> <span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #990000">(</span><span style="color: #009900">$op</span> <span style="color: #990000">==</span> <span style="color: #FF0000">'view'</span><span style="color: #990000">)</span> <span style="color: #FF0000">{</span>
+        <span style="color: #009900">$block</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">array</span></span><span style="color: #990000">();</span>
+        <span style="color: #009900">$block_content</span> <span style="color: #990000">=</span> <span style="color: #FF0000">''</span><span style="color: #990000">;</span>
+
+        <span style="font-weight: bold"><span style="color: #0000FF">return</span></span> <span style="color: #009900">$block</span><span style="color: #990000">;</span>
+    <span style="color: #FF0000">}</span>
+<span style="color: #FF0000">}</span></tt></pre></div></div>
+<div class="paragraph"><div class="title">安装模块</div><p>此时我们的模块基本上什么功能都没有实现, 但这并不妨碍我们先体验一下新建一个模块的成就感, 我们将直接安装这个模块先.</p></div>
+<div class="paragraph"><p>进入 <tt>/admin/build/modules</tt> 页面, 如果你没有人品问题的话, 应该就可以看到我们刚才新建的那个模块, 直接勾选安装即可, 然后我们需要做的是到 [权限设置] 里面, 把需要使用该模块的用户组勾上我们最开始指定的权限名, 不然用户是无法看到这个模块的.</p></div>
+<div class="paragraph"><p>检验是否安装成功, 可以通过方位我们在 <tt>hook_menu</tt> 中新建的那个后台管理页面地址来完成, 如果你可以访问到, 那么说明模块已经安装成功.</p></div>
+<div class="paragraph"><div class="title">结束语</div><p>关于 <tt>Drupal</tt> 模块的相关内容, 今后还将会一点一点的详细来讲述, 此文只先介绍最基本的内容, 相当于先打个地基, 慢慢再来一砖一瓦的建房子.</p></div>
+<div class="paragraph"><p>需要对刚开始用 <tt>Drupal</tt> 的开发者指出的就是, <strong>版本问题</strong> 很重要, 你查找到的资料很有可能不是你正在使用的版本, 所以就算你一步一步的照着别人说的做也可能出现问题.</p></div>
+<div class="paragraph"><p>如果没有太大的英文障碍的话还是建议根据官方提供的<a href="http://drupal.org/documentation/develop">开发手册</a> 来做, 选择你所使用的版本手册, 一口气基本就可以把前面几章看完, 然后就可以照着做, 最重要的是它肯定是对的, 如果出现问题, 那一定是你的问题, 而不像网上的其他资料, 很有可能你跟着做, 到最后却不知道到底是自己的问题, 还是版本的问题, 或者根本就是这篇资料的作者的问题.</p></div>
+<div class="paragraph"><p>本文使用的 <tt>drupal</tt> 版本是 6.20 , 代码是直接从过去的项目中节选出来的, 没有问题, 但因为是节选代码, 有许多部分都省略了, 所以只以启发思路为主, 不保证你COPY去就可以运行.</p></div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2011-04-06 17:51:59 CST
+</div>
+</div>
+</body>
+</html>

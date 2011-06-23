@@ -1,0 +1,697 @@
+= SPL(PHP标准库) 简介 =
+:language: php
+
+以下部分为我在读 <PHP高级程序设计模式框架与测试> 记的读书笔记中的一个章节, 因为关于发现网上关于 `SPL` 的介绍并不是很多, 所以节选上来供大家参考, 大部分为摘抄加一些个人注解.
+
+*******************************************************
+第三部分 SPL（标准PHP库） 
+*******************************************************
+
+== 第9章 SPL简介 114 ==
+
+=== 9.1 SPL基础 114  ===
+=== 9.2 迭代器 115  ===
+
+==== 9.2.1 Iterator接口 115 ====
+
+模式原型
+[source]
+--------------------------------------------------
+<?php
+
+interface Iterator {
+    public function current();   //value
+    public function key();        //key
+    public function next();
+    public function rewind();    //指针移到开始位置
+    public function valid();       //当前元素是否存在，必须在使用了next(),rewind()后才能调用
+}
+--------------------------------------------------
+
+==== 9.2.2 迭代器辅助函数 116 ====
+
+`iterator_to_array($iterator)`
+将迭代器转换为一个数组
+
+`iterator_count($iterator)` 
+
+`iterator_apply(iterator, callback, [user date])`
+类似于array_walk
+
+[source]
+----------------------------------------
+<?php
+
+function print_entry($iterator) {
+  print( $iterator->current() );
+  return true;  //回调函数返回true就继续循环，否则退出循环。
+}
+
+$array = array(1,2,3);
+$iterator = new ArrayIterator($array);
+iterator_apply($iterator, 'print_entry', array($iterator));
+------------------------------------------
+
+
+=== 9.3 数组重载 117 ===
+
+数组重载是将对象作为数组使用的一个过程。 
+
+==== 9.3.1 ArrayAccess接口 117 ====
+[source]
+------------------------------------------------
+<?php
+
+interface ArrayAccess {
+    public function offsetExists($offset);  //确定给的偏移量是否存在于数组中
+    public function offsetSet($offset);        //设置/替换偏移量位置上的数据
+    public function offsetGet($offset);      //返回偏移量位置上的数据
+    public function offsetUnset($offset);   //unset
+}
+------------------------------------------------
+
+==== 9.3.2 计数和数组访问 117 ====
+[source]
+------------------------------------------------
+<?php
+
+interfacec Countable {
+    public function count();
+} 
+------------------------------------------------
+
+=== 9.4 观察者模式 118 ===
+被观察 subject
+观察者 observer
+
+[source]
+-----------------------------------------
+<?php
+
+interface SplSubject {
+    public function attach(SplObserver $observer);
+    public function detach(SplObserver $observer);
+    public function notify();
+}
+
+interface SplObserver {
+    public function update(SplSubject $subject);
+}
+-----------------------------------------
+
+流程： 
+1. subject给observer注册（保存observer对象在列表中）。 
+2. 当subject发生变化时调用自己的notify(); 
+3. notify()调用保存在列表中的每个observer对象的observer->update()； 
+
+=== 9.5 序列化 121 ===
+
+`__sleep` 魔术方法不能序列化基类的私有变量，`Serializable` 接口解决了这个问题。
+
+[source]
+-----------------------------------------
+<?php
+
+interface Serializable {
+    public function serialize();   //需要返回序列后的字符串，通常调用serialize()得到.
+    public function unserialize();  
+}
+-----------------------------------------
+
+=== 9.6 SPL自动加载 123  ===
+
+在全局范围内简单的声明两个 `__autoload()` 会产生错误，`spl_autoload_register()` 解决了这个问题。
+
+[source]
+---------------------------------
+<?php
+
+spl_autoload_register(null,false);
+spl_autoload_extensions('.php,.inc,.class,.interface');
+function myLoader1($class) {
+  //Do something to try to load the $class
+}
+function myLoader2($class) {
+  //Maybe load the class from another path
+}
+spl_autoload_register('myLoader1',false);
+spl_autoload_register('myLoader2',false);
+$test = new SomeClass();
+
+---------------保留__autoload-------------------
+
+if(false === spl_autoload_functions()) {
+  if(function_exists('__autoload')) {
+    spl_autoload_register('__autoload',false);
+  }
+}
+//Continue to register autoload functions
+
+--------------------安全加载类---------------
+
+//Try to load className.php
+if(spl_autoload_call('className')
+  && class_exists('className',false)
+  ) {
+
+  echo 'className was loaded';
+
+  //Safe to instantiate className
+  $instance = new className();
+} else {
+
+  //Not safe to instantiate className
+  echo 'className was not found';
+
+}
+-----------------------------------------
+
+
+=== 9.7 对象标识符 126 ===
+[source]
+----------------------------------------------------
+<?php
+
+class a {}
+$instance = new a();
+$reference = $instance;
+echo spl_object_hash($instance) . "\n";
+echo spl_object_hash($reference) . "\n";
+
+//会返回相同的值，因为后者只是对象的引用（物理储存还是一样）。而每个对象都有一个唯一的标识符。
+
+php > class a{};
+php > $ca = new a();
+php > $cb = new a();
+php > spl_object_hash($ca);
+php > echo spl_object_hash($ca);
+33595103288c97645c4f9cf3e782477f
+php > echo spl_object_hash($cb);
+0af5f6846f3c7973fc3d15b858d658b6
+
+//即使是同一个类的实例，应该不是一个对象（物理储存位置不同），标识符也不相同。
+----------------------------------------------------
+
+
+
+
+== 第10章 SPL迭代器 128  ==
+
+=== 10.1 迭代器接口和迭代器 128 ===
+
+==== 10.1.1 迭代器接口 128  ====
+
+1. Traversable,  只有内部的类（C编写的)才能直接实现该接口 
+2. Iterator 
+3. IteratorAggregate, 可以在类的外部实现迭代功能，即可复用它。可和ArrayIterator配合使用 
+4. OuterIterator, 将多个迭代器包裹成一个大的迭代器。 
+5. RecursiveIterator, 提供了递归迭代访问功能，可用来表达一个树形的数据结构，例如目录。 
+
+[source]
+---------------------------------------------------------
+<?php
+
+interface IteratorAggregate extends Traverable {
+    function getIterator(); //必须返回一个实现了Iterator接口的类的实例。
+}
+
+interface OuterInterator extends Iterator {
+    function getInnerIterator();
+}
+
+interface RecursiveIterator extends Iterator {
+    function hasChildren();
+    function getChildren();
+} 
+---------------------------------------------------------
+
+==== 10.1.2 迭代器 130  ====
+
+.ArrayIterator
+从数组创建一个迭代器。
+
+[source]
+---------------------------------------------------------
+<?php
+
+$arr = array('a','b','c');
+$iterator = new ArrayIterator($arr);
+foreach($iterator as $val) {
+  echo $val;
+}
+---------------------------------------------------------
+
+它是基础，其他迭代器都只接受Iterator类型为参数，而不是直接接受Array类型. 
+
+.LimitIterator 
+`new LimitIterator( Iterator $iterator [, string $offset [, string $count ]] )`
+接受参数：迭代器，偏移量，限制数量
+可用于处理数据集的分页显示。
+[source]
+------------------------------------------------------------
+<?php
+
+$arr = array(1,2,3,4,5,6,7,8,9);
+$arrIterator = new ArrayIterator($arr);
+$limitIterator = new LimitIterator($arrIterator, 3, 4);
+foreach($limitIterator as $number) {
+  echo $number;
+} 
+AppendIterator 
+组合多个迭代器，一起循环。
+
+$arrFirst = new ArrayIterator(array(1,2,3));
+$arrSecond = new ArrayIterator(array(4,5,6));
+
+$iterator = new AppendIterator();
+$iterator->append($arrFirst);
+$iterator->append($arrSecond);
+
+foreach($iterator as $number) {
+  echo $number;
+} 
+------------------------------------------------------------
+
+.FilterIterator 
+是个抽象类，基于 `OuterIterator` 接口，用来过滤数据，返回符合条件的元素。
+
+例如和 `DirecoryIterator` 类一起返回一个大文件列表。
+抽象方法 `accept()` 必须返回boolean,为true，接受，为false，排除。
+
+[source]
+------------------------------------------------------
+<?php
+
+class GreaterThanThreeFilterIterator extends FilterIterator {
+  public function accept() {
+    return ($this->current() > 3);  // T/F
+  }
+}
+$arr = new ArrayIterator(array(1,2,3,4,5,6));
+
+$iterator = new GreaterThanThreeFilterIterator($arr);
+print_r(iterator_to_array($iterator));
+------------------------------------------------------
+
+.RegexIterator 
+继承于 `FilterIterator` ，可使用正则表达式。
+
+`$iterator = new RegexIterator($arrIterator, "/^a/");`
+
+.IteratorIterator 
+有些PHP扩展并没实现 `Iterator` 接口，而是实现了更底层的 `Traversable` 。例如 `PDO` .故如果要使用更高级的迭代器，就必须用该通用接口来做一个中转。
+
+[source]
+-------------------------------------------------------
+<?php
+
+$db = new PDO('pgsql:dbname=yourdb;user=youruser');
+$pdoStatement = $db->query('SELECT * FROM table');
+
+$iterator = new IteratorIterator($pdoStatement);
+$limitIterator = new LimitIterator($iterator, 0, 10);
+$tenRecordArray = iterator_to_array($limitIterator);
+-------------------------------------------------------
+
+.CachingIterator 
+提前读取下一个元素
+
+.SeekableIterator 
+非顺序访问，可跳到任何一个点上。 
+
+.NORewindIterator 
+不能回卷。 
+
+.EmptyIterator 
+占位符 
+
+.InfiniteIterator 
+自动回卷 
+
+.RecursiveArrayIterator 
+创建一个用于递归形式数据结构的迭代器 
+
+.RecursiveIteratorIterator 
+允许获得一个树形结构，并将其展开为一个一维结构。
+`__construct ( Traversable $iterator [, int $mode = LEAVES_ONLY [, int $flags = 0 ]] )`
+
+[source]
+------------------------------------------------------
+<?php
+
+$arr = array(
+         0 => 'a';
+         1 => array('a','b','c'),
+         2 => 'b',
+         3 => array('a','b','c'),
+         4 => 'c'
+);
+
+$arrayIterator = new RecursiveArrayIterator($arr);
+
+$it = new RecursiveIteratorIterator($arrayIterator);
+
+print_r(iterator_to_array($it, false));
+
+/* 输出结果
+Array {
+[0] => a
+[1] => a
+[2] => b
+[3] => c
+[4] => b
+[5] => a
+[6] => b
+[7] => c
+[8] => c
+}
+*/
+-------------------------------------------------
+
+.RecursiveTreeIterator 
+非内置，是example目录中的一个示范。
+返回树形式，类似tree命令得到的结果。
+
+.ParentIterator 
+扩展于FilterIterator，只返回包含子元素的
+
+.DualIterator 
+.RecursiveFilterIterator 
+递归版的FilterIterator。
+
+.RecursiveRegexIterator 
+.RecursiveDualIterator 
+.RecursiveCachingIterator 
+.SearchIterator 
+和 `FilterIterator` 一样是个抽象类，抽象方法也为 `accept` ，但找到一个匹配后便会停止操作。
+
+.iterator_to_array 
+`array iterator_to_array ( Traversable $iterator [, bool $use_keys = true ] )`
+
+当 `$use_keys = fasle` 时，出现重复 `key` 时，不会互相覆盖。
+
+=== 10.2 迭代器的实际用法 142  ===
+
+==== 10.2.1 使用SimpleXML解析XML文件.. 142  ====
+
+[source, xml]
+-----------------------------------------------
+<library>
+  <book>
+    <name>Pro PHP</name>
+    <author>Kevin McArthur</author>
+  </book>
+  <book>
+    <name>Other Book</name>
+  </book>
+</library>
+-----------------------------------------------
+
+[source, php]
+-------------------------------------------------------------
+<?php
+
+$it = new SimpleXMLIterator(file_get_contents('test.xml'));
+
+foreach($it as $key=>$node) {
+  echo $key . "\n";
+  if($it->hasChildren()) {
+    foreach($it->getChildren() as $element=>$value) {
+      echo "\t". $element . ":" . $value ."\n";
+    }
+  }
+}
+
+/* 输出:
+book
+    name:Pro PHP
+    author:Kevin McArthur
+book
+    name:Other Book
+*/
+-------------------------------------------------------------
+
+==== 10.2.2 使用DBA访问平面文件数据库 143  ====
+解析文件（例如.ini)
+
+
+
+== 第11章 SPL文件和目录处理 145 ==
+
+=== 11.1 文件和目录信息 145 === 
+
+.SplFileInfo  
+`__construct ( string $file_name )`
+返回对象方式文件详情， 
+其中path等于dirname()一样，而pathname只是输入参数$file_name的副本。 
+后面将要讲到的关于文件和目录处理的迭代器基本都是返回一个SplFileInfo对象。 
+
+=== 11.2 目录的迭代访问 147 ===
+
+==== 11.2.1 列出文件和目录的清单 148 ====
+[source]
+----------------------------------------------------------------
+<?php
+
+DirectoryIterator extends SplFileInfo implements Iterator , Traversable , SeekableIterator { 
+/* Methods */ 
+__construct ( string $path )
+//DirectoryIterator::isDot — Determine if current DirectoryIterator item is '.' or '..'
+public bool isDot ( void )
+----------------------------------------------------------------
+
+[source]
+------------------------------------
+<?php
+
+$pathName = '/path/to/iterate/';
+
+foreach(new DirectoryIterator($pathName) as $fileInfo) {
+  echo $fileInfo . "\n";
+}
+
+------------------------------------
+
+递归版 `RecursiveDirectoryIterator`. 
+
+==== 11.2.2 查找文件 150 ====
+
+.`FindFile`
+`__construct( string $path, string $file_name )`
+
+.RegexFindFile
+直接正则表达式的FindFile.
+
+
+==== 11.2.3 创建自定义文件过滤迭代器 151  ====
+
+.创建从FilterIterator迭代器继承的类并实现accept()即可。
+[source]
+-------------------------------------------------
+<?php
+
+class FileExtensionFinder extends FilterIterator {
+
+  protected $predicate, $path;
+
+  public function __construct($path, $predicate) {
+    $this->predicate = $predicate;
+    $this->path = $path;
+
+    $it = new RecursiveDirectoryIterator($path); //将目录转化为目录迭代器
+    $flatIterator = new RecursiveIteratorIterator($it); //将迭代器展开为一维
+
+    parent::__construct($flatIterator);
+
+  }
+
+  public function accept() {
+    $pathInfo = pathinfo($this->current());
+    $extension = $pathInfo['extension'];
+    return ($extension == $this->predicate);
+  }
+
+}
+
+$it = new FileExtensionFinder('/path/to/search/','php');
+
+foreach($it as $entry) {
+  echo $entry . "\n";
+}
+
+-----------------------------------------
+
+=== 11.3 SPL文件对象操作 153 ===
+
+SplFileObject类将PHP文件中的I/O函数综合在一起，如fopen,fread等，形成一个多功能的面向对象的接口。
+它也是一个迭代器。
+
+=== 11.3.1 文件内容的迭代访问 153 ===
+[source]
+-----------------------------------------
+<?php
+
+$it = new SplFileObject('pm.csv');
+
+foreach($it as $line) {
+        echo $line;
+} 
+11.3.2 CSV操作 153 
+$it = new SplFileObject('pm.csv');
+
+while($array = $it->fgetcsv()) {
+  var_export($array);
+}
+--------------------------------
+
+自定义CSV解析迭代器 详见笔记附录
+
+==== 11.3.3 搜索文件 157  ====
+详见笔记附录
+
+
+== 第12章 SPL数组重载 160 == 
+数组重载是指将对象作为数组使用的过程，即索引器。
+
+=== 12.1 ArrayAccess接口介绍 160 ===
+[source]
+--------------------------------------------------
+<?php
+
+class MyArray implements ArrayAccess {
+
+  protected $_arr;
+
+  public function __construct() {
+    $this->_arr = array();
+  }
+
+  public function offsetSet($offset, $value) {
+    $this->_arr[$offset] = $value;
+  }
+
+  public function offsetGet($offset) {
+    return $this->_arr[$offset];
+  }
+
+  public function offsetExists($offset) {
+    return array_key_exists($offset, $this->_arr);
+  }
+
+  public function offsetUnset($offset) {
+    unset($this->_arr[$offset]);
+  }
+
+}
+
+$myArray = new MyArray();   // Create an object as an array
+$myArray['first'] = 'test'; // offsetSet, set data by key
+$demo = $myArray['first'];  // offsetGet, get data by key
+unset($myArray['first']);   // offsetUnset, remove key
+--------------------------------------------------
+
+ArrayAccess需要实现Countable接口才能实现count功能，该接口只需要实现count()方法即可。
+
+
+=== 12.2 ArrayObject介绍 161  ===
+
+ArrayObject类是一个ArrayAccess接口的实现类，它还提供了迭代功能，以及用来排序和处理数据的非常有用的方法。
+
+`__construct ($array, $flags=0, $iterator_class="ArrayIterator")`
+
+
+.方法:
+    * append ($value) 
+    * array[] = $value 
+    * asort () 
+    * count () 
+    * qxchangeArray ($array)  替换底层数组 
+    * getArrayCopy () 
+    * getFlags () 
+    * getIterator () 
+    * getIteratorClass () 
+    * ksort () 
+    * natcasesort () 
+    * natsort () 
+    * offsetExists ($index) 
+    * offsetGet ($index) 
+    * offsetSet ($index, $newval) 
+    * offsetUnset ($index) 
+    * setFlags ($flags) 
+    * setIteratorClass ($itertor_class) 
+    * uasort (mixed cmp_function) 
+    * uksort (mixed cmp_function) 
+
+[source]
+-------------------------------------------------------
+<?php
+
+
+$myArray = new ArrayObject();
+$myArray['first'] = 'test';
+
+$demo = $myArray['first'];
+unset($myArray['first']);
+
+$numElements = count($myArray);
+//$numElements = $myArray->count();
+
+foreach($myArray as $key=>$value) {} 
+-------------------------------------------------------
+
+=== 12.3 创建一个SPL购物车 162  ===
+
+[source]
+------------------------------------------------------
+<?php
+
+require_once('Product.php');
+
+class Cart extends ArrayObject {
+
+  protected $_products;
+
+  public function __construct() {
+        $this->_products = array();
+
+        /*
+           Construct the underlying ArrayObject using
+           $this->_products as the foundation array. This
+           is important to ensure that the features
+           of ArrayObject are available to your object.
+           用$_products这个作底层数组。
+        */
+        parent::__construct($this->_products);
+  }
+
+public function getCartTotal() {
+  for(
+    $i=$sum=0, $cnt = count($this);  
+    $i<$cnt;
+    $sum += $this[$i++]->getPrice()
+  );
+  return $sum;
+}
+
+}
+
+$cart = new Cart();
+$product = new Product('00231-A', 'Description', 1.99);
+
+$cart[] = $product;
+
+print_r($cart);
+------------------------------------------------------
+
+
+=== 12.4 使用对象作为键值 165 ===
+
+.使用对象作为键值
+1. 用实现了ArrayAccess接口的数组来做 
+2. 使用spl_object_hash作为索引值来储存，$this->_keys[spl_object_hash($key)] = $key;
+    $this->_values[spl_object_hash($key)] = $value; 
+3. extends ArrayIterator使之可以迭代访问 
+
+代码详见笔记附录
+
+NOTE: 笔记附录过长, 这里就不再继续贴出来了.

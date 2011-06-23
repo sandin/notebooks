@@ -15,6 +15,8 @@ lds <lds2012@gmail.com>
     * 2010-11-23 p562
     * 2010-11-23 p602
     * 2010-11-25 END
+
+    * 2011-05-24 Review IO p594
 ***************************************
 
 .TODO
@@ -830,25 +832,51 @@ robot.delay(1000); //延迟
 
 == 流和文件 ==
 
-`InputStream` 读取 *字节序列* 的对象 输入流
-`OutputStream` 写入 *字节序列* 的对象 输出流
+`InputStream` 读取 *字节序列* 的对象 输入流.
+utputStream` 写入 *字节序列* 的对象 输出流.
+`Reader` , 读取 *Unicode字符*.
+`Write`, 写如 *Unicode字符*.
+
+=== 参考 ===
+字节::
+    Byte, 简写B,  连续的,固定数量的比特.
+    1 Byte = 8 Bit
+    1 kB = 10E3 = 1000 Byte
+    1 kiB = 2E10 = 1024 Byte
+    
+比特::
+    Bit, 简写b, 也称 *位* , *二进制比特* , *Binary digit* , 二进比特比较一个简单的正负, 非正即负的状态, 即或0或1.
+
+int&bype::
+    * byte uses 1 byte while int uses 4 bytes.
+    * integer literals like "45" are of int not byte.If you want a literal to be a byte, you have to cast it: "(byte)45".
+    * When values are promoted as part of an expression or as parameters to a method call, they may be promoted to int, but never to byte.
+    * Many parts of the Java language used int, but none of them use byte. For example, the length of an array is an int.
+
+文件分割符 `File.separator` .
 
 .InputStream
-read(),读取一个字节，返回该字节，读到EOF返回-1.
+int read(),读取一个 *字节* ，返回该字节，读到EOF返回-1.
+int read(byte[] b), 将数据读到一个字节数组,并返回读取的字节的实际数目. 也就是说数据现在在byte[] b中了.
+
+NOTE: read或write都会造成IO阻塞,直到完成读取/写完一个字节.
 
 .OutputStream
-flush(),刷新输出流，即将缓冲区中的所有数据发送到目的地。
+void write(int b), 将 *一个* 字节写到指定的输出位置.
+void write(byte[] b), 写入数组b中的所有字节.
+void flush(),刷新输出流，即将缓冲区中的所有数据发送到目的地。
 
 .Reader/Writer
 read(),和InputStream不同的，读取一个 *Unicode字符单位* ,而非 *字节序列* 。
 
-.字节输入 - DataInputStream
+.字节输入 - DataInputStream, 并使用Buffer
 [source]
 ---------------------------
 DataInputStream din = new DataInputStream(
         new BufferedInputStream(
             new FileInputStream("employee.dat")));
 ---------------------------
+
 
 .字节输出 - DataOutputStream
 writeChars/writeByte/writeInt/...
@@ -876,6 +904,12 @@ while ( (line = in.readLine() ) != null )
     // do something
 }
 ---------------------------
+
+.随机储存文件流
+能够在文件的任何位置查找或写入数据.
+long getFilePointer() ,返回文件指针的当前位置.
+void seek(long pos), 将文件指针移动从开始到pos字节处.
+
 
 .Zip读取
 [source]

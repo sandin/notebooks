@@ -1,0 +1,112 @@
+= DefaultHttpClient BasicAuth =
+:language: java
+
+其实一般的只要设置一个 `BasicScheme` 加在 `DefaultHttpClient` 上面即可进行 `BasicAuth` 认证, 但是这个简单的方法会出现一些问题, 就是需要进行认证的请求, httpClient都不会在第一次请求服务器的时候携带认证信息, 而是在请求一次被服务器拒绝后再重新发一次请求重新进行认证. 从而导致了重复请求的问题.
+
+通过抓包显示, `DefaultHttpClient` 里面的是储存了 `auth` 信息(用户名/密码)的, 但是所有HTTP请求都几乎会做了两遍, 第一次返回 `401 unauthorized` , 然后 `defaultHttpClient` 马上进行第二次重复请求, 添加了 `auth` 信息, 才返回200, 而使用 `curl` 进行对同样网址进行认证请求时抓包, 结果都是只进行一个请求, 直接返回200, 由此得到了 `DefaultHttpClient` 在进行 `BasicAuth` 的这个问题.
+
+唯一的原因只有是 `HttpClient` 的配置问题, 在查找了大量的关于 `org.apache.http.impl.client.DefaultHttpClient` 相关资料后才发现正确的配置方法, 可以说是较为复杂的.
+
+先贴代码片段, 注意这里的代码未经过删减, 是我参与的 *安能饭否* 项目中的实际代码:
+
+[source]
+----------------------------------------------------
+   /**
+     * Setup DefaultHttpClient
+     * 
+     * <p>
+     * Use ThreadSafeClientConnManager.
+     * </p>
+     * 
+     */
+    private void prepareHttpClient() {
+
+        // Create and initialize HTTP parameters
+        HttpParams params = new BasicHttpParams();
+        ConnManagerParams.setMaxTotalConnections(params, 10);
+        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+
+        // Create and initialize scheme registry
+        SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(new Scheme("http", PlainSocketFactory
+                .getSocketFactory(), 80));
+        schemeRegistry.register(new Scheme("https", SSLSocketFactory
+                .getSocketFactory(), 443));
+
+        // Create an HttpClient with the ThreadSafeClientConnManager.
+        ClientConnectionManager cm = new ThreadSafeClientConnManager(params,
+                schemeRegistry);
+        mClient = new DefaultHttpClient(cm, params);
+
+        // TODO: need to release this connection in httpRequest()
+        // cm.releaseConnection(conn, validDuration, timeUnit);
+
+        // Setup BasicAuth
+        BasicScheme basicScheme = new BasicScheme();
+        mAuthScope = new AuthScope(SERVER_HOST, AuthScope.ANY_PORT);
+
+        // mClient.setAuthSchemes(authRegistry);
+        mClient.setCredentialsProvider(new BasicCredentialsProvider());
+
+        // Generate BASIC scheme object and stick it to the local
+        // execution context
+        localcontext = new BasicHttpContext();
+        localcontext.setAttribute("preemptive-auth", basicScheme);
+
+        // first request interceptor
+        mClient.addRequestInterceptor(preemptiveAuth, 0);
+    }
+    
+    /**
+     * HttpRequestInterceptor for DefaultHttpClient
+     */
+    private HttpRequestInterceptor preemptiveAuth = new HttpRequestInterceptor() {
+        @Override
+        public void process(final HttpRequest request, final HttpContext context) {
+            AuthState authState = (AuthState) context
+                    .getAttribute(ClientContext.TARGET_AUTH_STATE);
+            CredentialsProvider credsProvider = (CredentialsProvider) context
+                    .getAttribute(ClientContext.CREDS_PROVIDER);
+            HttpHost targetHost = (HttpHost) context
+                    .getAttribute(ExecutionContext.HTTP_TARGET_HOST);
+
+            if (authState.getAuthScheme() == null) {
+                AuthScope authScope = new AuthScope(targetHost.getHostName(),
+                        targetHost.getPort());
+                Credentials creds = credsProvider.getCredentials(authScope);
+                if (creds != null) {
+                    authState.setAuthScheme(new BasicScheme());
+                    authState.setCredentials(creds);
+                }
+            }
+        }
+    };
+
+
+    /**
+     * Setup Credentials for HTTP Basic Auth
+     * 
+     * @param username
+     * @param password
+     */
+    public void setCredentials(String username, String password) {
+        mUserId = username;
+        mPassword = password;
+        mClient.getCredentialsProvider().setCredentials(mAuthScope,
+                new UsernamePasswordCredentials(username, password));
+        isAuthenticationEnabled = true;
+    }
+----------------------------------------------------
+
+
+这里并没有太多可以解释的, 目前看来是进行 `BasicAuth` 的基本配置, 直接搬去用就可以了. 如果说流量和请求对你的项目来说是一种负担的话.
+
+其实关键的地方在于:
+[source]
+-----------------------------------------------------
+// first request interceptor
+mClient.addRequestInterceptor(preemptiveAuth, 0);
+-----------------------------------------------------
+
+这里会在 `httpClient` 发出第一次请求前把anth信息强行添加到请求中去, 从而避免了重复请求. 
+

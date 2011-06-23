@@ -46,3 +46,9 @@ sudo a2ensite yourdomain.com.conf
 sudo /etc/init.d/apache2 reload
 sudo /etc/init.d/apache2 restart
 ---------------------------------------------
+
+
+== IIS ==
+
+=== 提示输入用户名和密码 ===
+右键网站--权限 

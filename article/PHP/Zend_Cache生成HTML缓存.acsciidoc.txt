@@ -1,0 +1,224 @@
+= Zend Framework - 生成HTML缓存 =
+:language: php
+
+使用HTML缓存可以使得一些对动态要求不高的页面请求更快,也缓解了服务器压力, 比如一些固定的文章页. 
+
+而使用Zend Framework构建的应用程序将 *非常简单* 的可以把服务器输出的内容缓存为html文件, 再之后的请求中, 完全就没有PHP和Zend Frameword什么事了, 只是简单的请求html文件即可, 快速而高效.
+
+但是可惜的是介绍相关内容的资料非常之少, 就连官方手册中也只是对该功能提了一下, 并没有给出完成的用例说明.
+
+这里不仅是介绍如何使用 `Zend_Cache` 将Zend Framework生成的页面缓存为HTML的方法, 也对其实现方法和原理进行了一些分析, 可不局限与ZF框架, 对PHP生成HTML静态缓存技术有进一步的了解, 同时也研究了ZF是如何利用这些基本缓存技术来实现对整个ZF应用生成的内容进行缓存.
+
+== PHP生成HTML缓存 ==
+
+首先简单将一些PHP生成HTML缓存的原理, 这有助于我们理解Zend_Cache是如何缓存整个页面的.
+
+首先我们大概都知道 `ob_start` 函数, 虽然可能很少用过, 但一定见过, 在一般情况下, 我们需要截获PHP输出内容, 一般会使用到这个函数, 例如:
+
+[source]
+---------------------------------------------------
+<?php
+
+// 开始缓存输出
+ob_start();
+
+// 模拟读取数据库之类等耗时操作
+$foo = $db->fetchAll("SELECT * FROM {node}");
+
+// 模拟向客户端输出内容
+echo $foo; 
+
+// 因为之前调用了ob_start(), 所以这里并不会立刻输出到客户端
+
+// 而我们可以截获到输出内容
+$buffer = ob_get_contents();
+
+// 将输出内容缓存到文件
+file_put_contents($buffer, '/tmp/cache.html');
+
+// 将之前的ob缓存释放到客户端
+ob_end_clean();
+
+---------------------------------------------------
+
+而 `ob_start` 是提供另一种形式的, 就是 `ob_start(callback)` , 其中 `callback` 为指定的回调函数名, 该回调函数可能会在如下情况下被调用:
+
+    * 调用 `ob_flush()` , 部分输出内容发送到客户端. 
+    * 调用 `ob_clean()` , 输出内容发送到客户端.
+    * 该请求终止时, 输出内容自动发送到客户端.
+
+.例子
+[source]
+---------------------------------------------------
+<?php
+
+function myCallback($buffer) {
+    file_put_contens($buffer, '/tmp/cache.html');
+}
+
+
+ob_start('myCallback');
+
+echo '<html><body></body></html>';
+
+ob_end_flush();
+
+----------------------------------------------------
+
+这里我们就基本了解了PHP生成HTML的原理, 接下来我们再来看Zend Framework这种具有比较复杂的系统如何来利用该原理实现HTML静态化的.
+
+== Zend_Cache_Backend_Static ==
+
+Zend Frameword 中内置的实现HTML静态化的组件就是 `Zend_Cache_Backend_Static` , 其属于 `Zend_Cache` 模块. 因此在了解它之前, 你必须了解 `Zend_Cache` 的原理和使用方法, 这里并不简介, 可以查看手册 http://framework.zend.com/manual/en/zend.cache.html[Zend_Cache] .
+
+`Zend_Cache_Backend_Static` 作为cache backend, 其必须和cache frontend中的 `Zend_Cache_Frontend_Capture` 配合使用.
+
+=== 内部实现 ===
+
+这里先讲解一下 `Zend_Cache_Backend_Static` 这个类, 在使用HTML静态化时可以不需要了解这个部分, Zend framework 提供了封住好的 `helper` 类, 不需要了解实现细节的可以跳过该小节.
+
+`Zend_Cache_Backend_Static` 的内部实现使用的其实只 `Core, File` 组合的一个 `innerCache` , 这里其实也很好理解, 因为它的功能就是将内容输出到文件, 所以就直接使用了 `Zend_Cache_Backend_File` 作为缓存到文件的功能, 当然这里并不需要去完全理解它, 除非你想要去自己实现 `innerCache` , 通过设置 `Zend_Cache_Backend_Static` 的 `tag_cache` 可以指定自己的 `innerCache` , 也可以调用 `setInnerCache()` 来完成.
+
+`Zend_Cache_Backend_Static` 基本上只有一个外部接口是最值得关注的, 就是 `save` 方法:
+`boolean save (string $data, string $id, [array $tags = array()], [int $specificLifetime = false])`
+
+.参数:
+    * `$data` , 是需要缓存的内容.
+    * `$id` , 是缓存的ID.
+
+例如调用:
+`$cache->save("bar : data to cache", bin2hex("/bar"));`
+
+将会把 "bar : data to cache" 作为文件缓存到 "public/bar.html" (默认设置情况下).
+
+这里也就了解了ZF将会如何去缓存输出到HTML了, 基本上就是通过截获 ob_start 储存起来的输出缓存, 然后把该缓存作为 `save` 中 `$data` 参数即可.
+
+== Zend_Controller_Action_Helper_Cache == 
+
+该 `action helper` 则是ZF为我们提供的一个封装好的帮助类, 使用它, 我们基本不需要做任何额外的操作就可以把整个action页缓存成html文件.
+
+既然是 `action helper` , 那么也就是说ZF提供 `Zend_Cache_Backend_Static` 这种缓存技术和其他的几个缓存组件并不一定, 它是属于 `Controller` 级别的缓存, 旨在将某几个 `action` 页面进行整体缓存, 使用方法也是在 `Controller_Action#init` 中进行使用的.
+
+这里先讲准备功能, 就是提供少数几个推荐提供给 `Zend_Cache_Backend_Static` 的参数:
+
+=== 步骤1: 配置文件 ===
+
+[source, ini]
+--------------------------------------------------------
+; Cache - static
+resources.cachemanager.page.backend.options.public_dir = APPLICATION_PATH "/../public/cached"
+resources.cachemanager.pagetag.backend.options.cache_dir = APPLICATION_PATH "/data/cache/tags"
+resources.frontController.params.disableOutputBuffering = true
+--------------------------------------------------------
+
+NOTE: 注意大小写, `cachemanager` 的 `m` 是小写, 而 `frontController` 的 `C` 是大写, 因为这个大小写的原因害我浪费了一天的时间.
+
+.public_dir
+一个是 `public_dir` , 默认的是 `../public` , 而有时我们需要把静态文件放置到统一的文件夹中, 如果指定了该文件夹, 并且该文件夹不存在, 就必须确保PHP有 `mkdir` 此文件夹的权限, 如果该文件夹你创建好了, 那么就必须确保PHP有读写的权限. 我的建议是把这个文件夹创建好, 然后给个比较大的权限 0777 之类的做测试用, 已排除是文件权限导致的静态化失败, 特别是linux系统.
+
+这个文件夹的制定很重要, 手册上推荐的是使用绝对路径(可以使用APPLICATION_PATH). 而且必须保存该文件夹可写, 而且创建HTML文件时就会失败.
+
+NOTE: 需要给linux系统的某些用户提醒下就是, PHP生成的HTML文件所有者会是 www-data 之类的apache用户, 而且缓存文件的权限可能只有所有者可读, 你可能会永远看都是空文件夹, 因为你可能没有权限查看该文件夹下的内容 可能ZF已经为你生成了缓存的HTML文件到缓存目录, 而你查看文件夹时会发现总是空, 这是权限问题, 如果你用su用户查看, 就会发现HTML文件已经在那里了.
+
+.disableOutputBuffering
+手册上也明确写出了如果要使用该静态缓存功能, 就必须将 `disableOutputBuffering` 设置为 `true` , 该选项的功能是关闭 frontController的 outputBufering, 因为默认情况下, 在frontController里面是会使用到 `ob_start` 的, 而这里我们需要关闭它, 使得我们可以在 `Zend_Cache_Backend_Static` 中来调用 `ob_start(callback)` 来缓存所有内容. 
+
+=== 步骤2: init() ===
+
+唯一需要做的就是在 `init()` 内部利用cache helper来制定哪几个action是需要被缓存的即可.
+
+[source]
+--------------------------------------------
+<?php
+
+class Node_IndexController extends Zend_Controller_Action
+{
+
+    public function init()
+    {
+        $this->_helper->cache(array('index', 'page'), array('allentries'));
+    }
+    
+    public function indexAction()
+    {
+        echo "index action cache";
+    }
+
+    public function pageAction() 
+    {
+        echo "page action cache";
+    }
+    
+}
+--------------------------------------------
+
+这时你访问 `/node/index/index` 就会发现你指定的缓存目录下会出现 `/node/index/index.html` 文件了. 比如你访问 `/node` 那么就会在缓存目录下直接生成 `/node.html` , 都是请求路径和缓存目录的路径一一对应的.
+
+NOTE: cache helper是支持 `Zend_Layout` 的, 生成的内容会包含layout.
+
+=== 步骤3: .htaccess ===
+
+修改 .htaccess 重写规则可以使得你的静态页面路径和不使用静态缓存的url一样, 比如在不使用缓存的情况下, 你的url是 `/node/get/` , 而使用缓存后, 假如缓存的HTML文件储存在 `public/cached/node/get.html` 下, 那么使用重写规则就可以使得用户继续使用 `/node/get/` 这个url来访问它, 此时用户访问的就不再是PHP页面, 而是被重写到了 `public/cached/node/get.html` 这个静态页面. url依然保持一致.
+
+
+重写规则可以参考手册上的 http://framework.zend.com/manual/en/zend.cache.backends.html#Zend_Cache_Backend_Static[Zend_Cache_Backend_Static] , 这里抄录一份:
+
+[source, ini]
+-------------------------------------------------------
+AddType application/rss+xml .xml
+AddType application/atom+xml .xml
+
+RewriteEngine On
+
+RewriteCond %{REQUEST_URI} feed/rss$
+RewriteCond %{DOCUMENT_ROOT}/cached/%{REQUEST_URI}.xml -f
+RewriteRule .* cached/%{REQUEST_URI}.xml [L,T=application/rss+xml]
+
+RewriteCond %{REQUEST_URI} feed/atom$
+RewriteCond %{DOCUMENT_ROOT}/cached/%{REQUEST_URI}.xml -f
+RewriteRule .* cached/%{REQUEST_URI}.xml [L,T=application/atom+xml]
+
+RewriteCond %{DOCUMENT_ROOT}/cached/index.html -f
+RewriteRule ^/*$ cached/index.html [L]
+RewriteCond %{DOCUMENT_ROOT}/cached/%{REQUEST_URI}.(html|xml|json|opml|svg) -f
+RewriteRule .* cached/%{REQUEST_URI}.%1 [L]
+
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [NC,L]
+
+RewriteRule ^.*$ index.php [NC,L]
+-------------------------------------------------------
+
+我测试出来是此重写规则在某些情况下是会失效的, 比如apache设置的virtualhost里会可能会出现问题(有些配置下), 原因是 `%{REQUEST_URI}` , 在有时候它会带前置的 `/` , 比如我请求 `http://www.eriji.com/node` , 按照重写规则,  `%{REQUEST_URI}` 应该被解析为 `node` , 而有些设置下它是会被设置为 `/node` 的, 多一个 `/` , 使得重写失败, apache将不会重写到我们的缓存文件, 如果你确认的ZF生成了HTML文件到文件系统, 但是因为重定向的问题导致缓存没有被读取, 可以开启 mod_rewrite 的 `rewriteLog` , 查看具体重定向日志, 检查重写规则是否命中.
+
+
+=== 内部实现 ===
+
+其实在了解了 `ob_start(callback)` 这个原理后, 我们自己都可以去实现HTML静态化,  但是在ZF里面, 唯一的问题是, 我们什么时候应该开启 `ob_start` , 而又到什么时候ZF才会把响应的内容(包括layout等)准备完毕, 也就是说什么时候使用 `ob_end_lean` ,特别是这个时机问题很重要, `clean` 早了可能缓存里面什么都没有, 也可能在使用了layout的情况下, 缓存里面只有action提供的view内容, 而没有 layout 部分.
+
+我们可以细致的研究下ZF的分发过程, 并且在其中观察 `Zend_Controller_Action_Helper_Cache` 是怎么来完成这个工作的, 从中可以了解到ZF的分发系统.
+
+首先我们从Controller_Action#init开始追踪, 因此我们在这一步里开始使用了cache helper. 
+
+    1. `Controller_Action#init()` , $this->_helper->cache(array('index'), ..
+    2. `HelperBroker`, 注册cache helper, Zend_Constroller_Action_Helper/Cache#direct
+    3. `Controller_Action#init()`, 执行init()剩余部分
+    4. `Controller_Dispatcher()`,  一系列分发
+    5. `Controller_Dispatcher_Standard#dispatch`, 如果 `disableOutputBuffering` 没有指定则会调用 `ob_start()` 我们使用静态缓存的时候就必须关闭它.
+    6. `Controller_Action#dispatch()`, action分发
+    7. `Controller_Action_Helper()`, 分发到注册的action helper
+    8. `Constoller_Action_Helper_Cache()#preDispatch`, 进入cache helper
+    9. `Zend_Cache_Frontend_Capture->start()`, 调用 [red]#ob_start(array(this, "_flush"))#
+    10. `Constoller_Front`, 调用所有插件的postDispatch, $this->_plugins->postDispatch($this->_request)
+    11. `Zend_Layout_Controller_Plugin_Layout` , layout插件对response->body进行处理, 目前的response->body中只有 action的view内容, 如果使用了layout, 这一步才会把layout的内容添加进来. 准确的说是把action view塞到layout里面去, 然后一起作为response->body.
+    12. `Zend_Cache_Frontend_Captrue#_flush($data)` , 得到response->body, 将其作为data参数, 调用 Zend_Cache_Backend_Static#save($data, $id, $tag)
+    13. `Zend_Cache_Backend_Static#save`, 调用 file_put_content 将响应内容输出到文件.
+    14. 请求结束.
+
+其中关键的就是 `9` 和 `12` , 都是 `Zend_Cache_Frontend_Captrue` 进行的操作, 使用的就是 `ob_start(callback)` 原理, 其中callback函数指定的是自己的 `_flush` 方法, 而在该方法里, 利用了 `Zend_Cache_Backend_Static#save` 来将缓存内容生成HTML文件. 
+
+
+UPDATE:
+将disableOutputBuffering设为true后，dispatcher就不会开启了 ob_start ,这也造成使用 Zend_View的json help之类时，因为已经向浏览器发送了 text/html　header, 而json helper会去发送一个 application/json　的header, 造成" headers already sent "错误，咱无解决原因，考虑到disableOutputBuffering只能在 bootstrap或application.ini中进行设置，所以也就是全局性的都会关闭dispatcher的ob_start, 唯一的解决办法是在bootstrap中去判断当前请求是否开启了HTML缓存，如果开启才设置disableOutputBuffering为true, 使得不会影响到其他不需要缓存的页面。

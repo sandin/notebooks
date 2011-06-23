@@ -1,0 +1,232 @@
+= Javascript 模块式开发 =
+:language: javascript
+
+众所周知关于Javascript中最基本的常识就是 *全局变量都是魔鬼* ,因此我们必须时刻注意不要随便去添加全局变量, 我的看法是你的程序一般只有一个全局变量做为你的命名空间即可, 然后在这个命名空间下, 你还可以进行模块式的开发. 这里我介绍一种关于模块开发的例子:
+
+我这里使用了过去设计的一种模块/命名空间机制, 可以作为例子来探讨一下, 首先把代码贴出来, 有个全局性的印象:
+
+我们这里使用 `window.Ediary` 作为应用程序统一使用全局性的唯一命名空间, 所有组件都必须储存在此命名空间下.
+
+.代码:
+[source]
+-----------------------------------------------
+(function($, win) {
+
+ // Application
+var Ediary = {
+    
+    debug: false,
+    
+    // default options
+    options: {
+        autoLoad : true             // auto load module immediately
+    },
+    
+    // modules list
+    modules: {},
+    
+    /**
+     * Registers a module
+     * 
+     * @param String module name 
+     * @param mixed module:
+     *          Object:   如果提供一个对象, 就被直接附加到命名空间下
+     *          Function: 如果提供一个函数, 则被会视作模块代码块, 该函数会在加载模块时执行.
+     * @param Object options:
+     *          autoLoad: 如果为false, 则模块中的代码不会被立即执行, 而是储存在modules list中
+     */
+    extend: function(name, object, options) {
+        if (typeof this.modules[name] !== 'undefined') {
+            console.error("Duplication Module, The " + name + " module is exsits.");
+            return;
+        } 
+        
+        var o = $.extend({}, this.options, options);
+        
+        switch (typeof object) {
+            case 'object': 
+                this[name] = object;
+                break;
+            case 'function':
+                if (o.autoLoad) {
+                    // load immediately
+                    this.loadModule(object, options);
+                } else {
+                    // Save it into this modules list
+                    this.modules[name] = {origin: object, load: false};
+                }
+                break;
+            default:
+                return; //do nothing
+        }
+    },
+    
+    /**
+     * Load a module
+     * 
+     * @param mixed module name 
+     *           Function: 如果提供一个匿名函数, 则被立即执行
+     *           String:   如果提供一个模块名称, 则会去调用之前注册时存储在模块列表中的模块代码 
+     * @param Object options
+     */
+    loadModule: function(module, options) {
+        var fn;
+        
+        if (typeof module == 'function') {
+            // Got a Function
+            fn = module;    
+        } else if (typeof module == 'string') {
+            // Got a Module Name
+            var mod = this.modules[module];
+            
+            if (typeof mod !== 'undefined') {
+                fn = mod['origin'];
+                mod.load = true;
+            } else {
+                console.warn("The Module %s is not exsits.", module);
+                return;
+            }
+        }
+        
+        fn.call(this, this, options); // inside Function 'this' point Ediary
+    },
+    
+    destroy: function() {
+    }
+};
+win.Ediary = Ediary;
+ 
+})(jQuery, window);
+------------------------------------------------------
+
+.新建一个模块
+
+我们可以先来看看如何新建模块先, 这是一个标准模块的例子:
+[source]
+------------------------------------------
+Ediary.extend('moduleName', function(E){
+
+    var YourModule = {
+        name: 'lds',
+        init: function() {
+        },
+        getName: function() {
+        }
+    };
+
+    // 在命名空间中注册
+    E.YourModule = YourModule;
+
+    
+}, options);
+------------------------------------------
+
+NOTE: 在这个匿名函数内部 `this` 指向的 `Ediary` 这个对象, 但不建议使用 `this` 关键词来引用 `Ediary` 对象, 而应该用 `E` 来引用.
+
+NOTE: 如果扩展模块的moduleName已经存在, 将会抛出错误.
+
+
+.延迟加载模块
+对于有些模块, 需要使用外部库, 或需要等待DOM解析完毕等情况,需要延迟加载模块,而非注册模块时立即加载,则可以使用 `autoLoad` 参数来实现:
+`options: {autoLoad: false}`
+
+例子:
+[source]
+-------------------------------------------
+Ediary.extend('moduleName', function(E) {
+    // your module code
+}, {autoLoad: false});
+-------------------------------------------
+
+这样进行注册的模块不会立即被加载到命名空间中(此模块的匿名函数不会被立即执行), 而是被存储到一个模块列表中去 ( `Ediary.modules = []` ), 你模块中的代码只有在手动的加载它时才会被执行, 因此得到了延时加载的目的:
+
+.手动加载模块:
+
+[source]
+-------------------------------------------
+Ediary.loadModule('moduleName');
+-------------------------------------------
+
+此时应用程序将会执行储存在modules list中的注册此模块时提供的匿名函数.
+
+NOTE: 如果加载一个尚未注册过的模块,会不被允许并抛出提示.
+
+
+
+.拓展分析
+
+使用这样一个简单的结构对你的代码进行模块式的分割, 可以得到你的代码不断的可以扩展和复用, 而完全不用担心会影响其他模块,  它比只使用一个匿名函数包裹着你的代码来避免破坏全局变量的好处就是, 你可以在外部去访问他们. 比如我们常常是这样来写一段代码的:
+
+[source]
+-------------------------------------
+(function() {
+    var Class = {
+        init: function() {}
+    };
+})();
+-------------------------------------
+
+这样是一个很好的习惯, 但导致了你在外部后将会完全不能去访问这个匿名函数中定义的内容了, 这样是完全的隔离, 我们使用一个唯一的全局变量来作为两个世界之间的桥梁, 这里在任何都去访问他们就比较灵活了.
+
+我的看法是把一个模块看作一个命名空间, 你再里面可以做任何的事情, 处理任何的逻辑, 然后丢出一个访问接口即可, 这样外部也可以使用你模块中的内容, 也不用担心不影响别人, 这应该是一种习惯.
+
+最后就贴出一个使用该结构的模块, 该模块设计是用来给每个模块提供 `i18n` 的多语言支持:
+
+[source]
+----------------------------------------------------
+// i18n module
+Ediary.extend('i18n', function(E) {
+    var i18n = {
+
+        languages: {},
+        
+        /**
+         * @param String key language package name
+         * @param Object value language package object, like { NAME : '中文翻译'}
+         */
+        extend: function(key, value) {
+            if (typeof this.languages[key] == 'undefined') {
+                this.languages[key] = value;
+            }
+            return value;
+        },
+        
+        /**
+         *@param String key language package name
+         */
+        get: function(key) {
+            if (typeof this.languages[key] !== 'undefined') {
+                return this.languages[key];
+            }
+        }
+    };
+    E.i18n = i18n;
+});
+----------------------------------------------------
+
+.这样就可以在模块中定义自己的语言:
+[source]
+----------------------------------------------------
+E.i18n.extend('Editor', {
+    SAVE_SUCCESS : '保存成功.',
+    SAVE_FAIL : '保存失败.',
+    SAVING : '正在保存...',
+    JSON_PARSE_ERROR : '无法解析服务器返回的数据',
+    NOT_SAVED: '日记没有保存, 确定离开?',
+    GETING_DIARYS : '正在获取日记.',
+    SUCCESS: '成功'
+};
+----------------------------------------------------
+
+
+当你需要使用的直接:
+[source]
+-----------------------------------------
+var i18n = E.i18n.get('Editor');
+
+alert(i18n.SAVE_SUCCESS);
+-----------------------------------------
+
+.结束语
+
+你可以使用这个结构, 也可以不使用, 但是使用 *唯一* 的全局变量作为 *命名空间* 的理念是每个人都应该拥有的, 永远不去破坏全局环境是没有 `namespace` 语言使用者的基本准则, 如果你不需要延时载入模块等复杂功能,  也可以只使用这种概念来书写自己的代码. 如果每个人都以这样的一种分功能的模块式来书写Javascript代码, 最后Javascript也会出现更多的可复用的第三方库资源. 到时就不需要每个人都重复在那里造轮子玩了.

@@ -1,0 +1,59 @@
+== javascript include ==
+:language: javascript
+
+Javascript 没有 `include` 语句有时挺讨厌, 特别是脚本和脚本之间存在依存的关系, 你根本就不能动态的去控制加载脚本, 一般来说最简单的 `include` 基本就是这样的, 当然我们这个使用了 `jQuery` 来进行请求脚本.
+
+.代码
+[source]
+----------------------------------------------
+  include: function (jsurl) {
+        if (jsurl == null || typeof(jsurl) != 'string') return;
+        var js = document.createElement('script');
+        js.type = 'text/javascript';
+        js.charset = 'utf-8';
+        js.src = jsurl;
+        $.ajaxSetup({ cache : true });
+        $('head').append(js);
+        //$.getScript(jsurl);
+ }
+----------------------------------------------
+
+.基本用法
+需要注意的是该函数其实在发送GET请求的事情是 jQuery.ajax 的 `getScript()` 来处理的, 但是在GET后的处理和 `$.getScript()` 不同, 因此导致使用方法会不一样, `getScript()` 一般需要把有依赖的函数写到它的回调函数中去, 如:
+
+[source]
+--------------------------------
+$.getScript('some.js', function() {
+    // 做写依赖 some.js文件的事情.
+});
+--------------------------------
+
+而我们这里的 `include` 不需要这么写, 而是直接:
+[source]
+----------------------------------
+include('some.js');
+
+// 这里可以直接写依赖 some.js 文件中定义的函数
+----------------------------------
+
+.开启缓存
+另外就是关于文件缓存, 默认情况下 `$.getScript` 是会在 url 后面加上一个时间戳, 使得在第二次请求的时候不让浏览器去读取缓存文件, 如果我们 `getScript("some.js")` , 最后在请求的时候会变成 GET `some.js?_23432434534235` 之类的, 这是一种强制不缓存的策略, 在开发阶段是比较好的, 但到了生产阶段, 会导致用户的浏览器每次都不缓存我们的js脚本, 这对效率是很大的影响, 我们应该自己在js脚本后面自己加上版本戳, 比如 `some.js?v=1` , 而不是使用每次都会变的时间戳, 所以需要使用:
+[source]
+----------------------------
+$.ajaxSetup({ cache : true });
+----------------------------
+这样就会关闭jQuery自动在url后面加上时间戳的特性.
+
+.requireJs
+如果你的脚本大量的存在互相依赖关系, 而又需要动态的决定加载哪些脚本, 那么我推荐的是使用 http://requirejs.org/docs/start.html[requirejs] .
+
+它的基本用法是:
+[source]
+------------------------------------------------
+require(["some/module", "a.js", "b.js"], function(someModule) {
+    // do something
+});
+------------------------------------------------
+
+它有一个要求就是你的前端js是作为模块式的开发, 在前端逻辑比较复杂的话, 使用模块式来进行前端开发应该是种不错的选择, 而关于JS的模块式开发在今后文章再专门谈, 这里只简单介绍一下, 如果对这个方面感兴趣的可以到http://requirejs.org/docs/start.html[requireJs官网]去看看.
+

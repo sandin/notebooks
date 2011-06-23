@@ -3,51 +3,52 @@ lds <lds2012@gmail.com>
 {localdate}
 
 
-.��������
+.遗留问题
 *****************************************
-      -	��4�� �Թ�
+      -	第4章 略过
       p64
 *****************************************
 
-== ��֧ ==
+== 分支 ==
 
-.��������:
-	- blob �ļ�
-	- tree Ŀ¼��
+.数据类型:
+	- blob 文件
+	- tree 目录树
 	- commit 
 
-.commit����:
+.commit包含:
 	- tree
-	- parent ָ����һ�ε�commit����
+	- parent 指向上一次的commit对象
 	- author
 	- committer
 
-branch��֧::
-	�����Ͻ�����ָ�� `commit` ����Ŀɱ�ָ��.
+branch分支::
+	本质上仅仅是指向 `commit` 对象的可变指针.
 
-`master` ����ָ�����һ�� `commit` ����.
+`master` 总是指向最后一个 `commit` 对象.
 
-`HEAD` ָ��������ڹ����еı��ط�֧��ָ��.����Ĭ�ϵ�ָ�� `master` ��֧.
+`HEAD` 指向的你正在工作中的本地分支的指针.例如默认的指向 `master` 分支.
 
-.�½���֧
+.新建分支
 `git branch testing`
 
-NOTE: �½���֧���������ת�����µķ�֧.
+NOTE: 新建分支命令并不帮你转换到新的分支.
 
-.ת����֧
+.转换分支
 `git checkout testing`
 
-������ʹ `HEAD` ָ�� `testing` ��֧.
+此命令使 `HEAD` 指向 `testing` 分支.
 
 NOTE:
-ת����֧��,����Ŀ¼�е��������ݶ���ָ�Ϊcheckout��֧��ָ����Ǹ�commit�Ŀ���.
+转换分支后,工作目录中的所有内容都会恢复为checkout分支所指向的那个commit的快照.
 
-.�ڷ�֧���ύ
-�ڷ�֧���ύ�ᴴ���µ�commit����,���Ҹ÷�ָ֧��ǰcommit����,�����Ⲣ����Ӱ��������֧��ָ��,����masterָ��ָ��Ŀ��ܻ���һ���ɵ�commit����.
+.在分支中提交
+在分支中提交会创建新的commit对象,并且该分支指向当前commit对象,但是这并不会影响其他分支的指针,例如master指针指向的可能还是一个旧的commit对象.
 
-`git checkout -b iss54` ��ͬ��
+`git checkout -b iss54` 等同于
 `git branch iss54; git checkout iss54`
 
-.�ܺ�
-��Զ��Ҫ�ܺ�һ���Ѿ����͵������������ϵ�commit.
+.衍和
+永远不要衍和一个已经推送到公共服务器上的commit.
+
 
